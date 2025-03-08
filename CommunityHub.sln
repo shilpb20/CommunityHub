@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommunityHub.UnitTests", "t
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommunityHub.IntegrationTests", "tests\CommunityHub.IntegrationTests\CommunityHub.IntegrationTests.csproj", "{78524C66-84D5-48E1-A54C-7CE1C7DE3692}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommunityHub.Tests.Core", "tests\CommunityHub.Tests.Core\CommunityHub.Tests.Core\CommunityHub.Tests.Core.csproj", "{7EC4CA59-1B4D-40F1-BC0A-D02A24F95035}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +51,10 @@ Global
 		{78524C66-84D5-48E1-A54C-7CE1C7DE3692}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{78524C66-84D5-48E1-A54C-7CE1C7DE3692}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{78524C66-84D5-48E1-A54C-7CE1C7DE3692}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7EC4CA59-1B4D-40F1-BC0A-D02A24F95035}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7EC4CA59-1B4D-40F1-BC0A-D02A24F95035}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7EC4CA59-1B4D-40F1-BC0A-D02A24F95035}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7EC4CA59-1B4D-40F1-BC0A-D02A24F95035}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -60,5 +66,6 @@ Global
 		{51EBCD68-2D91-422F-88DA-50FF5FA63356} = {602C3854-4D92-4690-89B6-E1C7CB0B2144}
 		{6AEF226C-7059-4D39-B3E1-ED2F7F7F0249} = {8EB5C17D-544C-4AE9-9E87-2A49AFFDB5D5}
 		{78524C66-84D5-48E1-A54C-7CE1C7DE3692} = {8EB5C17D-544C-4AE9-9E87-2A49AFFDB5D5}
+		{7EC4CA59-1B4D-40F1-BC0A-D02A24F95035} = {8EB5C17D-544C-4AE9-9E87-2A49AFFDB5D5}
 	EndGlobalSection
 EndGlobal
