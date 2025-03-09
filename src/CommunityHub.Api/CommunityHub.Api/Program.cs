@@ -1,6 +1,6 @@
 using AppComponents.Repository.EFCore;
-using CommunityHub.Api.Data;
-using CommunityHub.Api.Services;
+using CommunityHub.Infrastructure.Data;
+using CommunityHub.Infrastructure.Services;
 using CommunityHub.Core.Models;
 using Microsoft.EntityFrameworkCore;
 

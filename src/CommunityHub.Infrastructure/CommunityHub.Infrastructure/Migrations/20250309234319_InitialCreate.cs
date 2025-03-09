@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace CommunityHub.Api.Migrations
+namespace CommunityHub.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class initdatabase : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

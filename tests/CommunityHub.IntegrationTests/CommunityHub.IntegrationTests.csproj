@@ -22,6 +22,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\CommunityHub.Api\CommunityHub.Api\CommunityHub.Api.csproj" />
     <ProjectReference Include="..\..\src\CommunityHub.Core\CommunityHub.Core\CommunityHub.Core.csproj" />
+    <ProjectReference Include="..\..\src\CommunityHub.Infrastructure\CommunityHub.Infrastructure\CommunityHub.Infrastructure.csproj" />
     <ProjectReference Include="..\CommunityHub.Tests.Core\CommunityHub.Tests.Core\CommunityHub.Tests.Core.csproj" />
   </ItemGroup>
 

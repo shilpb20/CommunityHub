@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using CommunityHub.Api.Services;
+using CommunityHub.Infrastructure.Services;
 using CommunityHub.Core.Dtos;
 using CommunityHub.Core.Dtos.RegistrationData;
 using CommunityHub.Core.Models;
