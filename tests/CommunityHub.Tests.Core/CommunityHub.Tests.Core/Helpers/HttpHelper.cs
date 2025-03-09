@@ -12,18 +12,24 @@ namespace CommunityHub.Tests.Core.Helpers
 {
     public class HttpHelper
     {
-        public static HttpRequestMessage GetHttpPostRequest<T>(string url, T data)
+        public static HttpRequestMessage GetHttpPostRequest<T>(string url, T? data)
         {
             HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Post, url);
-            if (data != null)
+
+            var json = data != null ? JsonConvert.SerializeObject(data) : null;
+            if(json != null)
             {
-                var json = JsonConvert.SerializeObject(data);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
                 requestMessage.Content = content;
+            }
+            else
+            {
+                requestMessage.Content = null;  
             }
 
             return requestMessage;
         }
+
 
 
         public static async Task<T?> GetHttpResponseObject<T>(HttpResponseMessage response)
