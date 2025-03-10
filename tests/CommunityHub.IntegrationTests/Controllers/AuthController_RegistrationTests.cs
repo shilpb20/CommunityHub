@@ -1,23 +1,11 @@
 ﻿using AutoMapper;
-using CommunityHub.Infrastructure.Services;
 using CommunityHub.Core.Dtos;
-using CommunityHub.Core.Dtos.RegistrationData;
+using CommunityHub.Core.Helpers;
 using CommunityHub.Core.Models;
-using CommunityHub.Tests.Core.Helpers;
-using Microsoft.AspNetCore.Hosting;
+using CommunityHub.Infrastructure.Services;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Razor.TagHelpers;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.Extensions.DependencyInjection;
-using Moq;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CommunityHub.IntegrationTests.Controllers
 {
