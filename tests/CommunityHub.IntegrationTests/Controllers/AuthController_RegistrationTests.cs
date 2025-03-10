@@ -48,6 +48,8 @@ namespace CommunityHub.IntegrationTests.Controllers
             }
         }
 
+        #region add-registration-request
+
         [Fact]
         public async Task RegisterUser_ReturnsBadRequest_WhenNullDataIsSent()
         {
@@ -60,10 +62,41 @@ namespace CommunityHub.IntegrationTests.Controllers
         }
 
         [Fact]
-        public async Task RegisterUSer_ReturnsCreateAt_WhenValidDataIsSent()
+        public async Task RegisterUser_ReturnsCreateAt_WhenValidDataIsSent()
+        {
+            RegistrationDataCreateDto registrationDataCreateDto = GetRegistrationDataCreateDto();
+
+            var registrationData = _mapper.Map<RegistrationData>(registrationDataCreateDto);
+            var registrationRequest = new RegistrationRequest()
+            {
+                RegistrationData = JsonConvert.SerializeObject(registrationData),
+                CreatedAt = DateTime.UtcNow,
+                RegistrationStatus = "Pending",
+                ReviewedAt = null,
+                Review = null
+            };
+
+
+            //Act
+            var request = HttpHelper.GetHttpPostRequest<RegistrationDataCreateDto>(_url, registrationDataCreateDto);
+            var response = await _httpClient.SendAsync(request);
+            var result = await HttpHelper.GetHttpResponseObject<RegistrationRequestDto>(response);
+
+            //Assert
+            Assert.Equivalent(StatusCodes.Status201Created, response.StatusCode);
+            Assert.NotNull(result);
+
+            Assert.Equivalent(registrationData, result.RegistrationData);
+            Assert.Equivalent("Pending", result.RegistrationStatus);
+            Assert.InRange(DateTime.UtcNow, DateTime.UtcNow.AddMilliseconds(-100), DateTime.UtcNow);
+            Assert.Null(result.ReviewedAt);
+            Assert.Null(result.Review);
+        }
+
+        private static RegistrationDataCreateDto GetRegistrationDataCreateDto()
         {
             //Arrange
-            var registrationDataCreateDto = new RegistrationDataCreateDto()
+            return new RegistrationDataCreateDto()
             {
                 UserDetails = new UserDetailsCreateDto()
                 {
@@ -88,33 +121,58 @@ namespace CommunityHub.IntegrationTests.Controllers
                 },
                 Children = new List<string>() { "Anna", "Benny", "Cairo" }
             };
+        }
 
+        #endregion
 
-            var registrationData = _mapper.Map<RegistrationData>(registrationDataCreateDto);
-            var registrationRequest = new RegistrationRequest()
-            {
-                RegistrationData = JsonConvert.SerializeObject(registrationData),
-                CreatedAt = DateTime.UtcNow,
-                RegistrationStatus = "Pending",
-                ReviewedAt = null,
-                Review = null
-            };
+        #region get-registration-request
 
+        [Fact]
+        public async Task GetRegistrationRequest_ReturnsNotFound_WhenDataIsEmpty()
+        {
+            //Act
+            var request = HttpHelper.GetHttpGetRequestById(_url, 1);
+            var response = await _httpClient.SendAsync(request);
+
+            //Assert
+            Assert.Equivalent(StatusCodes.Status404NotFound, response.StatusCode);
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(-1)]
+        public async Task GetRegistrationRequest_ReturnsBadRequest_WhenNonPositiveIdIsSent(int id)
+        {
+            //Act
+            var request = HttpHelper.GetHttpGetRequestById(_url, -1);
+            var response = await _httpClient.SendAsync(request);
+
+            //Assert
+            Assert.Equivalent(StatusCodes.Status400BadRequest, response.StatusCode);
+        }
+
+        [Fact]
+        public async Task GetRegistrationRequest_ReturnsMatchingResult_WhenValidIdIsSent()
+        {
+            //Arrange
+            var registrationRequest = await AddRegistrationRequest();
 
             //Act
-            var request = HttpHelper.GetHttpPostRequest<RegistrationDataCreateDto>(_url, registrationDataCreateDto);
+            var request = HttpHelper.GetHttpGetRequestById(_url, registrationRequest.Id);
             var response = await _httpClient.SendAsync(request);
             var result = await HttpHelper.GetHttpResponseObject<RegistrationRequestDto>(response);
 
             //Assert
             Assert.Equivalent(StatusCodes.Status200OK, response.StatusCode);
-            Assert.NotNull(result);
+            Assert.Equivalent(registrationRequest, result);
+        }
 
-            Assert.Equivalent(registrationData, result.RegistrationData);
-            Assert.Equivalent("Pending", result.RegistrationStatus);
-            Assert.InRange(DateTime.UtcNow, DateTime.UtcNow.AddMilliseconds(-100), DateTime.UtcNow);
-            Assert.Null(result.ReviewedAt);
-            Assert.Null(result.Review);
+        #endregion
+
+        private async Task<RegistrationRequestDto> AddRegistrationRequest()
+        {
+            RegistrationDataCreateDto registrationData = GetRegistrationDataCreateDto();
+            return await HttpHelper.SendHttpPostRequest<RegistrationDataCreateDto, RegistrationRequestDto>(_httpClient, _url, registrationData);
         }
     }
 }

@@ -7,10 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Data\ApplicationDbContext.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="AppComponents.Repository" Version="1.1.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.2" />
@@ -22,10 +18,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\CommunityHub.Core\CommunityHub.Core\CommunityHub.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Data\" />
   </ItemGroup>
 
 </Project>

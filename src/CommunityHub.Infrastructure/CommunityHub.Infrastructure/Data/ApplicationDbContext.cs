@@ -7,6 +7,7 @@ namespace CommunityHub.Infrastructure.Data
     {
         public DbSet<RegistrationRequest> RegistrationRequests { get; set; }
 
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
 

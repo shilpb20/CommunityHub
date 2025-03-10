@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace CommunityHub.Api.Controllers
 {
     [ApiController]
-    [Route("api/")]
+    [Route("")]
     public class AuthController : ControllerBase
     {
         private readonly ILogger<AuthController> _logger;
@@ -24,9 +24,8 @@ namespace CommunityHub.Api.Controllers
             _registrationService = registrationService;
         }
 
-        //TODO: Status code update
         //TODO: Admin mail trigger after creation
-        [Route("register")]
+        [Route("api/register")]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(RegistrationRequestDto))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -44,17 +43,38 @@ namespace CommunityHub.Api.Controllers
                 var registrationRequest = await _registrationService.CreateRequestAsync(registrationData);
                 var registrationRequestDto = _mapper.Map<RegistrationRequestDto>(registrationRequest);
 
-                return Ok(registrationRequestDto);
-
-                //return CreatedAtRoute("GetRegistrationRequest", new { Id = registrationRequestDto.Id }, registrationRequestDto);
+                return CreatedAtRoute("GetRegistrationRequest", new { Id = registrationRequestDto.Id }, registrationRequestDto);
             }
             catch (Exception ex)
             {
                 _logger.LogError("An error occurred while processing Add Registration Request");
-                _logger.LogDebug($"Add Registration Request error - {ex.Message}");
+                _logger.LogError($"Add Registration Request error - {ex.Message}");
 
                 return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing the request.");
             }
         }
+
+        [Route("api/register/{id:int}")]
+        [HttpGet(Name = "GetRegistrationRequest")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(RegistrationRequestDto))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<RegistrationRequestDto>> GetRegistrationRequest(int id)
+        {
+            if (id <= 0)
+            {
+                return BadRequest("Id must be a positive number");
+            }
+
+            var result = await _registrationService.GetRequestAsync(id);
+            if (result == null)
+            {
+                return NotFound($"Request with Id - {id} is not found.");
+            }
+
+            var resultDto = _mapper.Map<RegistrationRequestDto>(result);
+            return Ok(resultDto);
+        }
+
     }
 }

@@ -47,5 +47,10 @@ namespace CommunityHub.Infrastructure.Services
                 throw;
             }        
         }
+
+        public async Task<RegistrationRequest> GetRequestAsync(int id)
+        {
+            return await _repository.GetAsync(x => x.Id == id);
+        }
     }
 }
