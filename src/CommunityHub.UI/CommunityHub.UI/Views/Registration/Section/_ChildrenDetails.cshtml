@@ -17,41 +17,26 @@
                 </div>
             </div>
 
-@*             <!-- Child Input Panel (Initially Hidden) -->
-            <div id="childInputSection" style="display: none;">
-                <div class="form-group row mb-2">
-                    <!-- Child's Name label above the textbox -->
-                    <label for="childNameInput" class="col-md-4 col-form-label">Child's Name</label>
-                    <div class="col-md-8">
-                        <input type="text" class="form-control" id="childNameInput" placeholder="Enter child's name" />
-                    </div>
-                </div>
-
-                <!-- Save and Cancel buttons aligned horizontally -->
-                <div class="form-group row mb-2">
-                    <div class="col-md-12 d-flex justify-content-end">
-                        <button type="button" class="btn btn-success me-2 col-md-3" id="btnSaveChild">Save</button>
-                        <button type="button" class="btn btn-secondary me-2 col-md-3" id="btnCancelChild">Cancel</button>
-                    </div>
-                </div>
-            </div> *@
-
             <div id="childInputSection" style="display: none;">
                 <div class="form-group row mb-2 d-flex align-items-start">
                     <label for="childNameInput" class="col-md-2 col-form-label">Child's Name</label>
-                    <div class="col-md-3">
+
+                    <!-- Make the input field longer by using col-md-6 -->
+                    <div class="col-md-6">
                         <input type="text" class="form-control" id="childNameInput" placeholder="Enter child's name" />
                     </div>
 
-                    <div class="col-md-3 d-flex justify-content-end">
+                    <!-- Align buttons properly, and adjust width if needed -->
+                    <div class="col-md-4 d-flex justify-content-end">
                         <button type="button" class="btn btn-success me-2" id="btnSaveChild">Save</button>
                         <button type="button" class="btn btn-secondary me-2" id="btnCancelChild">Cancel</button>
                     </div>
                 </div>
+            </div>
 
-                <div id="duplicateErrorMessage" class="alert alert-danger" style="display: none;">
-                    Child name has already been added!.
-                </div>
+            <div id="duplicateErrorMessage" class="alert alert-danger" style="display: none;">
+                Child name has already been added!
+            </div>
 
             <!-- List of Children -->
             <div id="childrenListSection">
