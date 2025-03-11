@@ -42,7 +42,7 @@ namespace CommunityHub.IntegrationTests.Controllers
         public async Task RegisterUser_ReturnsBadRequest_WhenNullDataIsSent()
         {
             //Act
-            var request = HttpHelper.GetHttpPostRequest<object>(_url, null);
+            var request = HttpHelper.GetHttpPostRequest<RegistrationRequestDto>(_url, null);
             var response = await _httpClient.SendAsync(request);
 
             //Assert
@@ -160,7 +160,7 @@ namespace CommunityHub.IntegrationTests.Controllers
         private async Task<RegistrationRequestDto> AddRegistrationRequest()
         {
             RegistrationDataCreateDto registrationData = GetRegistrationDataCreateDto();
-            return await HttpHelper.SendHttpPostRequest<RegistrationDataCreateDto, RegistrationRequestDto>(_httpClient, _url, registrationData);
+            return await HttpSendRequestHelper.SendPostRequest<RegistrationDataCreateDto, RegistrationRequestDto>(_httpClient, _url, registrationData);
         }
     }
 }

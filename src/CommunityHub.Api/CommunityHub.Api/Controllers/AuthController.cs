@@ -4,13 +4,12 @@ using CommunityHub.Core.Dtos;
 using CommunityHub.Core.Dtos.RegistrationData;
 using CommunityHub.Core.Helpers;
 using CommunityHub.Core.Models;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CommunityHub.Api.Controllers
 {
     [ApiController]
-    [Route("")]
+    [Route("api/register")]
     public class AuthController : ControllerBase
     {
         private readonly ILogger<AuthController> _logger;
@@ -24,26 +23,24 @@ namespace CommunityHub.Api.Controllers
             _registrationService = registrationService;
         }
 
-        //TODO: Admin mail trigger after creation
-        [Route("api/register")]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(RegistrationRequestDto))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<RegistrationRequestDto>> AddRegistrationRequest([FromBody] RegistrationDataCreateDto? registrationDataDto)
+        public async Task<ActionResult<RegistrationRequestDto>> AddRegistrationRequest([FromBody] RegistrationDataCreateDto registrationDataDto)
         {
+            if (registrationDataDto == null)
+            {
+                return BadRequest("Registration data must not be null");
+            }
+
             try
             {
-                if (registrationDataDto == null)
-                {
-                    return BadRequest("Registration data must not be null");
-                }
-
                 var registrationData = _mapper.Map<RegistrationData>(registrationDataDto);
                 var registrationRequest = await _registrationService.CreateRequestAsync(registrationData);
                 var registrationRequestDto = _mapper.Map<RegistrationRequestDto>(registrationRequest);
 
-                return CreatedAtRoute("GetRegistrationRequest", new { Id = registrationRequestDto.Id }, registrationRequestDto);
+                return CreatedAtRoute("GetRegistrationRequest", new { id = registrationRequestDto.Id }, registrationRequestDto);
             }
             catch (Exception ex)
             {
@@ -54,9 +51,8 @@ namespace CommunityHub.Api.Controllers
             }
         }
 
-        [Route("api/register/{id:int}")]
-        [HttpGet(Name = "GetRegistrationRequest")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(RegistrationRequestDto))]
+        [HttpGet("{id:int}", Name = "GetRegistrationRequest")]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(RegistrationRequestDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<RegistrationRequestDto>> GetRegistrationRequest(int id)
@@ -75,6 +71,5 @@ namespace CommunityHub.Api.Controllers
             var resultDto = _mapper.Map<RegistrationRequestDto>(result);
             return Ok(resultDto);
         }
-
     }
 }

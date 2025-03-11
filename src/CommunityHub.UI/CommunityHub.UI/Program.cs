@@ -1,6 +1,12 @@
+using CommunityHub.UI;
+using CommunityHub.UI.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add services to the container
+builder.Services.Configure<ApiSettings>(builder.Configuration.GetSection("ApiSettings"));
+builder.Services.AddHttpClient<IBaseService, BaseService>();
+
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();

@@ -1,0 +1,69 @@
+﻿@using CommunityHub.Core.Dtos
+@model CommunityHub.Core.Dtos.RegistrationDataCreateDto
+
+@section Scripts
+{
+    <script src="~/js/registrationForm.js"></script>
+}
+
+@{
+    ViewData["Title"] = "Registration Form";
+
+    var userDetails = Model?.UserDetails;
+}
+
+<div class="container mt-5">
+    <h2>@ViewData["Title"]</h2>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            <strong>Please fix the following errors:</strong>
+            <ul class="text-danger">
+                @foreach (var entry in ViewData.ModelState)
+                {
+                    foreach (var error in entry.Value.Errors)
+                    {
+                        string errorMessage = error.ErrorMessage;
+                        if (entry.Key.Contains("Spouse"))
+                        {
+                            errorMessage = "Spouse: " + errorMessage;
+                        }
+                        else if (entry.Key.Contains("UserDetails"))
+                        {
+                            errorMessage = "User: " + errorMessage;
+                        }
+
+                        <li>@errorMessage</li>
+                    }
+                }
+            </ul>
+        </div>
+    }
+
+    <form id="registrationForm" method="post" action="@Url.Action("Add", "Registration")">
+        <!-- Row for User and Spouse Details (side by side) -->
+        <div class="row mt-4">
+            @await Html.PartialAsync("Section/_UserDetails", Model)
+            @await Html.PartialAsync("Section/_SpouseDetails", Model)
+            @await Html.PartialAsync("Section/_ChildrenDetails", Model)
+        </div>
+
+        <!-- Row for Register and Cancel Buttons -->
+        <div class="col-md-6">
+            <div class="row mt-4">
+                <div class="col-md-12 d-flex justify-content-end">
+                    <button type="submit" class="btn btn-success me-2 col-md-3">Register</button>
+                    <button type="button" class="btn btn-secondary me-2 col-md-3" onclick="window.location.href='@Url.Action("Index", "Registration")';">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
