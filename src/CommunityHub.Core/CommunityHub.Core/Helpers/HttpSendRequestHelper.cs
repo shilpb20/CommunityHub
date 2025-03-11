@@ -25,14 +25,14 @@
                 if (!response.IsSuccessStatusCode)
                 {
                     var errorContent = await response.Content.ReadAsStringAsync();
-                    throw new Exception($"HTTP request failed with status code {response.StatusCode}. Error: {errorContent}");
+                    throw new HttpRequestException($"HTTP request failed with status code {response.StatusCode}. Error: {errorContent}");
                 }
 
                 return await HttpHelper.GetHttpResponseObject<V>(response);
             }
             catch (HttpRequestException httpEx)
             {
-                throw new Exception("Network error occurred while sending the POST request.", httpEx);
+                throw new Exception("An error occurred while sending the POST request.", httpEx);
             }
             catch (Exception ex)
             {

@@ -18,6 +18,7 @@ namespace CommunityHub.Core.Dtos
 
         [Required]
         public string HomeTown { get; set; }
+
         public string? HouseName { get; set; }
     }
 }
