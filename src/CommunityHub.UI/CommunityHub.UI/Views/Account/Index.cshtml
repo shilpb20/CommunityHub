@@ -1,0 +1,79 @@
+﻿@{
+    ViewData["Title"] = "Login - CommunityHub.UI";
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div id="successMessage" class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+@section Scripts
+{
+    <script src="~/js/registrationForm.js"></script>
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-4">
+                <!-- Logo and Heading -->
+                <div class="text-center mb-4">
+                    <img src="~/images/logo.png" alt="CommunityHub Logo" class="img-fluid mb-3" style="max-width: 150px;" />
+                    <h3>Welcome to CommunityHub</h3>
+                    <p class="text-muted">Connect with your community easily. Log in to access your account and start exploring!</p>
+                </div>
+
+                <!-- Login Form -->
+                <div class="card">
+                    <div class="card-header text-center">
+                        <h4>Login</h4>
+                    </div>
+                    <div class="card-body">
+                        <form id="loginForm" method="post" action="@Url.Action("index", "account")">
+                            <!-- Username -->
+                            <div class="form-group mb-3">
+                                <label for="Username">Username</label>
+                                <input type="text" class="form-control" id="Username" name="Username" placeholder="Enter Username" required />
+                            </div>
+
+                            <!-- Password -->
+                            <div class="form-group mb-3">
+                                <label for="Password">Password</label>
+                                <input type="password" class="form-control" id="Password" name="Password" placeholder="Enter Password" required />
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div class="form-group text-center">
+                                <button type="submit" class="btn btn-primary w-100">Login</button>
+                            </div>
+                        </form>
+
+                        <!-- Links for Forgot Password and Register -->
+                        <div class="d-flex justify-content-between mt-3">
+                            <a href="@Url.Action("forgot-password", "account")" class="text-secondary">Forgot Password?</a>
+                            <a href="@Url.Action("register", "account")" class="text-secondary">Register</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+</body>
+</html>

@@ -9,14 +9,14 @@ using Microsoft.AspNetCore.Mvc;
 namespace CommunityHub.Api.Controllers
 {
     [ApiController]
-    [Route("api/register")]
-    public class AuthController : ControllerBase
+    [Route("api/account")]
+    public class AccountController : ControllerBase
     {
-        private readonly ILogger<AuthController> _logger;
+        private readonly ILogger<AccountController> _logger;
         private readonly IMapper _mapper;
         private readonly IRegistrationService _registrationService;
 
-        public AuthController(IRegistrationService registrationService, ILogger<AuthController> logger, IMapper mapper)
+        public AccountController(IRegistrationService registrationService, ILogger<AccountController> logger, IMapper mapper)
         {
             _logger = logger;
             _mapper = mapper;

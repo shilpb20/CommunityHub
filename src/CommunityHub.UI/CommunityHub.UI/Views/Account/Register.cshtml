@@ -48,7 +48,7 @@
         </div>
     }
 
-    <form id="registrationForm" method="post" action="@Url.Action("Add", "Registration")">
+    <form id="registrationForm" method="post" action="@Url.Action("add", "account")">
         <!-- Row for User and Spouse Details (side by side) -->
         <div class="row mt-4">
             @await Html.PartialAsync("Section/_UserDetails", Model)
@@ -61,7 +61,7 @@
             <div class="row mt-4">
                 <div class="col-md-12 d-flex justify-content-end">
                     <button type="submit" class="btn btn-success me-2 col-md-3">Register</button>
-                    <button type="button" class="btn btn-secondary me-2 col-md-3" onclick="window.location.href='@Url.Action("Index", "Registration")';">Cancel</button>
+                    <button type="button" class="btn btn-secondary me-2 col-md-3" onclick="window.location.href='@Url.Action("register", "account")';">Cancel</button>
                 </div>
             </div>
         </div>

@@ -4,20 +4,28 @@ using CommunityHub.UI.Services;
 
 namespace CommunityHub.UI.Controllers
 {
-    public class RegistrationController : Controller
+    public class AccountController : Controller
     {
-        private readonly string _url = "api/Register";
+        private readonly string _url = "api/account";
 
+        private readonly ILogger<AccountController> _logger;
         private readonly IBaseService _service;
 
-        public RegistrationController(IBaseService service)
+        public AccountController(ILogger<AccountController> logger, IBaseService service)
         {
             _service = service;
+            _logger = logger;
         }
-
 
         [HttpGet]
         public IActionResult Index()
+        {
+            return View();
+        }
+
+        [HttpGet]
+        [Route("register")]
+        public IActionResult Register()
         {
             var registrationData = new RegistrationDataCreateDto() { UserDetails = new UserDetailsCreateDto() };
             return View(registrationData);
@@ -34,18 +42,18 @@ namespace CommunityHub.UI.Controllers
                    .ToList();
 
                 ViewBag.ErrorMessages = errorMessages;
-                return View("Index", registrationData);
+                return View("register", registrationData);
             }
 
             var result = await _service.AddRequestAsync<RegistrationDataCreateDto, RegistrationRequestDto>(_url, registrationData);
             if (result == null)
             {
                 ModelState.AddModelError("", "An error occurred while registering.");
-                return View("Index", registrationData);
+                return View("register", registrationData);
             }
 
-            TempData["SuccessMessage"] = "Registration request has been sent for admin approval.";
-            return RedirectToAction("Index");
+            TempData["SuccessMessage"] = "Registration request has been sent for admin approval!";
+            return RedirectToAction("index");
         }
     }
 }
