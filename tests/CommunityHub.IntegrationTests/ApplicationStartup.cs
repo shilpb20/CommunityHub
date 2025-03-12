@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.VisualStudio.TestPlatform.TestHost;
 
 namespace CommunityHub.IntegrationTests
@@ -10,7 +11,12 @@ namespace CommunityHub.IntegrationTests
 
         public ApplicationStartup()
         {
-            WebApplicationFactory = new WebApplicationFactory<Program>();
+            WebApplicationFactory = new WebApplicationFactory<Program>()
+                .WithWebHostBuilder(builder =>
+                {
+                    builder.UseEnvironment("Test");
+                });
+
             Client = WebApplicationFactory.CreateClient();
         }
     }
