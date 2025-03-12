@@ -25,5 +25,10 @@ namespace CommunityHub.UI.Services
         {
             return await HttpSendRequestHelper.SendPostRequest<T, V>(_httpClient, url, data);
         }
+
+        public HttpClient GetClient()
+        {
+            return _httpClient;
+        }
     }
 }

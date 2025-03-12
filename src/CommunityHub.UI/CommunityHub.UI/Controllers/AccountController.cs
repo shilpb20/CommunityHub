@@ -23,8 +23,7 @@ namespace CommunityHub.UI.Controllers
             return View();
         }
 
-        [HttpGet]
-        [Route("register")]
+        [HttpGet("register")]
         public IActionResult Register()
         {
             var registrationData = new RegistrationDataCreateDto() { UserDetails = new UserDetailsCreateDto() };

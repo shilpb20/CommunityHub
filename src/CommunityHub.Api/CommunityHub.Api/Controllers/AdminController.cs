@@ -29,8 +29,7 @@ namespace CommunityHub.Api.Controllers
             _registrationService = registrationService;
         }
 
-        [HttpGet(Name ="GetRegistrationRequests")]
-        [Route("requests")]
+        [HttpGet(Name ="GetRequests")]
         public async Task<ActionResult<List<RegistrationRequestDto>>> GetRequests([FromQuery]string registrationStatus = "pending")
         {
             if (Enum.TryParse<RegistrationStatus>(registrationStatus, true, out var status) 
