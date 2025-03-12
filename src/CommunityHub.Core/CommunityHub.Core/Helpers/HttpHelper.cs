@@ -10,9 +10,14 @@ namespace CommunityHub.Core.Helpers
         public static HttpRequestMessage GetHttpGetRequestById(string url, int id)
         {
             var formattedUrl = url.TrimEnd('/') + "/" + id;
-            return new HttpRequestMessage(HttpMethod.Get, formattedUrl);
+            return GetHttpGetRequest(formattedUrl);
         }
-      
+
+        public static HttpRequestMessage GetHttpGetRequest(string url)
+        {
+            return new HttpRequestMessage(HttpMethod.Get, url);
+        }
+
         public static HttpRequestMessage GetHttpPostRequest<T>(string url, T? data)
         {
             HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Post, url);

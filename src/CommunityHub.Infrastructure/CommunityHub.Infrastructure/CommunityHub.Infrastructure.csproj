@@ -20,4 +20,8 @@
     <ProjectReference Include="..\..\CommunityHub.Core\CommunityHub.Core\CommunityHub.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
+
 </Project>

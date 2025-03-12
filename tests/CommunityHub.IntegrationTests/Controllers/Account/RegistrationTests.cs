@@ -7,33 +7,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 
-namespace CommunityHub.IntegrationTests.Controllers
+namespace CommunityHub.IntegrationTests.Controllers.Account
 {
-    public class AuthController_RegistrationTests : IClassFixture<ApplicationStartup>
+    public class RegistrationTests : BaseTestEnv
     {
-        private readonly string _url = "api/register";
-
-        private readonly ApplicationStartup _application;
-        private readonly HttpClient _httpClient;
-        private readonly IServiceProvider _serviceProvider;
-
-
-        private readonly IMapper _mapper;
-        private readonly IRegistrationService _registrationService;
-
-        public AuthController_RegistrationTests(ApplicationStartup application)
+        public RegistrationTests(ApplicationStartup application, string url = "api/account") : base(application, url)
         {
-            _application = application;
-            _httpClient = _application.Client;
-
-            _serviceProvider = _application.WebApplicationFactory.Services;
-
-            _mapper = _application.WebApplicationFactory.Services.GetRequiredService<IMapper>();
-
-            using (var scope = _serviceProvider.CreateScope())
-            {
-                _registrationService = scope.ServiceProvider.GetRequiredService<IRegistrationService>();
-            }
         }
 
         #region add-registration-request
@@ -57,7 +36,7 @@ namespace CommunityHub.IntegrationTests.Controllers
             var registrationData = _mapper.Map<RegistrationData>(registrationDataCreateDto);
             var registrationRequest = new RegistrationRequest()
             {
-                RegistrationData = JsonConvert.SerializeObject(registrationData),
+                RegistrationData = JsonConvert.SerializeObject( registrationData),
                 CreatedAt = DateTime.UtcNow,
                 RegistrationStatus = "Pending",
                 ReviewedAt = null,
@@ -66,7 +45,7 @@ namespace CommunityHub.IntegrationTests.Controllers
 
 
             //Act
-            var request = HttpHelper.GetHttpPostRequest<RegistrationDataCreateDto>(_url, registrationDataCreateDto);
+            var request = HttpHelper.GetHttpPostRequest(_url, registrationDataCreateDto);
             var response = await _httpClient.SendAsync(request);
             var result = await HttpHelper.GetHttpResponseObject<RegistrationRequestDto>(response);
 
@@ -75,7 +54,7 @@ namespace CommunityHub.IntegrationTests.Controllers
             Assert.NotNull(result);
 
             Assert.Equivalent(registrationData, result.RegistrationData);
-            Assert.Equivalent("Pending", result.RegistrationStatus);
+            Assert.Equivalent("pending", result.RegistrationStatus);
             Assert.InRange(DateTime.UtcNow, DateTime.UtcNow.AddMilliseconds(-100), DateTime.UtcNow);
             Assert.Null(result.ReviewedAt);
             Assert.Null(result.Review);
@@ -118,12 +97,22 @@ namespace CommunityHub.IntegrationTests.Controllers
         [Fact]
         public async Task GetRegistrationRequest_ReturnsNotFound_WhenDataIsEmpty()
         {
+            //Arrange
+            await ClearRegistrationRequestsAsync();
+
             //Act
             var request = HttpHelper.GetHttpGetRequestById(_url, 1);
             var response = await _httpClient.SendAsync(request);
 
             //Assert
             Assert.Equivalent(StatusCodes.Status404NotFound, response.StatusCode);
+        }
+
+        public async Task ClearRegistrationRequestsAsync()
+        {
+            var allRequests = _dbContext.RegistrationRequests.ToList();
+            _dbContext.RegistrationRequests.RemoveRange(allRequests);
+            await _dbContext.SaveChangesAsync();
         }
 
         [Theory]

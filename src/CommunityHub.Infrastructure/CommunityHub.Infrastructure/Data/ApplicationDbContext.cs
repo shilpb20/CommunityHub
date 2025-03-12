@@ -1,5 +1,7 @@
 ﻿using CommunityHub.Core.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Newtonsoft.Json;
 
 namespace CommunityHub.Infrastructure.Data
 {

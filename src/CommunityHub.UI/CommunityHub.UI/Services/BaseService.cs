@@ -18,7 +18,7 @@ namespace CommunityHub.UI.Services
 
         public async Task<T> GetRequestAsync<T>(string url)
         {
-            return await HttpSendRequestHelper.SendGetRequest<T>(_httpClient, url);
+            return await HttpSendRequestHelper.SendGetRequestAsync<T>(_httpClient, url);
         }
 
         public async Task<V> AddRequestAsync<T, V>(string url, T? data)

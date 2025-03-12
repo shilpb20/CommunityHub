@@ -34,6 +34,12 @@ namespace CommunityHub.Api.Controllers
                 return BadRequest("Registration data must not be null");
             }
 
+
+            if (!ModelState.IsValid) 
+            {
+                return BadRequest(ModelState);
+            }
+
             try
             {
                 var registrationData = _mapper.Map<RegistrationData>(registrationDataDto);

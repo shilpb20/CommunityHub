@@ -3,6 +3,11 @@ using CommunityHub.Core.Models;
 using CommunityHub.Infrastructure.Data;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Logging;
+using CommunityHub.Core.Enums;
+using CommunityHub.Core.Extensions;
+using Azure.Core;
+using CommunityHub.Core.Dtos.RegistrationData;
+using CommunityHub.Core.Dtos;
 
 namespace CommunityHub.Infrastructure.Services
 {
@@ -34,7 +39,7 @@ namespace CommunityHub.Infrastructure.Services
                 {
                     RegistrationData = JsonConvert.SerializeObject(registrationData),
                     CreatedAt = DateTime.UtcNow,
-                    RegistrationStatus = "Pending",
+                    RegistrationStatus = "pending",
                     Review = null,
                     ReviewedAt = null
                 };
@@ -51,6 +56,16 @@ namespace CommunityHub.Infrastructure.Services
         public async Task<RegistrationRequest> GetRequestAsync(int id)
         {
             return await _repository.GetAsync(x => x.Id == id);
+        }
+
+        public async Task<List<RegistrationRequest>> GetRequestsAsync(RegistrationStatus status = RegistrationStatus.Pending)
+        {
+            if(status == RegistrationStatus.All)
+            {
+                return await _repository.GetAllAsync();
+            }
+               
+            return await _repository.GetAllAsync(x => x.RegistrationStatus.ToLower() == status.GetEnumMemberValue().ToLower());
         }
     }
 }

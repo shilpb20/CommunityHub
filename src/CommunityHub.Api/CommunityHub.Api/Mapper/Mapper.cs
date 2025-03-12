@@ -17,7 +17,7 @@ public class Mapper : Profile
                    string.IsNullOrEmpty(src.RegistrationData)
                        ? null
                        : JsonConvert.DeserializeObject<RegistrationDataDto>(src.RegistrationData)))
-           .ForMember(dest => dest.CreateAt, opt => opt.MapFrom(src => src.CreatedAt));
+           .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt));
 
         CreateMap<RegistrationRequestDto, RegistrationRequest>()
             .ForMember(dest => dest.RegistrationData, opt =>
@@ -25,6 +25,6 @@ public class Mapper : Profile
                     src.RegistrationData == null
                         ? null
                         : JsonConvert.SerializeObject(src.RegistrationData)))
-            .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreateAt));
+            .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt));
     }
 }
