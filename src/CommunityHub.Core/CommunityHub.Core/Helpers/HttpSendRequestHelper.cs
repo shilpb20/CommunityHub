@@ -39,23 +39,6 @@ namespace CommunityHub.Core.Helpers
             }
         }
 
-        public static async Task<T> SendUpdateRequestAsync<T>(HttpClient client, string url)
-        {
-            try
-            {
-                HttpRequestMessage request = HttpHelper.GetHttpPutRequest(url);
-                return await SendAndProcessResponse<T>(client, request);
-            }
-            catch (HttpRequestException httpEx)
-            {
-                throw new Exception("An error occurred while sending the PUT request.", httpEx);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception("An unexpected error occurred in sending the PUT request.");
-            }
-        }
-
         public static async Task<T> SendUpdateRequestAsync<T>(HttpClient client, string url, int id, T? data)
         {
             return await SendUpdateRequestAsync<T, T>(client, url, id, data);
@@ -65,7 +48,8 @@ namespace CommunityHub.Core.Helpers
         {
             try
             {
-                HttpRequestMessage request = HttpHelper.GetHttpPutRequest<T>(url, id, data);
+                var Uri = new Uri(client.BaseAddress, url);
+                HttpRequestMessage request = HttpHelper.GetHttpPutRequest<T>(Uri.ToString(), id, data);
                 return await SendAndProcessResponse<V>(client, request);
             }
             catch (HttpRequestException httpEx)

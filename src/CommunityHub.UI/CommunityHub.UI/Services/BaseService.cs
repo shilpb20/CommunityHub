@@ -26,6 +26,11 @@ namespace CommunityHub.UI.Services
             return await HttpSendRequestHelper.SendPostRequestAsync<T, V>(_httpClient, url, data);
         }
 
+        public async Task<V> UpdateRequestAsync<T, V>(string url, int id, T? data)
+        {
+            return await HttpSendRequestHelper.SendUpdateRequestAsync<T, V>(_httpClient, url, id, data);
+        }
+
         public HttpClient GetClient()
         {
             return _httpClient;

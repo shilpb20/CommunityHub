@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Azure.Core;
+using CommunityHub.Core.Constants;
 using CommunityHub.Core.Dtos;
 using CommunityHub.Core.Enums;
 using CommunityHub.Core.Extensions;
@@ -78,12 +79,11 @@ namespace CommunityHub.IntegrationTests.Controllers.Admin
             //Arrange
             await SeedRegistrationRequests();
 
-            var uriBuilder = new UriBuilder(_application.Client.BaseAddress)
+            Dictionary<string, string> queryParameters = new Dictionary<string, string>()
             {
-                Path = _url.TrimStart('/'),
-                Query = $"registrationStatus={registrationStatus}"
+               { RouteParameter.Request.RegistrationStatus, registrationStatus }
             };
-
+            var uriBuilder = HttpHelper.BuildUri(_httpClient.BaseAddress.ToString(), ApiRoutePath.Request, queryParameters);
 
             //Act
             var request = HttpHelper.GetHttpGetRequest(uriBuilder.ToString());
@@ -100,11 +100,11 @@ namespace CommunityHub.IntegrationTests.Controllers.Admin
             await SeedRegistrationRequests();
 
             var registrationStatus = "invalid";
-            var uriBuilder = new UriBuilder(_application.Client.BaseAddress)
+            Dictionary<string, string> queryParameters = new Dictionary<string, string>()
             {
-                Path = _url.TrimStart('/'),
-                Query = $"registrationStatus={registrationStatus}"
+               { RouteParameter.Request.RegistrationStatus, registrationStatus }
             };
+            var uriBuilder = HttpHelper.BuildUri(_httpClient.BaseAddress.ToString(), ApiRoutePath.Request, queryParameters);
 
 
             //Act
@@ -121,23 +121,19 @@ namespace CommunityHub.IntegrationTests.Controllers.Admin
         {
             //Arrange
             int id = 1;
-            string rejectUrl = _url + "/reject";
-            var reviewComment = "Duplicate request";
+            string comment = "Duplicate request";
+
             var requestsCreated = await SeedRegistrationRequests();
             var expectedResult = requestsCreated.FirstOrDefault();
 
-            var uriBuilder = new UriBuilder(_application.Client.BaseAddress)
-            {
-                Path = rejectUrl.TrimStart('/'),
-                Query = $"id={id}&reviewComment={Uri.EscapeDataString(reviewComment)}"
-            };
-
             //Act
-            var result = await HttpSendRequestHelper.SendUpdateRequestAsync<RegistrationRequestDto>(_httpClient, uriBuilder.ToString());
+            var result = await HttpSendRequestHelper
+                .SendUpdateRequestAsync<string, RegistrationRequestDto>
+                (_httpClient, ApiRoutePath.RejectRequest, id, comment);
 
             //Assert
-            Assert.Equivalent(RegistrationStatus.Rejected.GetEnumMemberValue(), result.RegistrationStatus.ToLower());
-            Assert.Equivalent(reviewComment, result.Review);
+            Assert.Equivalent(RegistrationStatus.Rejected.GetEnumMemberValue().ToLower(), result.RegistrationStatus.ToLower());
+            Assert.Equivalent(comment, result.Review);
 
             Assert.NotNull(result.ReviewedAt);
             Assert.InRange(result.ReviewedAt.Value, DateTime.UtcNow.AddMilliseconds(-500), DateTime.UtcNow);
@@ -152,18 +148,13 @@ namespace CommunityHub.IntegrationTests.Controllers.Admin
         public async Task RejectRequest_ShouldReturnBadRequest_WhenNonPositiveIdIsSent(int id)
         {
             //Arrange
-            var requestsCreated = await SeedRegistrationRequests();
+            string comment = "Duplicate request";
 
-            string rejectUrl = _url + "/reject";
-            var reviewComment = "Duplicate request";
-            var uriBuilder = new UriBuilder(_application.Client.BaseAddress)
-            {
-                Path = rejectUrl.TrimStart('/'),
-                Query = $"id={id}&reviewComment={Uri.EscapeDataString(reviewComment)}"
-            };
+            var requestsCreated = await SeedRegistrationRequests();
+            var expectedResult = requestsCreated.FirstOrDefault();
 
             //Act
-            HttpRequestMessage request = HttpHelper.GetHttpPutRequest(uriBuilder.ToString());
+            HttpRequestMessage request = HttpHelper.GetHttpPutRequest<string>(ApiRoutePath.RejectRequest, id, comment);
             var response = await _httpClient.SendAsync(request);
 
             //Assert
@@ -176,17 +167,10 @@ namespace CommunityHub.IntegrationTests.Controllers.Admin
             //Arrange
             var requestsCreated = await SeedRegistrationRequests();
             int id = _dbContext.RegistrationRequests.OrderByDescending(x => x.Id).FirstOrDefault().Id + 1;
-
-            string rejectUrl = _url + "/reject";
-            var reviewComment = "Invalid data";
-            var uriBuilder = new UriBuilder(_application.Client.BaseAddress)
-            {
-                Path = rejectUrl.TrimStart('/'),
-                Query = $"id={id}&reviewComment={Uri.EscapeDataString(reviewComment)}"
-            };
+            string comment = "Invalid request";
 
             //Act
-            HttpRequestMessage request = HttpHelper.GetHttpPutRequest(uriBuilder.ToString());
+            HttpRequestMessage request = HttpHelper.GetHttpPutRequest<string>(ApiRoutePath.RejectRequest, id, comment);
             var response = await _httpClient.SendAsync(request);
 
             //Assert

@@ -1,12 +1,27 @@
 ﻿
 using Newtonsoft.Json;
 using System.Text;
+using System.Web;
 using JsonException = Newtonsoft.Json.JsonException;
 
 namespace CommunityHub.Core.Helpers
 {
     public class HttpHelper
     {
+        public static string BuildUri(string baseUrl, string path, Dictionary<string, string> queryParams)
+        {
+            var uriBuilder = new UriBuilder(new Uri(new Uri(baseUrl), path));
+            var query = HttpUtility.ParseQueryString(string.Empty);
+            foreach (var param in queryParams)
+            {
+                query[param.Key] = param.Value;
+            }
+
+            uriBuilder.Query = query.ToString();
+            return uriBuilder.ToString();
+        }
+
+
         public static HttpRequestMessage GetHttpGetRequestById(string url, int id)
         {
             var formattedUrl = url.TrimEnd('/') + "/" + id;

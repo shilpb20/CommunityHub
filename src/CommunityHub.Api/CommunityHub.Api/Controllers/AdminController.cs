@@ -1,19 +1,14 @@
-﻿using AppComponents.Repository.Abstraction;
-using AutoMapper;
+﻿using AutoMapper;
+using CommunityHub.Core.Constants;
 using CommunityHub.Core.Dtos;
 using CommunityHub.Core.Enums;
-using CommunityHub.Infrastructure.Data;
 using CommunityHub.Infrastructure.Services;
 using Microsoft.AspNetCore.Mvc;
-using CommunityHub.Core.Constants;
-using CommunityHub.Core.Dtos.RegistrationData;
-using Newtonsoft.Json;
-using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace CommunityHub.Api.Controllers
 {
     [ApiController]
-    [Route(ApiRoute.Admin)]
+    [Route(ApiRoutePath.Admin)]
     public class AdminController : ControllerBase
     {
         private readonly ILogger<AdminController> _logger;
@@ -21,8 +16,8 @@ namespace CommunityHub.Api.Controllers
         private readonly IRegistrationService _registrationService;
 
         public AdminController(
-            ILogger<AdminController> logger, 
-            IMapper mapper, 
+            ILogger<AdminController> logger,
+            IMapper mapper,
             IRegistrationService registrationService)
         {
             _logger = logger;
@@ -34,38 +29,38 @@ namespace CommunityHub.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<RegistrationRequestDto>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<List<RegistrationRequestDto>>> GetRequests([FromQuery]string registrationStatus = "pending")
+        public async Task<ActionResult<List<RegistrationRequestDto>>> GetRequests([FromQuery] string status = "pending")
         {
-            if (Enum.TryParse<RegistrationStatus>(registrationStatus, true, out var status) 
-                && Enum.IsDefined(typeof(RegistrationStatus), status))
+            if (Enum.TryParse<RegistrationStatus>(status, true, out var registrationStatus)
+                && Enum.IsDefined(typeof(RegistrationStatus), registrationStatus))
             {
-                var requests = await _registrationService.GetRequestsAsync(status);
+                var requests = await _registrationService.GetRequestsAsync(registrationStatus);
 
-                if(!requests.Any())
+                if (!requests.Any())
                 {
                     return NoContent();
                 }
 
-                var requestDtos = _mapper.Map < List<RegistrationRequestDto>>(requests);
+                var requestDtos = _mapper.Map<List<RegistrationRequestDto>>(requests);
                 return Ok(requestDtos);
             }
             else
             {
-                return BadRequest($"Invalid registration status value: {registrationStatus}. Valid values are {string.Join(", ", Enum.GetNames(typeof(RegistrationStatus)))}.");
+                return BadRequest($"Invalid registration status value: {status}. Valid values are {string.Join(", ", Enum.GetNames(typeof(RegistrationStatus)))}.");
             }
         }
 
-        [HttpPut("request/reject")]
+        [HttpPut("request/reject/{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(RegistrationRequestDto))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<RegistrationRequestDto>> RejectRequest(int id, string reviewComment)
+        public async Task<ActionResult<RegistrationRequestDto>> RejectRequest(int id, [FromBody]string comment)
         {
             try
             {
                 if (id <= 0)
                 {
-                    return BadRequest("Id must be a positive value");
+                    return BadRequest("Id must be a positive number");
                 }
 
                 var matchingRequest = await _registrationService.GetRequestAsync(id);
@@ -74,7 +69,7 @@ namespace CommunityHub.Api.Controllers
                     return BadRequest("Matching data not found");
                 }
 
-                var registrationRequest = await _registrationService.RejectRequestAsync(id, reviewComment);
+                var registrationRequest = await _registrationService.RejectRequestAsync(id, comment);
                 var registrationRequestDto = _mapper.Map<RegistrationRequestDto>(registrationRequest);
                 return Ok(registrationRequestDto);
             }

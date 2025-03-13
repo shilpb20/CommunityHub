@@ -1,15 +1,15 @@
-﻿using CommunityHub.Core.Dtos;
+﻿using CommunityHub.Core.Constants;
+using CommunityHub.Core.Dtos;
 using CommunityHub.Core.Enums;
+using CommunityHub.Core.Extensions;
+using CommunityHub.Core.Helpers;
 using CommunityHub.UI.Services;
 using Microsoft.AspNetCore.Mvc;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace CommunityHub.UI.Controllers
 {
     public class AdminController : Controller
     {
-        private readonly string _url = "api/admin";
-
         private readonly ILogger<AdminController> _logger;
         private readonly IBaseService _service;
 
@@ -25,35 +25,36 @@ namespace CommunityHub.UI.Controllers
             return View();
         }
 
-        //[HttpPost("ApproveRequest")]
-        //public IActionResult ApproveRequest(int id)
-        //{
-        //    return View();
-        //}
 
-        //[HttpPost("RejectRequest")]
-        //public IActionResult RejectRequest(int id, string review)
-        //{
-        //    return View();
-        //}
-
-        [HttpGet("GetRequests")]
-        public async Task<IActionResult> GetRequests([FromQuery]string registrationStatus = "pending")
+        [HttpGet("request")]
+        public async Task<IActionResult> GetRequests([FromQuery] string status = "pending")
         {
-            if (!Enum.TryParse<RegistrationStatus>(registrationStatus, true, out var status)
-                || !Enum.IsDefined(typeof(RegistrationStatus), status))
+            if (!Enum.TryParse<RegistrationStatus>(status, true, out var regStatus)
+                || !Enum.IsDefined(typeof(RegistrationStatus), regStatus))
             {
                 return BadRequest("Invalid registration status value.");
             }
 
-            var uriBuilder = new UriBuilder(_service.GetClient().BaseAddress)
+            Dictionary<string, string> queryParameters = new Dictionary<string, string>()
             {
-                Path = _url.TrimStart('/'),
-                Query = $"registrationStatus={registrationStatus}"
+               { RouteParameter.Request.RegistrationStatus, status }
             };
 
-            var requests = await _service.GetRequestAsync<List<RegistrationRequestDto>>(uriBuilder.ToString());
-            return View(requests);
+            string uri = HttpHelper.BuildUri(_service.GetClient().BaseAddress.ToString(), ApiRoutePath.Request, queryParameters);
+            var result = await _service.GetRequestAsync<List<RegistrationRequestDto>>(uri);
+            return View(result);
+        }
+
+        [HttpPost("request/reject")]
+        public async Task<IActionResult> RejectRequest([FromForm] int id,  [FromForm]string comment)
+        {
+            var result = await _service.UpdateRequestAsync<string, RegistrationRequestDto>(ApiRoutePath.RejectRequest, id, comment);
+            if(result != null)
+            {
+                TempData["SuccessMessage"] = "Request rejected successfully!";
+            }
+
+            return RedirectToAction("GetRequests", new { status = "pending" });
         }
     }
 }
