@@ -14,7 +14,7 @@ namespace CommunityHub.IntegrationTests.Controllers
 {
     public abstract class BaseTestEnv : IClassFixture<ApplicationStartup>
     {
-        protected readonly string _url;
+        protected string _url;
         protected readonly ApplicationStartup _application;
         protected readonly HttpClient _httpClient;
         protected readonly IServiceProvider _serviceProvider;
@@ -23,9 +23,8 @@ namespace CommunityHub.IntegrationTests.Controllers
         protected readonly IMapper _mapper;
         protected readonly IRegistrationService _registrationService;
 
-        public BaseTestEnv(ApplicationStartup application, string url)
+        public BaseTestEnv(ApplicationStartup application)
         {
-            _url = url;
             _application = application;
             _httpClient = _application.Client;
 

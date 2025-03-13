@@ -67,5 +67,15 @@ namespace CommunityHub.Infrastructure.Services
                
             return await _repository.GetAllAsync(x => x.RegistrationStatus.ToLower() == status.GetEnumMemberValue().ToLower());
         }
+
+        public async Task<RegistrationRequest> RejectRequestAsync(int id, string reviewComment)
+        {
+            RegistrationRequest request = await GetRequestAsync(id);
+            request.Review = reviewComment;
+            request.RegistrationStatus = RegistrationStatus.Rejected.GetEnumMemberValue();
+            request.ReviewedAt = DateTime.UtcNow;
+
+            return await _repository.UpdateAsync(request);
+        }
     }
 }

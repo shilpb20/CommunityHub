@@ -11,8 +11,9 @@ namespace CommunityHub.IntegrationTests.Controllers.Account
 {
     public class RegistrationTests : BaseTestEnv
     {
-        public RegistrationTests(ApplicationStartup application, string url = "api/account") : base(application, url)
+        public RegistrationTests(ApplicationStartup application) : base(application)
         {
+            _url = "api/account";
         }
 
         #region add-registration-request
@@ -29,7 +30,7 @@ namespace CommunityHub.IntegrationTests.Controllers.Account
         }
 
         [Fact]
-        public async Task RegisterUser_ReturnsCreateAt_WhenValidDataIsSent()
+        public async Task RegisterUser_ReturnsCreatedAtResult_WhenValidDataIsSent()
         {
             RegistrationDataCreateDto registrationDataCreateDto = GetRegistrationDataCreateDto();
 
@@ -55,7 +56,7 @@ namespace CommunityHub.IntegrationTests.Controllers.Account
 
             Assert.Equivalent(registrationData, result.RegistrationData);
             Assert.Equivalent("pending", result.RegistrationStatus);
-            Assert.InRange(DateTime.UtcNow, DateTime.UtcNow.AddMilliseconds(-100), DateTime.UtcNow);
+            Assert.InRange(result.CreatedAt, DateTime.UtcNow.AddMilliseconds(-500), DateTime.UtcNow);
             Assert.Null(result.ReviewedAt);
             Assert.Null(result.Review);
         }
@@ -149,7 +150,7 @@ namespace CommunityHub.IntegrationTests.Controllers.Account
         private async Task<RegistrationRequestDto> AddRegistrationRequest()
         {
             RegistrationDataCreateDto registrationData = GetRegistrationDataCreateDto();
-            return await HttpSendRequestHelper.SendPostRequest<RegistrationDataCreateDto, RegistrationRequestDto>(_httpClient, _url, registrationData);
+            return await HttpSendRequestHelper.SendPostRequestAsync<RegistrationDataCreateDto, RegistrationRequestDto>(_httpClient, _url, registrationData);
         }
     }
 }

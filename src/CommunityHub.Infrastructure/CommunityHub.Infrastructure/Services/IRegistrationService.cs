@@ -1,4 +1,5 @@
-﻿using CommunityHub.Core.Enums;
+﻿using CommunityHub.Core.Dtos;
+using CommunityHub.Core.Enums;
 using CommunityHub.Core.Models;
 
 namespace CommunityHub.Infrastructure.Services
@@ -8,5 +9,6 @@ namespace CommunityHub.Infrastructure.Services
         Task<RegistrationRequest> CreateRequestAsync(RegistrationData registrationData);
         Task<RegistrationRequest> GetRequestAsync(int id);
         Task<List<RegistrationRequest>> GetRequestsAsync(RegistrationStatus status);
+        Task<RegistrationRequest> RejectRequestAsync(int id, string reviewComment);
     }
 }

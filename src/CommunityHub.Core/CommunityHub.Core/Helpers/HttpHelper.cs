@@ -18,6 +18,28 @@ namespace CommunityHub.Core.Helpers
             return new HttpRequestMessage(HttpMethod.Get, url);
         }
 
+        public static HttpRequestMessage GetHttpPutRequest<T>(string url, int id, T? data)
+        {
+            HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Put, url + $"/{id}");
+            var json = data != null ? JsonConvert.SerializeObject(data) : null;
+            if (json != null)
+            {
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                requestMessage.Content = content;
+            }
+            else
+            {
+                requestMessage.Content = null;
+            }
+
+            return requestMessage;
+        }
+
+        public static HttpRequestMessage GetHttpPutRequest(string url)
+        {
+            return new HttpRequestMessage(HttpMethod.Put, url);
+        }
+
         public static HttpRequestMessage GetHttpPostRequest<T>(string url, T? data)
         {
             HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Post, url);
