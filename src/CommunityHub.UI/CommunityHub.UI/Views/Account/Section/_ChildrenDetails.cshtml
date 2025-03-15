@@ -1,8 +1,4 @@
-﻿@model CommunityHub.Core.Dtos.RegistrationDataCreateDto
-
-@{
-    var User = Model?.Children ?? new List<string>();
-}
+﻿@model CommunityHub.Core.Dtos.RegistrationInfoCreateDto
 
 <div class="col-md-6">
     <div class="card mt-4">
@@ -46,8 +42,8 @@
                         foreach (var child in Model.Children)
                         {
                             <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <span>@child</span>
-                                <input type="hidden" name="Children" value="@child" />
+                                <span>@child.Name</span>
+                                <input type="hidden" name="Children" value="@child.Name" />
                                 <button type="button" class="btn btn-danger btn-sm btnDeleteChild">Delete</button>
                             </li>
                         }

@@ -1,0 +1,25 @@
+﻿@model List<CommunityHub.Core.Dtos.RegistrationRequestDto>
+
+@section Scripts
+{
+    <script src="~/js/filter-location.js"></script>
+}
+
+<div class="mb-3 w-100">
+    <div class="d-flex justify-content-end align-items-center" style="white-space: nowrap;">
+        <select id="locationFilter" class="form-select" style="width:350px;" onchange="filterByLocation()">
+            <option value="">All Locations</option>
+            @if (Model != null && Model.Any())
+            {
+                @foreach (var loc in Model.Select(r => r.RegistrationInfo.UserInfo.Location).Distinct())
+                {
+                    <option value="@loc">@loc</option>
+                }
+            }
+            else
+            {
+                <option value="" disabled>No locations available</option>
+            }
+        </select>
+    </div>
+</div>

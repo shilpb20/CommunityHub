@@ -1,17 +1,20 @@
+using AppComponents.Repository.Abstraction;
 using AppComponents.Repository.EFCore;
+using AppComponents.Repository.EFCore.Transaction;
+using CommunityHub.Core.Models;
 using CommunityHub.Infrastructure.Data;
 using CommunityHub.Infrastructure.Services;
-using CommunityHub.Core.Models;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
-if (builder.Environment.IsEnvironment("Test"))
+var transactionSettings = builder.Configuration.GetSection("TransactionSettings");
+bool useInMemoryDb = transactionSettings.GetValue<bool>("UseInMemoryDatabase"); 
+if (useInMemoryDb)
 {
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseInMemoryDatabase("TestDb"));
+        options.UseInMemoryDatabase("TestDB"));
 }
 else
 {
@@ -19,10 +22,13 @@ else
         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 }
 
-
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
+builder.Services.Configure<TransactionSettings>(builder.Configuration.GetSection("TransactionSettings"));
+builder.Services.AddTransactionManager<ApplicationDbContext>();
 builder.Services.AddRepository<RegistrationRequest, ApplicationDbContext>();
+builder.Services.AddRepository<UserInfo, ApplicationDbContext>();
+
 builder.Services.AddScoped<IRegistrationService, RegistrationService>();
 
 builder.Services.AddControllers();

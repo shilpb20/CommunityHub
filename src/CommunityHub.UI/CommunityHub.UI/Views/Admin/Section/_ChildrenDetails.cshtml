@@ -1,0 +1,29 @@
+﻿@model CommunityHub.Core.Dtos.RegistrationRequestDto
+ 
+<!-- Children Details Table -->
+<div class="col-4">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th colspan="2" class="text-center" style="border-top: 2px solid #dee2e6; border-bottom: 2px solid #dee2e6;">
+                    Children Details
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.RegistrationInfo.Children == null || !Model.RegistrationInfo.Children.Any())
+            {
+                <tr>
+                    <td colspan="2" class="text-center">N/A</td>
+                </tr>
+            }
+            else
+            {
+                <tr>
+                    <td><strong>Children:</strong></td>
+                    <td>@string.Join(", ", Model.RegistrationInfo.Children)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
