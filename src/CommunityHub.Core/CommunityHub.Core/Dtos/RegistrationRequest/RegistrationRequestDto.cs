@@ -1,5 +1,5 @@
-﻿using CommunityHub.Core.Dtos.RegistrationData;
-using System.ComponentModel.DataAnnotations;
+﻿using CommunityHub.Core.Dtos;
+using CommunityHub.Core.Models;
 
 namespace CommunityHub.Core.Dtos
 {
@@ -7,9 +7,9 @@ namespace CommunityHub.Core.Dtos
     {
         public int Id { get; set; }
 
-        public RegistrationDataDto RegistrationData { get; set; }
+        public RegistrationInfo RegistrationInfo { get; set; }
         public DateTime CreatedAt { get; set; }
-        public string RegistrationStatus { get; set; }
+        public string RegistrationStatus { get; set; } = string.Empty;
         public DateTime? ReviewedAt { get; set; }
         public string? Review { get; set; }
     }

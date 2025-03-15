@@ -1,9 +1,8 @@
 ﻿using AutoMapper;
-using CommunityHub.Infrastructure.Services;
+using CommunityHub.Core.Constants;
 using CommunityHub.Core.Dtos;
-using CommunityHub.Core.Dtos.RegistrationData;
-using CommunityHub.Core.Helpers;
 using CommunityHub.Core.Models;
+using CommunityHub.Infrastructure.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CommunityHub.Api.Controllers
@@ -16,7 +15,10 @@ namespace CommunityHub.Api.Controllers
         private readonly IMapper _mapper;
         private readonly IRegistrationService _registrationService;
 
-        public AccountController(IRegistrationService registrationService, ILogger<AccountController> logger, IMapper mapper)
+        public AccountController(
+            ILogger<AccountController> logger,
+            IMapper mapper,
+            IRegistrationService registrationService)
         {
             _logger = logger;
             _mapper = mapper;
@@ -27,23 +29,19 @@ namespace CommunityHub.Api.Controllers
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(RegistrationRequestDto))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<RegistrationRequestDto>> AddRegistrationRequest([FromBody] RegistrationDataCreateDto registrationDataDto)
+        public async Task<ActionResult<RegistrationRequestDto>> AddRegistrationRequest([FromBody] RegistrationInfoCreateDto registrationInfoDto)
         {
-            if (registrationDataDto == null)
+            if (registrationInfoDto == null || !ModelState.IsValid)
             {
-                return BadRequest("Registration data must not be null");
-            }
-
-
-            if (!ModelState.IsValid) 
-            {
-                return BadRequest(ModelState);
+                return BadRequest("Invalid registration data");
             }
 
             try
             {
-                var registrationData = _mapper.Map<RegistrationData>(registrationDataDto);
-                var registrationRequest = await _registrationService.CreateRequestAsync(registrationData);
+                var registrationInfo = _mapper.Map<RegistrationInfo>(registrationInfoDto);
+
+                var registrationRequest = await _registrationService.CreateRequestAsync(registrationInfo);
+
                 var registrationRequestDto = _mapper.Map<RegistrationRequestDto>(registrationRequest);
 
                 return CreatedAtRoute("GetRegistrationRequest", new { id = registrationRequestDto.Id }, registrationRequestDto);

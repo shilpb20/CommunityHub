@@ -10,7 +10,7 @@
             </tr>
         </thead>
         <tbody>
-            @if (Model.RegistrationData.SpouseDetails == null)
+            @if (Model.RegistrationInfo.SpouseInfo == null)
             {
                 <tr>
                     <td colspan="2" class="text-center">N/A</td>
@@ -18,32 +18,32 @@
             }
             else
             {
-                @if (!string.IsNullOrEmpty(Model.RegistrationData.SpouseDetails.Email))
+                @if (!string.IsNullOrEmpty(Model.RegistrationInfo.SpouseInfo.Email))
                 {
                 <tr>
                     <td><strong>Email:</strong></td>
-                        <td>@Model.RegistrationData.SpouseDetails.Email</td>
+                        <td>@Model.RegistrationInfo.SpouseInfo.Email</td>
                 </tr>
                 }
-                @if (!string.IsNullOrEmpty(Model.RegistrationData.SpouseDetails.ContactNumber))
+                @if (!string.IsNullOrEmpty(Model.RegistrationInfo.SpouseInfo.ContactNumber))
                 {
                     <tr>
                         <td><strong>Contact:</strong></td>
-                        <td>@Model.RegistrationData.SpouseDetails.CountryCode - @Model.RegistrationData.SpouseDetails.ContactNumber</td>
+                        <td>@Model.RegistrationInfo.SpouseInfo.CountryCode - @Model.RegistrationInfo.SpouseInfo.ContactNumber</td>
                     </tr>
                 }
-                @if (!string.IsNullOrEmpty(Model.RegistrationData.SpouseDetails.HomeTown))
+                @if (!string.IsNullOrEmpty(Model.RegistrationInfo.SpouseInfo.HomeTown))
                 {
                     <tr>
                         <td><strong>Home Town:</strong></td>
-                        <td>@Model.RegistrationData.SpouseDetails.HomeTown</td>
+                        <td>@Model.RegistrationInfo.SpouseInfo.HomeTown</td>
                     </tr>
                 }
-                @if (!string.IsNullOrEmpty(Model.RegistrationData.SpouseDetails.HouseName))
+                @if (!string.IsNullOrEmpty(Model.RegistrationInfo.SpouseInfo.HouseName))
                 {
                     <tr>
                         <td><strong>House Name:</strong></td>
-                        <td>@Model.RegistrationData.SpouseDetails.HouseName</td>
+                        <td>@Model.RegistrationInfo.SpouseInfo.HouseName</td>
                     </tr>
                 }
             }

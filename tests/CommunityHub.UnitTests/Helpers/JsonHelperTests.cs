@@ -1,17 +1,12 @@
-﻿using Newtonsoft.Json;
+﻿using CommunityHub.Core.Helpers;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Xunit;
-using CommunityHub.Core.Helpers;
 
 namespace CommunityHub.UnitTests.Helpers
 {
     public class JsonHelperTests
     {
         [Theory]
-        [InlineData(null, false)] 
+        [InlineData(null, false)]
         public void IsEmptyJson_ShouldReturnFalse_ForNullObject(object input, bool expected)
         {
             // Act
@@ -96,7 +91,7 @@ namespace CommunityHub.UnitTests.Helpers
             var result = JsonHelper.IsEmptyJson(jsonElement);
 
             // Assert
-            Assert.False(result); 
+            Assert.False(result);
         }
     }
 }

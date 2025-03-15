@@ -1,17 +1,16 @@
 ﻿using CommunityHub.Core.Dtos;
-using CommunityHub.Core.Dtos.RegistrationData;
 
-namespace CommunityHub.IntegrationTests.Controllers.Admin
+namespace CommunityHub.IntegrationTests.TestData
 {
     public static class RegistrationDataList
     {
-        public static List<RegistrationDataCreateDto> GetRequests()
+        public static List<RegistrationInfoCreateDto> GetRequests()
         {
-            return new List<RegistrationDataCreateDto>()
+            return new List<RegistrationInfoCreateDto>()
             {
-                new RegistrationDataCreateDto()
+                new RegistrationInfoCreateDto()
                 {
-                    UserDetails = new UserDetailsCreateDto()
+                    UserInfo = new UserInfoCreateDto()
                     {
                         FullName = "Alice Springs",
                         Email = "alice.springs@gmail.com",
@@ -24,9 +23,9 @@ namespace CommunityHub.IntegrationTests.Controllers.Admin
                         HouseName = "Naomi home"
                     }
                 },
-                new RegistrationDataCreateDto()
+                new RegistrationInfoCreateDto()
                 {
-                    UserDetails = new UserDetailsCreateDto()
+                    UserInfo = new UserInfoCreateDto()
                     {
                         FullName = "Alex Springs",
                         Email = "alex.springs@gmail.com",
@@ -38,7 +37,7 @@ namespace CommunityHub.IntegrationTests.Controllers.Admin
                         HomeTown = "Atlanta",
                         HouseName = "Naomi home"
                     },
-                    SpouseDetails = new SpouseDetailsCreateDto()
+                    SpouseInfo = new SpouseInfoCreateDto()
                     {
                         FullName = "Alicia Adams",
                         Email = "alicia.adams@gmail.com",
@@ -47,11 +46,16 @@ namespace CommunityHub.IntegrationTests.Controllers.Admin
                         HomeTown = "Georgia",
                         HouseName = "Adams Family",
                     },
-                    Children = new List<string>() { "Anna", "Ben", "Cairo" }
+                    Children = new List<ChildrenCreateDto>()
+                    {
+                         new() { Name = "Anna", },
+                         new() { Name = "Ben"}, 
+                         new() { Name = "Cairo" }
+                    }
                 },
-                new RegistrationDataCreateDto()
+                new RegistrationInfoCreateDto()
                 {
-                    UserDetails = new UserDetailsCreateDto()
+                    UserInfo = new UserInfoCreateDto()
                     {
                         FullName = "Alice Smith",
                         Email = "alice.smith@gmail.com",
@@ -63,11 +67,17 @@ namespace CommunityHub.IntegrationTests.Controllers.Admin
                         HomeTown = "Sydney",
                         HouseName = "Smith Family"
                     },
-                    Children = new List<string>() { "Ari", "Garry", "Cherry", "Fairy" }
+                    Children = new List<ChildrenCreateDto>() 
+                    { 
+                        new() { Name = "Ari" },
+                        new() { Name = "Garry" },
+                        new() { Name = "Cherry" },
+                        new() { Name = "Fairy" }
+                    }
                 },
-                new RegistrationDataCreateDto()
+                new RegistrationInfoCreateDto()
                 {
-                    UserDetails = new UserDetailsCreateDto()
+                    UserInfo = new UserInfoCreateDto()
                     {
                         FullName = "Daisy Shaw",
                         Email = "daisy.shaw@gmail.com",

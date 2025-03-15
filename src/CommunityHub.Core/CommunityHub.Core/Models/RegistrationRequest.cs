@@ -1,4 +1,4 @@
-﻿using CommunityHub.Core.Dtos.RegistrationData;
+﻿using CommunityHub.Core.Dtos;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -12,7 +12,7 @@ namespace CommunityHub.Core.Models
 
         [Required]
 
-        public string RegistrationData { get; set; }
+        public string RegistrationInfo { get; set; }
         public string RegistrationStatus { get; set; }
 
         public DateTime CreatedAt { get; set; }

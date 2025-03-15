@@ -11,7 +11,7 @@
             <option value="">All Locations</option>
             @if (Model != null && Model.Any())
             {
-                @foreach (var loc in Model.Select(r => r.RegistrationData.UserDetails.Location).Distinct())
+                @foreach (var loc in Model.Select(r => r.RegistrationInfo.UserInfo.Location).Distinct())
                 {
                     <option value="@loc">@loc</option>
                 }

@@ -11,7 +11,7 @@
             </tr>
         </thead>
         <tbody>
-            @if (Model.RegistrationData.Children == null || !Model.RegistrationData.Children.Any())
+            @if (Model.RegistrationInfo.Children == null || !Model.RegistrationInfo.Children.Any())
             {
                 <tr>
                     <td colspan="2" class="text-center">N/A</td>
@@ -21,7 +21,7 @@
             {
                 <tr>
                     <td><strong>Children:</strong></td>
-                    <td>@string.Join(", ", Model.RegistrationData.Children)</td>
+                    <td>@string.Join(", ", Model.RegistrationInfo.Children)</td>
                 </tr>
             }
         </tbody>

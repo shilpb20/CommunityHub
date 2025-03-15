@@ -16,7 +16,7 @@ namespace CommunityHub.Core.Helpers
             {
                 throw new Exception("An error occurred while sending the GET request.", httpEx);
             }
-            catch (Exception ex)
+            catch
             {
                 throw new Exception("An unexpected error occurred in sending the GET request.");
             }
@@ -33,7 +33,7 @@ namespace CommunityHub.Core.Helpers
             {
                 throw new Exception("An error occurred while sending the POST request.", httpEx);
             }
-            catch (Exception ex)
+            catch
             {
                 throw new Exception("An unexpected error occurred in sending the POST request.");
             }
@@ -56,7 +56,7 @@ namespace CommunityHub.Core.Helpers
             {
                 throw new Exception("An error occurred while sending the PUT request.", httpEx);
             }
-            catch (Exception ex)
+            catch
             {
                 throw new Exception("An unexpected error occurred in sending the PUT request.");
             }

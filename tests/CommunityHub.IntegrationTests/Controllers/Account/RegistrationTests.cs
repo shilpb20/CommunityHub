@@ -1,10 +1,7 @@
-﻿using AutoMapper;
-using CommunityHub.Core.Dtos;
+﻿using CommunityHub.Core.Dtos;
 using CommunityHub.Core.Helpers;
 using CommunityHub.Core.Models;
-using CommunityHub.Infrastructure.Services;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 
 namespace CommunityHub.IntegrationTests.Controllers.Account
@@ -19,31 +16,19 @@ namespace CommunityHub.IntegrationTests.Controllers.Account
         #region add-registration-request
 
         [Fact]
-        public async Task RegisterUser_ReturnsBadRequest_WhenNullDataIsSent()
-        {
-            //Act
-            var request = HttpHelper.GetHttpPostRequest<RegistrationRequestDto>(_url, null);
-            var response = await _httpClient.SendAsync(request);
-
-            //Assert
-            Assert.Equivalent(StatusCodes.Status400BadRequest, response.StatusCode);
-        }
-
-        [Fact]
         public async Task RegisterUser_ReturnsCreatedAtResult_WhenValidDataIsSent()
         {
-            RegistrationDataCreateDto registrationDataCreateDto = GetRegistrationDataCreateDto();
+            RegistrationInfoCreateDto registrationDataCreateDto = GetRegistrationDataCreateDto();
 
-            var registrationData = _mapper.Map<RegistrationData>(registrationDataCreateDto);
+            var registrationData = _mapper.Map<RegistrationInfoDto>(registrationDataCreateDto);
             var registrationRequest = new RegistrationRequest()
             {
-                RegistrationData = JsonConvert.SerializeObject( registrationData),
+                RegistrationInfo = JsonConvert.SerializeObject(registrationData),
                 CreatedAt = DateTime.UtcNow,
                 RegistrationStatus = "Pending",
                 ReviewedAt = null,
                 Review = null
             };
-
 
             //Act
             var request = HttpHelper.GetHttpPostRequest(_url, registrationDataCreateDto);
@@ -54,22 +39,34 @@ namespace CommunityHub.IntegrationTests.Controllers.Account
             Assert.Equivalent(StatusCodes.Status201Created, response.StatusCode);
             Assert.NotNull(result);
 
-            Assert.Equivalent(registrationData, result.RegistrationData);
+            Assert.Equivalent(registrationData, result.RegistrationInfo);
             Assert.Equivalent("pending", result.RegistrationStatus);
             Assert.InRange(result.CreatedAt, DateTime.UtcNow.AddMilliseconds(-500), DateTime.UtcNow);
             Assert.Null(result.ReviewedAt);
             Assert.Null(result.Review);
         }
 
-        private static RegistrationDataCreateDto GetRegistrationDataCreateDto()
+        [Fact]
+        public async Task RegisterUser_ReturnsBadRequest_WhenNullDataIsSent()
+        {
+            //Act
+            var request = HttpHelper.GetHttpPostRequest<RegistrationRequestDto>(_url, null);
+            request.Content = new StringContent("null", System.Text.Encoding.UTF8, "application/json");
+            var response = await _httpClient.SendAsync(request);
+
+            //Assert
+            Assert.Equivalent(StatusCodes.Status400BadRequest, response.StatusCode);
+        }
+
+        private static RegistrationInfoCreateDto GetRegistrationDataCreateDto()
         {
             //Arrange
-            return new RegistrationDataCreateDto()
+            return new RegistrationInfoCreateDto()
             {
-                UserDetails = new UserDetailsCreateDto()
+                UserInfo = new UserInfoCreateDto()
                 {
                     FullName = "Alice Smith",
-                    Email = "alice.smith@gmail.com",
+                    Email = "Alice.smith@gmail.com",
                     CountryCode = "+61",
                     ContactNumber = "0410203040",
                     Location = "Sydney",
@@ -78,7 +75,7 @@ namespace CommunityHub.IntegrationTests.Controllers.Account
                     HomeTown = "Beranki",
                     HouseName = "Kaadu mane"
                 },
-                SpouseDetails = new SpouseDetailsCreateDto()
+                SpouseInfo = new SpouseInfoCreateDto()
                 {
                     FullName = "Janet Smith",
                     Email = "janet.smith@gmail.com",
@@ -87,7 +84,12 @@ namespace CommunityHub.IntegrationTests.Controllers.Account
                     HomeTown = "Sydney",
                     HouseName = "Smith Family"
                 },
-                Children = new List<string>() { "Anna", "Benny", "Cairo" }
+                Children = new List<ChildrenCreateDto>()
+                {
+                    new() { Name = "Anna" },
+                    new() { Name = "Benny" },
+                    new() { Name = "Cairo" }
+                }
             };
         }
 
@@ -109,6 +111,7 @@ namespace CommunityHub.IntegrationTests.Controllers.Account
             Assert.Equivalent(StatusCodes.Status404NotFound, response.StatusCode);
         }
 
+        [Fact]
         public async Task ClearRegistrationRequestsAsync()
         {
             var allRequests = _dbContext.RegistrationRequests.ToList();
@@ -122,7 +125,7 @@ namespace CommunityHub.IntegrationTests.Controllers.Account
         public async Task GetRegistrationRequest_ReturnsBadRequest_WhenNonPositiveIdIsSent(int id)
         {
             //Act
-            var request = HttpHelper.GetHttpGetRequestById(_url, -1);
+            var request = HttpHelper.GetHttpGetRequestById(_url, id);
             var response = await _httpClient.SendAsync(request);
 
             //Assert
@@ -149,8 +152,8 @@ namespace CommunityHub.IntegrationTests.Controllers.Account
 
         private async Task<RegistrationRequestDto> AddRegistrationRequest()
         {
-            RegistrationDataCreateDto registrationData = GetRegistrationDataCreateDto();
-            return await HttpSendRequestHelper.SendPostRequestAsync<RegistrationDataCreateDto, RegistrationRequestDto>(_httpClient, _url, registrationData);
+            RegistrationInfoCreateDto registrationData = GetRegistrationDataCreateDto();
+            return await HttpSendRequestHelper.SendPostRequestAsync<RegistrationInfoCreateDto, RegistrationRequestDto>(_httpClient, _url, registrationData);
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿@using CommunityHub.Core.Dtos
-@model CommunityHub.Core.Dtos.RegistrationDataCreateDto
+﻿@model CommunityHub.Core.Dtos.RegistrationInfoCreateDto
 
 @section Scripts
 {
@@ -10,7 +9,7 @@
 @{
     ViewData["Title"] = "Registration Form";
 
-    var userDetails = Model?.UserDetails;
+    var userDetails = Model?.UserInfo;
 }
 
 <div class="container mt-5">

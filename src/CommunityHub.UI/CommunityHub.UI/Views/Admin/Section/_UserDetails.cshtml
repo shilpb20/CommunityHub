@@ -10,46 +10,46 @@
         </tr>
     </thead>
     <tbody>
-        @if (!string.IsNullOrEmpty(Model.RegistrationData.UserDetails.Email))
+        @if (!string.IsNullOrEmpty(Model.RegistrationInfo.UserInfo.Email))
         {
             <tr>
                 <td><strong>Email:</strong></td>
-                <td>@Model.RegistrationData.UserDetails.Email</td>
+                <td>@Model.RegistrationInfo.UserInfo.Email</td>
             </tr>
         }
-        @if (!string.IsNullOrEmpty(Model.RegistrationData.UserDetails.ContactNumber))
+        @if (!string.IsNullOrEmpty(Model.RegistrationInfo.UserInfo.ContactNumber))
         {
             <tr>
                 <td><strong>Contact:</strong></td>
-                <td>@Model.RegistrationData.UserDetails.CountryCode - @Model.RegistrationData.UserDetails.ContactNumber</td>
+                <td>@Model.RegistrationInfo.UserInfo.CountryCode - @Model.RegistrationInfo.UserInfo.ContactNumber</td>
             </tr>
         }
-        @if (!string.IsNullOrEmpty(Model.RegistrationData.UserDetails.Gender))
+        @if (!string.IsNullOrEmpty(Model.RegistrationInfo.UserInfo.Gender))
         {
             <tr>
                 <td><strong>Gender:</strong></td>
-                <td>@Model.RegistrationData.UserDetails.Gender</td>
+                <td>@Model.RegistrationInfo.UserInfo.Gender</td>
             </tr>
         }
-        @if (!string.IsNullOrEmpty(Model.RegistrationData.UserDetails.MaritalStatus))
+        @if (!string.IsNullOrEmpty(Model.RegistrationInfo.UserInfo.MaritalStatus))
         {
             <tr>
                 <td><strong>Marital Status:</strong></td>
-                <td>@Model.RegistrationData.UserDetails.MaritalStatus</td>
+                <td>@Model.RegistrationInfo.UserInfo.MaritalStatus</td>
             </tr>
         }
-        @if (!string.IsNullOrEmpty(Model.RegistrationData.UserDetails.HomeTown))
+        @if (!string.IsNullOrEmpty(Model.RegistrationInfo.UserInfo.HomeTown))
         {
             <tr>
                 <td><strong>Home Town:</strong></td>
-                <td>@Model.RegistrationData.UserDetails.HomeTown</td>
+                <td>@Model.RegistrationInfo.UserInfo.HomeTown</td>
             </tr>
         }
-        @if (!string.IsNullOrEmpty(Model.RegistrationData.UserDetails.HouseName))
+        @if (!string.IsNullOrEmpty(Model.RegistrationInfo.UserInfo.HouseName))
         {
             <tr>
                 <td><strong>House Name:</strong></td>
-                <td>@Model.RegistrationData.UserDetails.HouseName</td>
+                <td>@Model.RegistrationInfo.UserInfo.HouseName</td>
             </tr>
         }
     </tbody>

@@ -1,23 +1,13 @@
-﻿using AutoMapper;
-using Azure.Core;
-using CommunityHub.Core.Constants;
+﻿using CommunityHub.Core.Constants;
 using CommunityHub.Core.Dtos;
 using CommunityHub.Core.Enums;
 using CommunityHub.Core.Extensions;
 using CommunityHub.Core.Helpers;
-using CommunityHub.Core.Models;
+using CommunityHub.IntegrationTests;
+using CommunityHub.IntegrationTests.TestData;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace CommunityHub.IntegrationTests.Controllers.Admin
+namespace CommunityHub.Integrations.Controllers.Admin
 {
     public class RegistrationReviewTests : BaseTestEnv
     {
@@ -36,9 +26,9 @@ namespace CommunityHub.IntegrationTests.Controllers.Admin
             foreach (var registrationData in registrationRequests)
             {
                 var result = await HttpSendRequestHelper
-                    .SendPostRequestAsync<RegistrationDataCreateDto, RegistrationRequestDto>(_httpClient, "api/account", registrationData);
+                    .SendPostRequestAsync<RegistrationInfoCreateDto, RegistrationRequestDto>(_httpClient, "api/account", registrationData);
 
-                Assert.Equivalent(registrationData, result.RegistrationData);
+                Assert.Equivalent(registrationData, result.RegistrationInfo);
 
                 createdRequests.Add(result);
             }
@@ -46,6 +36,7 @@ namespace CommunityHub.IntegrationTests.Controllers.Admin
             return createdRequests;
         }
 
+        #region get- requests
 
         [Theory]
         [InlineData("")]
@@ -83,7 +74,7 @@ namespace CommunityHub.IntegrationTests.Controllers.Admin
             {
                { RouteParameter.Request.RegistrationStatus, registrationStatus }
             };
-            var uriBuilder = HttpHelper.BuildUri(_httpClient.BaseAddress.ToString(), ApiRoutePath.Request, queryParameters);
+            var uriBuilder = HttpHelper.BuildUri(_httpClient.BaseAddress.ToString(), ApiRouteSegment.AdminRequest, queryParameters);
 
             //Act
             var request = HttpHelper.GetHttpGetRequest(uriBuilder.ToString());
@@ -104,7 +95,7 @@ namespace CommunityHub.IntegrationTests.Controllers.Admin
             {
                { RouteParameter.Request.RegistrationStatus, registrationStatus }
             };
-            var uriBuilder = HttpHelper.BuildUri(_httpClient.BaseAddress.ToString(), ApiRoutePath.Request, queryParameters);
+            var uriBuilder = HttpHelper.BuildUri(_httpClient.BaseAddress.ToString(), ApiRouteSegment.AdminRequest, queryParameters);
 
 
             //Act
@@ -115,6 +106,10 @@ namespace CommunityHub.IntegrationTests.Controllers.Admin
             Assert.Equivalent(StatusCodes.Status400BadRequest, response.StatusCode);
         }
 
+        #endregion
+
+
+        #region reject-requests
 
         [Fact]
         public async Task RejectRequest_ShouldReturnSuccessAndUpdateRegistrationRequest_WhenValidRequestIsSent()
@@ -129,7 +124,7 @@ namespace CommunityHub.IntegrationTests.Controllers.Admin
             //Act
             var result = await HttpSendRequestHelper
                 .SendUpdateRequestAsync<string, RegistrationRequestDto>
-                (_httpClient, ApiRoutePath.RejectRequest, id, comment);
+                (_httpClient, ApiRouteSegment.RejectRequest, id, comment);
 
             //Assert
             Assert.Equivalent(RegistrationStatus.Rejected.GetEnumMemberValue().ToLower(), result.RegistrationStatus.ToLower());
@@ -138,7 +133,7 @@ namespace CommunityHub.IntegrationTests.Controllers.Admin
             Assert.NotNull(result.ReviewedAt);
             Assert.InRange(result.ReviewedAt.Value, DateTime.UtcNow.AddMilliseconds(-500), DateTime.UtcNow);
 
-            Assert.Equivalent(expectedResult.RegistrationData, result.RegistrationData);
+            Assert.Equivalent(expectedResult.RegistrationInfo, result.RegistrationInfo);
             Assert.Equivalent(expectedResult.CreatedAt, result.CreatedAt);
         }
 
@@ -154,7 +149,7 @@ namespace CommunityHub.IntegrationTests.Controllers.Admin
             var expectedResult = requestsCreated.FirstOrDefault();
 
             //Act
-            HttpRequestMessage request = HttpHelper.GetHttpPutRequest<string>(ApiRoutePath.RejectRequest, id, comment);
+            HttpRequestMessage request = HttpHelper.GetHttpPutRequest<string>(ApiRouteSegment.RejectRequest, id, comment);
             var response = await _httpClient.SendAsync(request);
 
             //Assert
@@ -170,11 +165,37 @@ namespace CommunityHub.IntegrationTests.Controllers.Admin
             string comment = "Invalid request";
 
             //Act
-            HttpRequestMessage request = HttpHelper.GetHttpPutRequest<string>(ApiRoutePath.RejectRequest, id, comment);
+            HttpRequestMessage request = HttpHelper.GetHttpPutRequest<string>(ApiRouteSegment.RejectRequest, id, comment);
             var response = await _httpClient.SendAsync(request);
 
             //Assert
             Assert.Equivalent(StatusCodes.Status400BadRequest, response.StatusCode);
         }
+
+        #endregion
+
+        #region approve requests
+
+        [Fact]
+        public async Task ApproveRequest_ShouldReturnCreatedAndRegisterUser()
+        {
+            //Arrange
+            string approveRoute = $"{ApiRouteSegment.ApproveRequest}/1";
+            var requestsCreated = await SeedRegistrationRequests();
+            var expectedResult = requestsCreated.FirstOrDefault();
+            Assert.Equivalent(_dbContext.UserInfo.Count(), 0);
+
+            //Act
+            var request = HttpHelper.GetHttpPostRequest<string>(approveRoute, null);
+            var response = await _httpClient.SendAsync(request);
+            var result = await HttpHelper.GetHttpResponseObject<UserInfoDto>(response);
+
+            //Assert
+            Assert.Equivalent(StatusCodes.Status200OK, response.StatusCode);
+            Assert.Equivalent(_dbContext.UserInfo.Count(), 1);
+            Assert.Equivalent(_mapper.Map<UserInfoDto>(_dbContext.UserInfo.FirstOrDefault()), result);
+        }
+
+        #endregion
     }
 }

@@ -24,7 +24,7 @@
 @if (Model == null || !Model.Any())
 {
     <div class="alert alert-warning">
-        No pending requests available.
+        <i class="bi bi-info-circle"></i> No pending requests available.
     </div>
 }
 else
@@ -47,10 +47,13 @@ else
                 <tr class="mainRow">
                     <td>@serial</td>
                     <td>@request.Id</td>
-                    <td>@request.RegistrationData.UserDetails.FullName</td>
-                    <td><span class="compact-location">@request.RegistrationData.UserDetails.Location</span></td>
+                    <td>@request.RegistrationInfo.UserInfo.FullName</td>
+                    <td><span class="compact-location">@request.RegistrationInfo.UserInfo.Location</span></td>
                     <td>
-                        <a href="@Url.Action("ApproveRequest", "Admin", new { id = request.Id })" class="btn btn-success">Approve</a>
+                        <form action="@Url.Action("ApproveRequest", "Admin")" method="post" style="display:inline;">
+                            <input type="hidden" name="id" value="@request.Id" />
+                            <button type="submit" class="btn btn-success">Approve</button>
+                        </form>
                         <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal-@request.Id">Reject</button>
                     </td>
                     <td>

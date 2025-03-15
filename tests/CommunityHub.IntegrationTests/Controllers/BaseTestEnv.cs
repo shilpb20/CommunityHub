@@ -10,11 +10,11 @@ using System.Text;
 using System.Threading.Tasks;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace CommunityHub.IntegrationTests.Controllers
+namespace CommunityHub.IntegrationTests
 {
     public abstract class BaseTestEnv : IClassFixture<ApplicationStartup>
     {
-        protected string _url;
+        protected string _url = string.Empty;
         protected readonly ApplicationStartup _application;
         protected readonly HttpClient _httpClient;
         protected readonly IServiceProvider _serviceProvider;

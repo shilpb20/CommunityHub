@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using CommunityHub.Core.Dtos;
 using CommunityHub.UI.Services;
+using CommunityHub.Core.Models;
+using CommunityHub.Core.Constants;
 
 namespace CommunityHub.UI.Controllers
 {
@@ -26,12 +28,12 @@ namespace CommunityHub.UI.Controllers
         [HttpGet("register")]
         public IActionResult Register()
         {
-            var registrationData = new RegistrationDataCreateDto() { UserDetails = new UserDetailsCreateDto() };
+            var registrationData = new RegistrationInfoCreateDto() { UserInfo = new UserInfoCreateDto() };
             return View(registrationData);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add([FromForm] RegistrationDataCreateDto registrationData)
+        public async Task<IActionResult> Add([FromForm] RegistrationInfo registrationData)
         {
             if (!ModelState.IsValid)
             {
@@ -44,7 +46,7 @@ namespace CommunityHub.UI.Controllers
                 return View("register", registrationData);
             }
 
-            var result = await _service.AddRequestAsync<RegistrationDataCreateDto, RegistrationRequestDto>(_url, registrationData);
+            var result = await _service.AddRequestAsync<RegistrationInfo, RegistrationRequestDto>(_url, registrationData);
             if (result == null)
             {
                 ModelState.AddModelError("", "An error occurred while registering.");
