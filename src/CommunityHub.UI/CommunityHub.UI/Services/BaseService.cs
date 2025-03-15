@@ -18,12 +18,22 @@ namespace CommunityHub.UI.Services
 
         public async Task<T> GetRequestAsync<T>(string url)
         {
-            return await HttpSendRequestHelper.SendGetRequest<T>(_httpClient, url);
+            return await HttpSendRequestHelper.SendGetRequestAsync<T>(_httpClient, url);
         }
 
         public async Task<V> AddRequestAsync<T, V>(string url, T? data)
         {
-            return await HttpSendRequestHelper.SendPostRequest<T, V>(_httpClient, url, data);
+            return await HttpSendRequestHelper.SendPostRequestAsync<T, V>(_httpClient, url, data);
+        }
+
+        public async Task<V> UpdateRequestAsync<T, V>(string url, int id, T? data)
+        {
+            return await HttpSendRequestHelper.SendUpdateRequestAsync<T, V>(_httpClient, url, id, data);
+        }
+
+        public HttpClient GetClient()
+        {
+            return _httpClient;
         }
     }
 }

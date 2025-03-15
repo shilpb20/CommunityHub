@@ -1,0 +1,93 @@
+﻿@model List<CommunityHub.Core.Dtos.RegistrationRequestDto>
+
+@section Scripts
+{
+    <script src="~/js/common-actions.js"></script>
+}
+
+@{
+    ViewData["Title"] = "Registration Requests";
+    int serial = 1;
+}
+@if (TempData["SuccessMessage"] != null)
+{
+    <div id="successMessage" class="alert alert-success">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+<h1>Registration Requests</h1>
+<hr />
+
+<!-- Filter by Location -->
+@await Html.PartialAsync("Section/_Filter", Model)
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-warning">
+        <i class="bi bi-info-circle"></i> No pending requests available.
+    </div>
+}
+else
+{
+
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>S.No</th>
+                <th>Request ID</th>
+                <th>User Name</th>
+                <th>Location</th>
+                <th>Actions</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody id="requestTableBody">
+            @foreach (var request in Model)
+            {
+                <tr class="mainRow">
+                    <td>@serial</td>
+                    <td>@request.Id</td>
+                    <td>@request.RegistrationInfo.UserInfo.FullName</td>
+                    <td><span class="compact-location">@request.RegistrationInfo.UserInfo.Location</span></td>
+                    <td>
+                        <form action="@Url.Action("ApproveRequest", "Admin")" method="post" style="display:inline;">
+                            <input type="hidden" name="id" value="@request.Id" />
+                            <button type="submit" class="btn btn-success">Approve</button>
+                        </form>
+                        <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal-@request.Id">Reject</button>
+                    </td>
+                    <td>
+                        <button class="btn btn-info" data-bs-toggle="collapse" data-bs-target="#details-@request.Id" aria-expanded="false" aria-controls="details-@request.Id">
+                            View Details
+                        </button>
+                    </td>
+                </tr>
+
+                @await Html.PartialAsync("Section/_RejectionModal", request.Id)
+
+                <tr class="collapse" id="details-@request.Id">
+                    <td colspan="6">
+                        <div class="row">
+                            @(await Html.PartialAsync("Section/_UserDetails", request))
+                            @(await Html.PartialAsync("Section/_SpouseDetails", request))
+                            @(await Html.PartialAsync("Section/_ChildrenDetails", request))
+                        </div>
+                    </td>
+                </tr>
+                serial++;
+            }
+        </tbody>
+    </table>
+
+}
+
+<style>
+    .compact-location {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100px;
+        display: inline-block;
+        vertical-align: middle;
+    }
+</style>

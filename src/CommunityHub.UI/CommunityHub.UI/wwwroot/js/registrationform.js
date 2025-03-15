@@ -1,10 +1,5 @@
 ﻿document.addEventListener("DOMContentLoaded", function () {
 
-    //Growl
-        setTimeout(function () {
-            $('#successMessage').fadeOut();
-        }, 5000); 
-
     //Spouse section
     var maritalStatusSelector = document.getElementById("MaritalStatus");
     var spouseSection = document.getElementById("spouseSection");

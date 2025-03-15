@@ -1,0 +1,57 @@
+﻿@model CommunityHub.Core.Dtos.RegistrationRequestDto
+
+<div class="col-4">
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th colspan="2" class="text-center" style="border-top: 2px solid #dee2e6; border-bottom: 2px solid #dee2e6;">
+                User Details
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (!string.IsNullOrEmpty(Model.RegistrationInfo.UserInfo.Email))
+        {
+            <tr>
+                <td><strong>Email:</strong></td>
+                <td>@Model.RegistrationInfo.UserInfo.Email</td>
+            </tr>
+        }
+        @if (!string.IsNullOrEmpty(Model.RegistrationInfo.UserInfo.ContactNumber))
+        {
+            <tr>
+                <td><strong>Contact:</strong></td>
+                <td>@Model.RegistrationInfo.UserInfo.CountryCode - @Model.RegistrationInfo.UserInfo.ContactNumber</td>
+            </tr>
+        }
+        @if (!string.IsNullOrEmpty(Model.RegistrationInfo.UserInfo.Gender))
+        {
+            <tr>
+                <td><strong>Gender:</strong></td>
+                <td>@Model.RegistrationInfo.UserInfo.Gender</td>
+            </tr>
+        }
+        @if (!string.IsNullOrEmpty(Model.RegistrationInfo.UserInfo.MaritalStatus))
+        {
+            <tr>
+                <td><strong>Marital Status:</strong></td>
+                <td>@Model.RegistrationInfo.UserInfo.MaritalStatus</td>
+            </tr>
+        }
+        @if (!string.IsNullOrEmpty(Model.RegistrationInfo.UserInfo.HomeTown))
+        {
+            <tr>
+                <td><strong>Home Town:</strong></td>
+                <td>@Model.RegistrationInfo.UserInfo.HomeTown</td>
+            </tr>
+        }
+        @if (!string.IsNullOrEmpty(Model.RegistrationInfo.UserInfo.HouseName))
+        {
+            <tr>
+                <td><strong>House Name:</strong></td>
+                <td>@Model.RegistrationInfo.UserInfo.HouseName</td>
+            </tr>
+        }
+    </tbody>
+</table>
+</div>

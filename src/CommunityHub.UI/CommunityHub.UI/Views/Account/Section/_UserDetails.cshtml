@@ -1,8 +1,8 @@
 ﻿@using CommunityHub.Core.Dtos
-@model CommunityHub.Core.Dtos.RegistrationDataCreateDto
+@model CommunityHub.Core.Dtos.RegistrationInfoCreateDto
 
 @{
-    var User = Model?.UserDetails ?? new UserDetailsCreateDto();
+    var User = Model?.UserInfo ?? new UserInfoCreateDto();
 }
 
 <div class="col-md-6">
@@ -15,7 +15,7 @@
             <div class="form-group row mb-2">
                 <label for="FullName" class="col-md-4 col-form-label">Full Name</label>
                 <div class="col-md-8">
-                    <input type="text" class="form-control" id="FullName" asp-for="UserDetails.FullName" value="@User?.FullName" />
+                    <input type="text" class="form-control" id="FullName" asp-for="UserInfo.FullName" value="@User?.FullName" />
                 </div>
             </div>
 
@@ -23,7 +23,7 @@
             <div class="form-group row mb-2">
                 <label for="Email" class="col-md-4 col-form-label">Email</label>
                 <div class="col-md-8">
-                    <input type="email" class="form-control" id="Email" asp-for="UserDetails.Email" value="@User?.Email" />
+                    <input type="email" class="form-control" id="Email" asp-for="UserInfo.Email" value="@User?.Email" />
                 </div>
             </div>
 
@@ -31,14 +31,14 @@
             <div class="form-group row mb-2">
                 <label for="CountryCode" class="col-md-4 col-form-label">Country Code</label>
                 <div class="col-md-4">
-                    <select class="form-select" id="CountryCode" asp-for="UserDetails.CountryCode">
+                    <select class="form-select" id="CountryCode" asp-for="UserInfo.CountryCode">
                         <option value=""></option>
                         <option value="+61">AU</option>
                         <option value="+64">NZ</option>
                     </select>
                 </div>
                 <div class="col-md-4">
-                    <input type="text" class="form-control" id="ContactNumber" value="@User?.ContactNumber" asp-for="UserDetails.ContactNumber" />
+                    <input type="text" class="form-control" id="ContactNumber" value="@User?.ContactNumber" asp-for="UserInfo.ContactNumber" />
                 </div>
             </div>
 
@@ -46,7 +46,7 @@
             <div class="form-group row mb-2">
                 <label for="Location" class="col-md-4 col-form-label">Location</label>
                 <div class="col-md-8">
-                    <select class="form-select" id="Location" asp-for="UserDetails.Location">
+                    <select class="form-select" id="Location" asp-for="UserInfo.Location">
                         <optgroup label="Australia">
                             <option value=""></option>
                             <option value="NSW">New South Wales</option>
@@ -76,7 +76,7 @@
             <div class="form-group row mb-2">
                 <label for="Gender" class="col-md-4 col-form-label">Gender</label>
                 <div class="col-md-8">
-                    <select class="form-select" asp-for="UserDetails.Gender">
+                    <select class="form-select" asp-for="UserInfo.Gender">
                         <option value=""></option>
                         <option value="Female">Female</option>
                         <option value="Male">Male</option>
@@ -89,7 +89,7 @@
             <div class="form-group row mb-2">
                 <label for="MaritalStatus" class="col-md-4 col-form-label">Marital Status</label>
                 <div class="col-md-8">
-                    <select class="form-select" id="MaritalStatus" asp-for="UserDetails.MaritalStatus">
+                    <select class="form-select" id="MaritalStatus" asp-for="UserInfo.MaritalStatus">
                         <option value=""></option>
                         <option value="Married">Married</option>
                         <option value="Unmarried">Unmarried/Separated/Divorced</option>
@@ -102,7 +102,7 @@
             <div class="form-group row mb-2">
                 <label for="HomeTown" class="col-md-4 col-form-label">Home Town</label>
                 <div class="col-md-8">
-                    <input type="text" class="form-control" id="HomeTown" asp-for="UserDetails.HomeTown" value="@User?.HomeTown" />
+                    <input type="text" class="form-control" id="HomeTown" asp-for="UserInfo.HomeTown" value="@User?.HomeTown" />
                 </div>
             </div>
 
@@ -110,7 +110,7 @@
             <div class="form-group row mb-2">
                 <label for="HouseName" class="col-md-4 col-form-label">House Name</label>
                 <div class="col-md-8">
-                    <input type="text" class="form-control" id="HouseName" asp-for="UserDetails.HouseName" value="@User?.HouseName" />
+                    <input type="text" class="form-control" id="HouseName" asp-for="UserInfo.HouseName" value="@User?.HouseName" />
                 </div>
             </div>
         </div>

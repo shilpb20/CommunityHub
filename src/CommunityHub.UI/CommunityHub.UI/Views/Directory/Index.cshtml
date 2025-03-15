@@ -1,0 +1,105 @@
+﻿@model List<CommunityHub.Core.Dtos.UserInfoDto>
+
+@section Scripts
+{
+    <script src="~/js/common-actions.js"></script>
+}
+
+@{
+    ViewData["Title"] = "User Directory";
+    int serial = 1;
+}
+
+<h1>Registration Requests</h1>
+<hr />
+
+<!-- Filter by Location -->
+@await Html.PartialAsync("Section/_Filter", Model)
+
+<!-- Sorting Controls -->
+<div class="mb-3">
+    <a href="@Url.Action("SortByLocation", "Admin")" class="btn btn-link">Sort by Location</a>
+    <a href="@Url.Action("SortByName", "Admin")" class="btn btn-link">Sort by Name</a>
+</div>
+
+@if (Model == null || !Model.Any())
+{
+    <div class="alert alert-warning">
+        <i class="bi bi-info-circle"></i> No pending requests available.
+    </div>
+}
+else
+{
+    <table class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>S.No</th>
+                <th>Request ID</th>
+                <th>User Name</th>
+                <th>Location</th>
+                <th>Details</th>
+            </tr>
+        </thead>
+        <tbody id="requestTableBody">
+            @foreach (var user in Model)
+            {
+                <tr class="mainRow">
+                    <td>@serial</td>
+                    <td>@user.FullName</td>
+                    <td><span class="compact-location">@user.Location</span></td>
+                    <td>
+                        <button class="btn btn-info" data-bs-toggle="collapse" data-bs-target="#details-@request.Id" aria-expanded="false" aria-controls="details-@request.Id">
+                            View Details
+                        </button>
+                    </td>
+                </tr>
+
+                <tr class="collapse" id="details-@user.Id">
+                    <td colspan="5">
+                        <div class="row">
+                            @(await Html.PartialAsync("Section/_UserDetails", user))
+                            @(await Html.PartialAsync("Section/_SpouseDetails", user))
+                            @(await Html.PartialAsync("Section/_ChildrenDetails", user))
+                        </div>
+                    </td>
+                </tr>
+                serial++;
+            }
+        </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <div class="pagination-container">
+        @* Pagination logic goes here *@
+        @if (Model.Count > 0)
+        {
+            <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("PreviousPage", "Admin")" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item"><a class="page-link" href="@Url.Action("Page", "Admin", new { page = 1 })">1</a></li>
+                    <li class="page-item"><a class="page-link" href="@Url.Action("Page", "Admin", new { page = 2 })">2</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("NextPage", "Admin")" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        }
+    </div>
+}
+
+<style>
+    .compact-location {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100px;
+        display: inline-block;
+        vertical-align: middle;
+    }
+</style>
