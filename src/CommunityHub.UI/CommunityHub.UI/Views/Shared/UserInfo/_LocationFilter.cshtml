@@ -1,4 +1,4 @@
-﻿@model List<CommunityHub.Core.Dtos.UserInfoDto>
+﻿@model List<string>
 
 @section Scripts
 {
@@ -8,10 +8,11 @@
 <div class="mb-3 w-100">
     <div class="d-flex justify-content-end align-items-center" style="white-space: nowrap;">
         <select id="locationFilter" class="form-select" style="width:350px;" onchange="filterByLocation()">
+
             <option value="">All Locations</option>
             @if (Model != null && Model.Any())
             {
-                @foreach (var loc in Model.Select(r => r.Location).Distinct())
+                @foreach (var loc in Model.ToList().Distinct())
                 {
                     <option value="@loc">@loc</option>
                 }

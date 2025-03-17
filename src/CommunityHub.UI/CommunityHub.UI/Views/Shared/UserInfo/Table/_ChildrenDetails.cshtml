@@ -1,4 +1,4 @@
-﻿@model CommunityHub.Core.Dtos.RegistrationRequestDto
+﻿@model List<CommunityHub.Core.Dtos.ChildrenDto>
  
 <!-- Children Details Table -->
 <div class="col-4">
@@ -11,7 +11,7 @@
             </tr>
         </thead>
         <tbody>
-            @if (Model.RegistrationInfo.Children == null || !Model.RegistrationInfo.Children.Any())
+            @if (Model == null || !Model.Any())
             {
                 <tr>
                     <td colspan="2" class="text-center">N/A</td>
@@ -21,7 +21,7 @@
             {
                 <tr>
                     <td><strong>Children:</strong></td>
-                    <td>@string.Join(", ", Model.RegistrationInfo.Children)</td>
+                    <td>@string.Join(", ", Model.Select(x => x.Name).ToList())</td>
                 </tr>
             }
         </tbody>

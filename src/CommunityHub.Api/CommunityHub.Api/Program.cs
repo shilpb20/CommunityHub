@@ -3,7 +3,8 @@ using AppComponents.Repository.EFCore;
 using AppComponents.Repository.EFCore.Transaction;
 using CommunityHub.Core.Models;
 using CommunityHub.Infrastructure.Data;
-using CommunityHub.Infrastructure.Services;
+using CommunityHub.Infrastructure.Services.Registration;
+using CommunityHub.Infrastructure.Services.User;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,9 +27,13 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.Configure<TransactionSettings>(builder.Configuration.GetSection("TransactionSettings"));
 builder.Services.AddTransactionManager<ApplicationDbContext>();
+
 builder.Services.AddRepository<RegistrationRequest, ApplicationDbContext>();
 builder.Services.AddRepository<UserInfo, ApplicationDbContext>();
+builder.Services.AddRepository<SpouseInfo, ApplicationDbContext>();
+builder.Services.AddRepository<Children, ApplicationDbContext>();
 
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRegistrationService, RegistrationService>();
 
 builder.Services.AddControllers();

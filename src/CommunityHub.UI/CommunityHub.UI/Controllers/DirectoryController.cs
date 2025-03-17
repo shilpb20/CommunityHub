@@ -1,11 +1,12 @@
-﻿using CommunityHub.UI.Services;
+﻿using CommunityHub.Core.Dtos;
+using CommunityHub.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CommunityHub.UI.Controllers
 {
     [ApiController]
     [Route("directory")]
-    public class DirectoryController : ControllerBase
+    public class DirectoryController : Controller
     {
         private readonly ILogger<DirectoryController> _logger;
         private readonly IBaseService _service;
@@ -16,9 +17,10 @@ namespace CommunityHub.UI.Controllers
             _service = baseService;       
         }
 
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var users = await _service.GetRequestAsync("api/users")
+            var users = await _service.GetRequestAsync<List<UserInfoDto>>("api/users");
             return View(users);
         }
     }

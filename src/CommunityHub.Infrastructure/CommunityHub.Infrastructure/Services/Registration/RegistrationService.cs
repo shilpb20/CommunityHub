@@ -1,35 +1,32 @@
 ﻿using AppComponents.Repository.Abstraction;
-using CommunityHub.Core.Models;
-using CommunityHub.Infrastructure.Data;
-using Newtonsoft.Json;
-using Microsoft.Extensions.Logging;
 using CommunityHub.Core.Enums;
 using CommunityHub.Core.Extensions;
-using Azure.Core;
-using CommunityHub.Core.Dtos;
-using System.Runtime.CompilerServices;
-using Microsoft.EntityFrameworkCore;
-using System.Transactions;
+using CommunityHub.Core.Models;
+using CommunityHub.Infrastructure.Data;
+using CommunityHub.Infrastructure.Services.User;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
-namespace CommunityHub.Infrastructure.Services
+namespace CommunityHub.Infrastructure.Services.Registration
 {
     public class RegistrationService : IRegistrationService
     {
         private readonly ILogger<IRegistrationService> _logger;
         private readonly ITransactionManager _transactionManager;
+        private readonly IUserService _userService;
         private readonly IRepository<RegistrationRequest, ApplicationDbContext> _requestRepository;
-        private readonly IRepository<UserInfo, ApplicationDbContext> _userInfoRepository;
 
         public RegistrationService(
             ILogger<IRegistrationService> logger,
             ITransactionManager transactionManager,
+            IUserService userService,
             IRepository<RegistrationRequest, ApplicationDbContext> requestRepository,
             IRepository<UserInfo, ApplicationDbContext> userInfoRepository)
         {
             _logger = logger;
             _transactionManager = transactionManager;
             _requestRepository = requestRepository;
-            _userInfoRepository = userInfoRepository;
+            _userService = userService;
         }
 
         public async Task<UserInfo> ApproveRequestAsync(int id)
@@ -42,7 +39,7 @@ namespace CommunityHub.Infrastructure.Services
                     if (matchingRequest == null) return null;
 
                     var registrationInfo = JsonConvert.DeserializeObject<RegistrationInfo>(matchingRequest.RegistrationInfo);
-                    var newUser = await _userInfoRepository.AddAsync(registrationInfo.UserInfo);
+                    var newUser = await _userService.CreateUserAsync(registrationInfo.UserInfo, registrationInfo.SpouseInfo, registrationInfo.Children);
                     if (newUser == null) return null;
 
                     matchingRequest.ReviewedAt = DateTime.UtcNow;
@@ -90,7 +87,7 @@ namespace CommunityHub.Infrastructure.Services
             {
                 _logger.LogError($"Error occurred while creating registration request: {ex.Message}", ex);
                 throw;
-            }        
+            }
         }
 
         public async Task<RegistrationRequest> GetRequestAsync(int id)
@@ -100,11 +97,11 @@ namespace CommunityHub.Infrastructure.Services
 
         public async Task<List<RegistrationRequest>> GetRequestsAsync(RegistrationStatus status = RegistrationStatus.Pending)
         {
-            if(status == RegistrationStatus.All)
+            if (status == RegistrationStatus.All)
             {
                 return await _requestRepository.GetAllAsync();
             }
-               
+
             return await _requestRepository.GetAllAsync(x => x.RegistrationStatus.ToLower() == status.GetEnumMemberValue().ToLower());
         }
 

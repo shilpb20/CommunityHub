@@ -27,7 +27,7 @@ public class Mapper : Profile
         CreateMap<RegistrationRequest, RegistrationRequestDto>()
             .ForMember(dest => dest.RegistrationInfo,
                 f => f.MapFrom(src => string.IsNullOrEmpty(src.RegistrationInfo)
-                    ? null : JsonConvert.DeserializeObject<RegistrationInfo>(src.RegistrationInfo)))
+                    ? null : JsonConvert.DeserializeObject<RegistrationInfoDto>(src.RegistrationInfo)))
             .ForMember(dest => dest.CreatedAt, f => f.MapFrom(src => src.CreatedAt));
 
         CreateMap<RegistrationRequestDto, RegistrationRequest>()
