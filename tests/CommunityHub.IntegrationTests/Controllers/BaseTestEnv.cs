@@ -1,14 +1,7 @@
 ﻿using AutoMapper;
 using CommunityHub.Infrastructure.Data;
-using CommunityHub.Infrastructure.Services;
-using Microsoft.AspNetCore.Mvc.Testing;
+using CommunityHub.Infrastructure.Services.Registration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace CommunityHub.IntegrationTests
 {
@@ -34,7 +27,7 @@ namespace CommunityHub.IntegrationTests
 
             using (var scope = _serviceProvider.CreateScope())
             {
-                _registrationService = scope.ServiceProvider.GetRequiredService<IRegistrationService>();   
+                _registrationService = scope.ServiceProvider.GetRequiredService<IRegistrationService>();
             }
         }
     }

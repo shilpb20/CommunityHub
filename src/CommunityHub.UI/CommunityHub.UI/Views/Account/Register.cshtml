@@ -8,8 +8,6 @@
 
 @{
     ViewData["Title"] = "Registration Form";
-
-    var userDetails = Model?.UserInfo;
 }
 
 <div class="container mt-5">
@@ -51,9 +49,9 @@
     <form id="registrationForm" method="post" action="@Url.Action("add", "account")">
         <!-- Row for User and Spouse Details (side by side) -->
         <div class="row mt-4">
-            @await Html.PartialAsync("Section/_UserDetails", Model)
-            @await Html.PartialAsync("Section/_SpouseDetails", Model)
-            @await Html.PartialAsync("Section/_ChildrenDetails", Model)
+            @await Html.PartialAsync("~/Views/Shared/UserInfo/Registration/_UserDetails.cshtml", Model)
+            @await Html.PartialAsync("~/Views/Shared/UserInfo/Registration/_SpouseDetails.cshtml", Model)
+            @await Html.PartialAsync("~/Views/Shared/UserInfo/Registration/_ChildrenDetails.cshtml", Model)
         </div>
 
         <!-- Row for Register and Cancel Buttons -->

@@ -7,7 +7,7 @@ namespace CommunityHub.Core.Dtos
     {
         public int Id { get; set; }
 
-        public RegistrationInfo RegistrationInfo { get; set; }
+        public RegistrationInfoDto RegistrationInfo { get; set; }
         public DateTime CreatedAt { get; set; }
         public string RegistrationStatus { get; set; } = string.Empty;
         public DateTime? ReviewedAt { get; set; }

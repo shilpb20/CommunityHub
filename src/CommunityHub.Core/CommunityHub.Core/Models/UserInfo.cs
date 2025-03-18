@@ -39,9 +39,9 @@ namespace CommunityHub.Core.Models
 
 
         [ForeignKey("SpouseInfoId")]
-        public SpouseInfo? SpouseInfo { get; set; }
+        public virtual SpouseInfo? SpouseInfo { get; set; }
 
 
-        public List<Children> Children { get; set; } = new List<Children>();
+        public virtual List<Children> Children { get; set; } = new List<Children>();
     }
 }

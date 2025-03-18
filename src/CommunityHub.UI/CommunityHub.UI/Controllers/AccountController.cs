@@ -28,12 +28,18 @@ namespace CommunityHub.UI.Controllers
         [HttpGet("register")]
         public IActionResult Register()
         {
-            var registrationData = new RegistrationInfoCreateDto() { UserInfo = new UserInfoCreateDto() };
+            var registrationData = new RegistrationInfoCreateDto() 
+            { 
+                UserInfo = new UserInfoCreateDto(), 
+                SpouseInfo = null, 
+                Children = new List<ChildrenCreateDto>() 
+            };
+
             return View(registrationData);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add([FromForm] RegistrationInfo registrationData)
+        public async Task<IActionResult> Add([FromForm]RegistrationInfoCreateDto registrationData)
         {
             if (!ModelState.IsValid)
             {
@@ -46,7 +52,7 @@ namespace CommunityHub.UI.Controllers
                 return View("register", registrationData);
             }
 
-            var result = await _service.AddRequestAsync<RegistrationInfo, RegistrationRequestDto>(_url, registrationData);
+            var result = await _service.AddRequestAsync<RegistrationInfoCreateDto, RegistrationRequestDto>(_url, registrationData);
             if (result == null)
             {
                 ModelState.AddModelError("", "An error occurred while registering.");

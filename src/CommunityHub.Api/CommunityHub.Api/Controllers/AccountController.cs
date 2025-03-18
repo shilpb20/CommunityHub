@@ -2,7 +2,7 @@
 using CommunityHub.Core.Constants;
 using CommunityHub.Core.Dtos;
 using CommunityHub.Core.Models;
-using CommunityHub.Infrastructure.Services;
+using CommunityHub.Infrastructure.Services.Registration;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CommunityHub.Api.Controllers

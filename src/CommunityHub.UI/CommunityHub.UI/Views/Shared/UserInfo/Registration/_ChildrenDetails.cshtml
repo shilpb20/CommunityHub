@@ -1,4 +1,8 @@
-﻿@model CommunityHub.Core.Dtos.RegistrationInfoCreateDto
+﻿ @model CommunityHub.Core.Dtos.RegistrationInfoCreateDto
+
+@{
+    var children = Model?.Children ?? new List<CommunityHub.Core.Dtos.ChildrenCreateDto>();
+}
 
 <div class="col-md-6">
     <div class="card mt-4">
@@ -13,16 +17,17 @@
                 </div>
             </div>
 
+            <!-- Child Input Section (Initially Hidden) -->
             <div id="childInputSection" style="display: none;">
                 <div class="form-group row mb-2 d-flex align-items-start">
                     <label for="childNameInput" class="col-md-2 col-form-label">Child's Name</label>
 
-                    <!-- Make the input field longer by using col-md-6 -->
+                    <!-- Child Name Input Field -->
                     <div class="col-md-6">
                         <input type="text" class="form-control" id="childNameInput" placeholder="Enter child's name" />
                     </div>
 
-                    <!-- Align buttons properly, and adjust width if needed -->
+                    <!-- Buttons -->
                     <div class="col-md-4 d-flex justify-content-end">
                         <button type="button" class="btn btn-success me-2" id="btnSaveChild">Save</button>
                         <button type="button" class="btn btn-secondary me-2" id="btnCancelChild">Cancel</button>
@@ -30,6 +35,7 @@
                 </div>
             </div>
 
+            <!-- Duplicate Error Message -->
             <div id="duplicateErrorMessage" class="alert alert-danger" style="display: none;">
                 Child name has already been added!
             </div>
@@ -37,19 +43,23 @@
             <!-- List of Children -->
             <div id="childrenListSection">
                 <ul id="childrenList" class="list-group mt-3">
-                    @if (Model?.Children != null && Model.Children.Any())
+                    @for (int i = 0; i < children.Count; i++)
                     {
-                        foreach (var child in Model.Children)
-                        {
-                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                <span>@child.Name</span>
-                                <input type="hidden" name="Children" value="@child.Name" />
-                                <button type="button" class="btn btn-danger btn-sm btnDeleteChild">Delete</button>
-                            </li>
-                        }
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>@children[i].Name</span>
+
+                            <!-- Hidden Input for Binding Each Child to Model -->
+                            <input type="hidden" name="Children[@i].Name" value="@children[i].Name" />
+
+                            <button type="button" class="btn btn-danger btn-sm btnDeleteChild">Delete</button>
+                        </li>
                     }
                 </ul>
             </div>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script src="~/js/registrationForm.js"></script>
+}
