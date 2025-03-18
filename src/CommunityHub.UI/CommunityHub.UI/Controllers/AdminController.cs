@@ -1,7 +1,6 @@
 ﻿using CommunityHub.Core.Constants;
 using CommunityHub.Core.Dtos;
 using CommunityHub.Core.Enums;
-using CommunityHub.Core.Extensions;
 using CommunityHub.Core.Helpers;
 using CommunityHub.Core.Models;
 using CommunityHub.UI.Services;
@@ -64,7 +63,7 @@ namespace CommunityHub.UI.Controllers
         }
 
         [HttpPost("request/approve")]
-        public async Task<IActionResult> ApproveRequest([FromForm]int id)
+        public async Task<IActionResult> ApproveRequest([FromForm] int id)
         {
             var result = await _service.AddRequestAsync<string, UserInfo>($"{ApiRouteSegment.ApproveRequest}/{id}", null);
             if (result != null)

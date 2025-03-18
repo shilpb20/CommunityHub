@@ -34,7 +34,7 @@ namespace CommunityHub.Infrastructure.Services.User
 
         public async Task<UserInfo> CreateUserAsync(UserInfo userInfo, SpouseInfo? spouseInfo, List<Children>? children)
         {
-            using(_transactionManager.BeginTransactionAsync())
+            using (_transactionManager.BeginTransactionAsync())
             {
                 try
                 {
@@ -51,11 +51,10 @@ namespace CommunityHub.Infrastructure.Services.User
                     if (newUser == null)
                         throw new Exception("User info creation failed.");
 
-                    foreach (var child in children) 
+                    foreach (var child in children)
                     {
                         child.UserInfoId = newUser.Id;
                         await _childRepository.AddAsync(child);
-
                     }
 
                     await _transactionManager.CommitTransactionAsync();
@@ -75,13 +74,11 @@ namespace CommunityHub.Infrastructure.Services.User
             return await _userRepository.GetAsync(x => x.Id == id);
         }
 
-        public async Task<List<UserInfo>> GetUsersAsync()
+
+        public async Task<List<UserInfo>> GetUsersAsync(Dictionary<string, bool> orderBy)
         {
-            var userInfos = await _userRepository.GetAll();
-            return await userInfos
-                            .Include(x => x.SpouseInfo)
-                            .Include(y => y.Children)
-                            .ToListAsync();
+            var users = await _userRepository.GetAll(orderByClause: orderBy);
+            return await users.Include(x => x.SpouseInfo).Include(y => y.Children).ToListAsync();
         }
     }
 }

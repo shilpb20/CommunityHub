@@ -1,16 +1,14 @@
-﻿using CommunityHub.Core.Dtos;
-using CommunityHub.Core.Enums;
-using CommunityHub.Core.Models;
+﻿using CommunityHub.Core.Models;
 
 namespace CommunityHub.Infrastructure.Services.User
 {
     public interface IUserService
     {
-        Task<UserInfo> CreateUserAsync(UserInfo userInfo, 
+        Task<UserInfo> CreateUserAsync(UserInfo userInfo,
             SpouseInfo? spouseInfo,
             List<Children>? children);
 
         Task<UserInfo> GetUserAsync(int id);
-        Task<List<UserInfo>> GetUsersAsync();
+        Task<List<UserInfo>> GetUsersAsync(Dictionary<string, bool> orderBy);
     }
 }

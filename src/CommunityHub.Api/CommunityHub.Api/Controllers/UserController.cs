@@ -1,11 +1,9 @@
-﻿using AppComponents.Repository.Abstraction;
+﻿ using AppComponents.Repository.Abstraction;
 using AutoMapper;
 using CommunityHub.Core.Dtos;
 using CommunityHub.Core.Models;
-using CommunityHub.Infrastructure.Data;
 using CommunityHub.Infrastructure.Services.User;
 using Microsoft.AspNetCore.Mvc;
-using System.Reflection.PortableExecutable;
 
 namespace CommunityHub.Api.Controllers
 {
@@ -18,8 +16,8 @@ namespace CommunityHub.Api.Controllers
         private readonly IUserService _userService;
 
         public UserController(
-            ILogger<UserController> logger, 
-            IMapper mapper, 
+            ILogger<UserController> logger,
+            IMapper mapper,
             IUserService userService)
         {
             _logger = logger;
@@ -27,13 +25,33 @@ namespace CommunityHub.Api.Controllers
             _userService = userService;
         }
 
+
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK, Type=typeof(List<UserInfoDto>))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<UserInfoDto>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<ActionResult<List<UserInfoDto>>> GetUsers()
+        public async Task<ActionResult<List<UserInfoDto>>> GetUsers(
+            [FromQuery]string? sortBy,
+            [FromQuery]bool ascending = true)
         {
-            var users = await _userService.GetUsersAsync();
-            if(!users.Any())
+            Dictionary<string, bool> orderBy = new();
+            if(sortBy == null)
+            {
+                orderBy = new Dictionary<string, bool>
+                {
+                    { "Location", true },
+                    { "FullName", true }
+                };
+            }
+            else
+            {
+                orderBy = new Dictionary<string, bool>()
+                {
+                    { sortBy, ascending }
+                };
+            }
+
+            var users = await _userService.GetUsersAsync(orderBy);
+            if (!users.Any())
             {
                 return NoContent();
             }

@@ -3,6 +3,7 @@
 @section Scripts
 {
     <script src="~/js/common-actions.js"></script>
+    <script src="~/js/filter-location.js"></script>
 }
 
 @{
@@ -20,9 +21,6 @@
 <hr />
 
 <!-- Filter by Location -->
-@* @await Html.PartialAsync("~/Views/Shared/UserInfo/_LocationFilter.cshtml", Model.Select(x => x.RegistrationInfo.UserInfo.Location).ToList()) *@
-
-
 <div class="mb-3 w-100">
     <div class="d-flex justify-content-end align-items-center" style="white-space: nowrap;">
         <select id="locationFilter" class="form-select" style="width:350px;" onchange="filterByLocation()">
@@ -30,7 +28,7 @@
             <option value="">All Locations</option>
             @if (Model != null && Model.Any())
             {
-                @foreach (var loc in Model.ToList().Distinct())
+                @foreach (var loc in Model.Select(x => x.RegistrationInfo.UserInfo.Location).ToList().Distinct())
                 {
                     <option value="@loc">@loc</option>
                 }
