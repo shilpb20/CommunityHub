@@ -18,16 +18,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
-      - name: Check installed .NET SDKs
+
+      - name: Install .NET 9 SDK
         run: |
-          dotnet --version
-          dotnet --list-sdks
-          
-      - name: Set up .NET SDK
-        uses: actions/setup-dotnet@v3
-        with:
-          sdk-version: '9.0.x'  # Use the latest .NET 9 SDK
+          wget https://download.visualstudio.microsoft.com/download/pr/5bbf4100-4b1f-4f6e-b01b-fd08bbfd1f90/a9ef7f808be95b0c5a93a4b228db86ef/dotnet-sdk-9.0.3-linux-x64.tar.gz
+          sudo mkdir -p /usr/share/dotnet
+          sudo tar -zxf dotnet-sdk-9.0.3-linux-x64.tar.gz -C /usr/share/dotnet
+          sudo ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
 
       - name: Cache NuGet packages
         uses: actions/cache@v3
