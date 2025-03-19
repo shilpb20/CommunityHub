@@ -25,7 +25,7 @@ namespace CommunityHub.Api.Controllers
             _registrationService = registrationService;
         }
 
-        [HttpGet("api/admin/request")]
+        [HttpGet(ApiRouteSegment.AdminRequest)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<RegistrationRequestDto>))]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -45,7 +45,7 @@ namespace CommunityHub.Api.Controllers
             }
         }
 
-        [HttpPut("api/admin/request/reject/{id:int}")]
+        [HttpPut(ApiRouteSegment.RejectRequest + "/{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(RegistrationRequestDto))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
@@ -67,7 +67,7 @@ namespace CommunityHub.Api.Controllers
             }
         }
 
-        [HttpPost("api/admin/request/approve/{id:int}")]
+        [HttpPost(ApiRouteSegment.ApproveRequest+ "/{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserInfoDto))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]

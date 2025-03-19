@@ -8,6 +8,7 @@ using CommunityHub.IntegrationTests;
 using CommunityHub.IntegrationTests.TestData;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using CommunityHub.Core.Constants;
 
 namespace CommunityHub.Integrations.Controllers.Admin
 {
@@ -18,7 +19,7 @@ namespace CommunityHub.Integrations.Controllers.Admin
 
         public RegistrationReviewTests(ApplicationStartup application) : base(application)
         {
-            _url = "api/admin/request";
+            _url = ApiRouteSegment.AdminRequest;
         }
 
         public async Task InitializeAsync()
