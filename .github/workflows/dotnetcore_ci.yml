@@ -19,6 +19,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install .NET 9 SDK
+        run: |
+          wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh
+          sudo bash dotnet-install.sh --version 9.0.202 --install-dir /usr/share/dotnet
+          sudo rm -f /usr/bin/dotnet  # Remove any existing symbolic link
+          sudo ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet  # Create new symbolic link
+
       - name: Cache NuGet packages
         uses: actions/cache@v3
         with:
@@ -26,6 +33,10 @@ jobs:
           key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
           restore-keys: |
             ${{ runner.os }}-nuget-
+
+      - name: Restore NuGet packages (if needed)
+        run: dotnet restore
+        if: steps.cache.outputs.cache-hit != 'true'  # Only restore if the cache was not hit
 
       - name: Build code
         run: dotnet build --configuration Release --no-restore
@@ -38,4 +49,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-results
-          path: TestResults/
+          path: **/test-results.trx  # This will upload the .trx file from any folder
