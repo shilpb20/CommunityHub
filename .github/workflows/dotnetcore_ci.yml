@@ -9,7 +9,7 @@ on:
     branches:
       - development
       - master
-  workflow_dispatch:  # Allows manual trigger via GitHub UI
+  workflow_dispatch:
 
 jobs:
   build:
@@ -34,8 +34,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nuget-
 
-      - name: Restore NuGet packages
+      - name: Restore NuGet packages (if needed)
         run: dotnet restore
+        if: steps.cache.outputs.cache-hit != 'true'  # Only restore if the cache was not hit
 
       - name: Build code
         run: dotnet build --configuration Release --no-restore
@@ -43,9 +44,13 @@ jobs:
       - name: Run tests with code coverage
         run: dotnet test --configuration Release --no-build --logger "trx;LogFileName=test-results.trx" --verbosity normal
 
+      # Add this step to verify where the test results file is located
+      - name: List files in working directory
+        run: ls -R  # This will recursively list all files in the working directory to help find test-results.trx
+
       - name: Upload test results
-        if: always()  # Always upload test results even if tests fail
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: test-results
-          path: ./TestResults/test-results.trx  # Ensure the correct path to test results
+          path: ./test-results.trx  # Update the path to match where the file is located based on the previous step
