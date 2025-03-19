@@ -34,6 +34,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nuget-
 
+      - name: Restore NuGet packages (if needed)
+        run: dotnet restore
+        if: steps.cache.outputs.cache-hit != 'true'  # Only restore if the cache was not hit
+
       - name: Build code
         run: dotnet build --configuration Release --no-restore
 
