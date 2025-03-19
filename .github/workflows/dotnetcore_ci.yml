@@ -21,7 +21,7 @@ jobs:
 
       - name: Install .NET 9 SDK
         run: |
-          wget https://download.visualstudio.microsoft.com/download/pr/5bbf4100-4b1f-4f6e-b01b-fd08bbfd1f90/a9ef7f808be95b0c5a93a4b228db86ef/dotnet-sdk-9.0.3-linux-x64.tar.gz
+          wget https://download.visualstudio.microsoft.com/download/pr/52daf653-e6d8-4915-aea1-9c2e2be169a5/9f3e289918eb9054770b69c0b100bb8f/dotnet-sdk-9.0.202-linux-arm64.tar.gz
           sudo mkdir -p /usr/share/dotnet
           sudo tar -zxf dotnet-sdk-9.0.3-linux-x64.tar.gz -C /usr/share/dotnet
           sudo ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
