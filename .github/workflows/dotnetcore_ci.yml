@@ -23,7 +23,8 @@ jobs:
         run: |
           wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh
           sudo bash dotnet-install.sh --version 9.0.202 --install-dir /usr/share/dotnet
-          sudo ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet
+          sudo rm -f /usr/bin/dotnet  # Remove any existing symbolic link
+          sudo ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet  # Create new symbolic link
 
       - name: Cache NuGet packages
         uses: actions/cache@v3
