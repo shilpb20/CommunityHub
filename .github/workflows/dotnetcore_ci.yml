@@ -9,7 +9,7 @@ on:
     branches:
       - development
       - master
-  workflow_dispatch:  # Allow manual trigger
+  workflow_dispatch:  # Allows manual trigger via GitHub UI
 
 jobs:
   build:
@@ -34,9 +34,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nuget-
 
-      - name: Restore NuGet packages (if needed)
+      - name: Restore NuGet packages
         run: dotnet restore
-        if: steps.cache.outputs.cache-hit != 'true'  # Only restore if the cache was not hit
 
       - name: Build code
         run: dotnet build --configuration Release --no-restore
@@ -45,8 +44,8 @@ jobs:
         run: dotnet test --configuration Release --no-build --logger "trx;LogFileName=test-results.trx" --verbosity normal
 
       - name: Upload test results
-        if: always()  # Ensures the test results are uploaded even if tests fail
+        if: always()  # Always upload test results even if tests fail
         uses: actions/upload-artifact@v4
         with:
           name: test-results
-          path: TestResults/
+          path: ./TestResults/test-results.trx  # Ensure the correct path to test results
