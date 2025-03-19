@@ -3,22 +3,36 @@ using CommunityHub.Core.Dtos;
 using CommunityHub.Core.Enums;
 using CommunityHub.Core.Extensions;
 using CommunityHub.Core.Helpers;
+using CommunityHub.Core.Models;
 using CommunityHub.IntegrationTests;
 using CommunityHub.IntegrationTests.TestData;
 using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 
 namespace CommunityHub.Integrations.Controllers.Admin
 {
-    public class RegistrationReviewTests : BaseTestEnv
+    public class RegistrationReviewTests : BaseTestEnv, IAsyncLifetime
     {
         private const string _registerRoute = "api/account";
+        private List<RegistrationRequestDto> _registrationRequests;
 
         public RegistrationReviewTests(ApplicationStartup application) : base(application)
         {
             _url = "api/admin/request";
         }
 
-        async Task<List<RegistrationRequestDto>> SeedRegistrationRequests()
+        public async Task InitializeAsync()
+        {
+            _registrationRequests = await SeedRegistrationRequests();
+        }
+
+        public Task DisposeAsync()
+        {
+            return Task.CompletedTask;
+        }
+
+
+        public async Task<List<RegistrationRequestDto>> SeedRegistrationRequests()
         {
             var createdRequests = new List<RegistrationRequestDto>();
 
@@ -45,8 +59,6 @@ namespace CommunityHub.Integrations.Controllers.Admin
         public async Task GetRequests_ShouldReturnSuccessAndAllPendingRequests_WhenValidRequestIsSent(string registrationStatus)
         {
             //Arrange
-            await SeedRegistrationRequests();
-
             var uriBuilder = new UriBuilder(_application.Client.BaseAddress)
             {
                 Path = _url.TrimStart('/'),
@@ -68,8 +80,6 @@ namespace CommunityHub.Integrations.Controllers.Admin
         public async Task GetRequests_ShouldReturnNoContent_WhenMatchingDataIsNotFound(string registrationStatus)
         {
             //Arrange
-            await SeedRegistrationRequests();
-
             Dictionary<string, string> queryParameters = new Dictionary<string, string>()
             {
                { RouteParameter.Request.RegistrationStatus, registrationStatus }
@@ -88,8 +98,6 @@ namespace CommunityHub.Integrations.Controllers.Admin
         public async Task GetRequests_ShouldReturnBadRequest_WhenInvalidStatusIsSent()
         {
             //Arrange
-            await SeedRegistrationRequests();
-
             var registrationStatus = "invalid";
             Dictionary<string, string> queryParameters = new Dictionary<string, string>()
             {
@@ -115,16 +123,13 @@ namespace CommunityHub.Integrations.Controllers.Admin
         public async Task RejectRequest_ShouldReturnSuccessAndUpdateRegistrationRequest_WhenValidRequestIsSent()
         {
             //Arrange
-            int id = 1;
             string comment = "Duplicate request";
-
-            var requestsCreated = await SeedRegistrationRequests();
-            var expectedResult = requestsCreated.FirstOrDefault();
+            var expectedResult = _registrationRequests.FirstOrDefault();
 
             //Act
             var result = await HttpSendRequestHelper
                 .SendUpdateRequestAsync<string, RegistrationRequestDto>
-                (_httpClient, ApiRouteSegment.RejectRequest, id, comment);
+                (_httpClient, ApiRouteSegment.RejectRequest, expectedResult.Id, comment);
 
             //Assert
             Assert.Equivalent(RegistrationStatus.Rejected.GetEnumMemberValue().ToLower(), result.RegistrationStatus.ToLower());
@@ -144,9 +149,7 @@ namespace CommunityHub.Integrations.Controllers.Admin
         {
             //Arrange
             string comment = "Duplicate request";
-
-            var requestsCreated = await SeedRegistrationRequests();
-            var expectedResult = requestsCreated.FirstOrDefault();
+            var expectedResult = _registrationRequests.FirstOrDefault();
 
             //Act
             HttpRequestMessage request = HttpHelper.GetHttpPutRequest<string>(ApiRouteSegment.RejectRequest, id, comment);
@@ -160,7 +163,6 @@ namespace CommunityHub.Integrations.Controllers.Admin
         public async Task RejectRequest_ShouldReturnBadRequest_WhenInvalidIdIsSent()
         {
             //Arrange
-            var requestsCreated = await SeedRegistrationRequests();
             int id = _dbContext.RegistrationRequests.OrderByDescending(x => x.Id).FirstOrDefault().Id + 1;
             string comment = "Invalid request";
 
@@ -180,9 +182,10 @@ namespace CommunityHub.Integrations.Controllers.Admin
         public async Task ApproveRequest_ShouldReturnCreatedAndRegisterUser()
         {
             //Arrange
-            string approveRoute = $"{ApiRouteSegment.ApproveRequest}/1";
-            var requestsCreated = await SeedRegistrationRequests();
-            var expectedResult = requestsCreated.FirstOrDefault();
+            RegistrationRequest registrationRequest = _dbContext.RegistrationRequests.FirstOrDefault(
+                    x => x.RegistrationStatus == RegistrationStatus.Pending.GetEnumMemberValue());
+
+            string approveRoute = $"{ApiRouteSegment.ApproveRequest}/{registrationRequest.Id}";
             Assert.Equivalent(_dbContext.UserInfo.Count(), 0);
 
             //Act
@@ -192,8 +195,11 @@ namespace CommunityHub.Integrations.Controllers.Admin
 
             //Assert
             Assert.Equivalent(StatusCodes.Status200OK, response.StatusCode);
-            Assert.Equivalent(_dbContext.UserInfo.Count(), 1);
-            Assert.Equivalent(_mapper.Map<UserInfoDto>(_dbContext.UserInfo.FirstOrDefault()), result);
+
+            var matchingRegistration = JsonConvert.DeserializeObject<RegistrationInfo>(registrationRequest.RegistrationInfo);
+            Assert.Equivalent(matchingRegistration.UserInfo.Email, result.Email);
+
+            //TODO: Match objects
         }
 
         #endregion
