@@ -9,7 +9,7 @@ on:
     branches:
       - development
       - master
-  workflow_dispatch:
+  workflow_dispatch:  # Allow manual trigger
 
 jobs:
   build:
@@ -18,16 +18,13 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
-      - name: Check installed .NET SDKs
+
+      - name: Install .NET 9 SDK
         run: |
-          dotnet --version
-          dotnet --list-sdks
-          
-      - name: Set up .NET SDK
-        uses: actions/setup-dotnet@v3
-        with:
-          sdk-version: '9.0.x'  # Use the latest .NET 9 SDK
+          wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh
+          sudo bash dotnet-install.sh --version 9.0.202 --install-dir /usr/share/dotnet
+          sudo rm -f /usr/bin/dotnet  # Remove any existing symbolic link
+          sudo ln -s /usr/share/dotnet/dotnet /usr/bin/dotnet  # Create new symbolic link
 
       - name: Cache NuGet packages
         uses: actions/cache@v3
@@ -37,6 +34,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-nuget-
 
+      - name: Restore NuGet packages (if needed)
+        run: dotnet restore
+        if: steps.cache.outputs.cache-hit != 'true'  # Only restore if the cache was not hit
+
       - name: Build code
         run: dotnet build --configuration Release --no-restore
 
@@ -44,7 +45,7 @@ jobs:
         run: dotnet test --configuration Release --no-build --logger "trx;LogFileName=test-results.trx" --verbosity normal
 
       - name: Upload test results
-        if: always()
+        if: always()  # Ensures the test results are uploaded even if tests fail
         uses: actions/upload-artifact@v4
         with:
           name: test-results
