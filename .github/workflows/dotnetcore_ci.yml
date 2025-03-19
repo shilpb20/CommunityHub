@@ -42,15 +42,16 @@ jobs:
         run: dotnet build --configuration Release --no-restore
 
       - name: Run tests with code coverage
-        run: dotnet test --configuration Release --no-build --logger "trx;LogFileName=test-results.trx" --verbosity normal
-
-      # Add this step to verify where the test results file is located
-      - name: List files in working directory
-        run: ls -R  # This will recursively list all files in the working directory to help find test-results.trx
+        run: |
+          dotnet test --configuration Release --no-build --logger "trx;LogFileName=test-results.trx" --results-directory ./TestResults --verbosity normal
+          
+      # List files in the directory to check if test-results.trx was created
+      - name: List files in TestResults directory
+        run: ls -R ./TestResults  # Check if test-results.trx exists in this folder
 
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: test-results
-          path: ./test-results.trx  # Update the path to match where the file is located based on the previous step
+          path: ./TestResults/test-results.trx  # Adjusted to the correct path of the .trx file
