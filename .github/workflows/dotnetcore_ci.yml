@@ -19,6 +19,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up .NET SDK
+        uses: actions/setup-dotnet@v3
+        with:
+          sdk-version: '9.0.x'  # Use the latest .NET 9 SDK
+
       - name: Cache NuGet packages
         uses: actions/cache@v3
         with:
