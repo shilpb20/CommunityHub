@@ -18,7 +18,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
+        
+      - name: Check installed .NET SDKs
+        run: |
+          dotnet --version
+          dotnet --list-sdks
+          
       - name: Set up .NET SDK
         uses: actions/setup-dotnet@v3
         with:
