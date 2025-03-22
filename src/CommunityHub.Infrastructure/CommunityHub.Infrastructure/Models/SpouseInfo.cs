@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace CommunityHub.Core.Models
+namespace CommunityHub.Infrastructure.Models
 {
     public class SpouseInfo
     {
@@ -20,10 +20,21 @@ namespace CommunityHub.Core.Models
 
         [Required]
         public string ContactNumber { get; set; } = string.Empty;
+        [Required]
+        public string Gender { get; set; } = string.Empty;
+
+        [Required]
+        public string Location { get; set; } = string.Empty;
 
         [Required]
         public string HomeTown { get; set; } = string.Empty;
 
         public string? HouseName { get; set; }
+
+
+        public int UserInfoId { get; set; }
+
+        [ForeignKey("UserInfoId")]
+        public UserInfo UserInfo { get; set; }
     }
 }

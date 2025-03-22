@@ -3,23 +3,24 @@ using CommunityHub.Core.Dtos;
 using CommunityHub.Core.Enums;
 using CommunityHub.Core.Extensions;
 using CommunityHub.Core.Helpers;
-using CommunityHub.Core.Models;
+using CommunityHub.Infrastructure.Models;
 using CommunityHub.IntegrationTests;
 using CommunityHub.IntegrationTests.TestData;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
-using CommunityHub.Core.Constants;
 
 namespace CommunityHub.Integrations.Controllers.Admin
 {
     public class RegistrationReviewTests : BaseTestEnv, IAsyncLifetime
     {
-        private const string _registerRoute = "api/account";
+        private readonly string _registrationRequest = ApiRoute.Registration.Request;
+        private readonly string _rejectRequest = ApiRoute.Admin.RejectRequestById;
+        private readonly string _approveRequest = ApiRoute.Admin.ApproveRequestById;
+
         private List<RegistrationRequestDto> _registrationRequests;
 
         public RegistrationReviewTests(ApplicationStartup application) : base(application)
         {
-            _url = ApiRouteSegment.AdminRequest;
         }
 
         public async Task InitializeAsync()
@@ -41,7 +42,7 @@ namespace CommunityHub.Integrations.Controllers.Admin
             foreach (var registrationData in registrationRequests)
             {
                 var result = await HttpSendRequestHelper
-                    .SendPostRequestAsync<RegistrationInfoCreateDto, RegistrationRequestDto>(_httpClient, "api/account", registrationData);
+                    .SendPostRequestAsync<RegistrationInfoCreateDto, RegistrationRequestDto>(_httpClient, ApiRoute.Registration.Request, registrationData);
 
                 Assert.Equivalent(registrationData, result.RegistrationInfo);
 
@@ -62,7 +63,7 @@ namespace CommunityHub.Integrations.Controllers.Admin
             //Arrange
             var uriBuilder = new UriBuilder(_application.Client.BaseAddress)
             {
-                Path = _url.TrimStart('/'),
+                Path = _registrationRequest,
                 Query = $"registrationStatus={registrationStatus}"
             };
 
@@ -83,9 +84,9 @@ namespace CommunityHub.Integrations.Controllers.Admin
             //Arrange
             Dictionary<string, string> queryParameters = new Dictionary<string, string>()
             {
-               { RouteParameter.Request.RegistrationStatus, registrationStatus }
+               { RouteParameter.Registration.Status, registrationStatus }
             };
-            var uriBuilder = HttpHelper.BuildUri(_httpClient.BaseAddress.ToString(), ApiRouteSegment.AdminRequest, queryParameters);
+            var uriBuilder = HttpHelper.BuildUri(_httpClient.BaseAddress.ToString(), _registrationRequest, queryParameters);
 
             //Act
             var request = HttpHelper.GetHttpGetRequest(uriBuilder.ToString());
@@ -102,9 +103,9 @@ namespace CommunityHub.Integrations.Controllers.Admin
             var registrationStatus = "invalid";
             Dictionary<string, string> queryParameters = new Dictionary<string, string>()
             {
-               { RouteParameter.Request.RegistrationStatus, registrationStatus }
+               { RouteParameter.Registration.Status, registrationStatus }
             };
-            var uriBuilder = HttpHelper.BuildUri(_httpClient.BaseAddress.ToString(), ApiRouteSegment.AdminRequest, queryParameters);
+            var uriBuilder = HttpHelper.BuildUri(_httpClient.BaseAddress.ToString(), _registrationRequest, queryParameters);
 
 
             //Act
@@ -130,7 +131,7 @@ namespace CommunityHub.Integrations.Controllers.Admin
             //Act
             var result = await HttpSendRequestHelper
                 .SendUpdateRequestAsync<string, RegistrationRequestDto>
-                (_httpClient, ApiRouteSegment.RejectRequest, expectedResult.Id, comment);
+                (_httpClient, _rejectRequest, expectedResult.Id, comment);
 
             //Assert
             Assert.Equivalent(RegistrationStatus.Rejected.GetEnumMemberValue().ToLower(), result.RegistrationStatus.ToLower());
@@ -153,7 +154,7 @@ namespace CommunityHub.Integrations.Controllers.Admin
             var expectedResult = _registrationRequests.FirstOrDefault();
 
             //Act
-            HttpRequestMessage request = HttpHelper.GetHttpPutRequest<string>(ApiRouteSegment.RejectRequest, id, comment);
+            HttpRequestMessage request = HttpHelper.GetHttpPutRequest<string>(_rejectRequest, id, comment);
             var response = await _httpClient.SendAsync(request);
 
             //Assert
@@ -168,7 +169,7 @@ namespace CommunityHub.Integrations.Controllers.Admin
             string comment = "Invalid request";
 
             //Act
-            HttpRequestMessage request = HttpHelper.GetHttpPutRequest<string>(ApiRouteSegment.RejectRequest, id, comment);
+            HttpRequestMessage request = HttpHelper.GetHttpPutRequest<string>(_rejectRequest, id, comment);
             var response = await _httpClient.SendAsync(request);
 
             //Assert
@@ -186,11 +187,10 @@ namespace CommunityHub.Integrations.Controllers.Admin
             RegistrationRequest registrationRequest = _dbContext.RegistrationRequests.FirstOrDefault(
                     x => x.RegistrationStatus == RegistrationStatus.Pending.GetEnumMemberValue());
 
-            string approveRoute = $"{ApiRouteSegment.ApproveRequest}/{registrationRequest.Id}";
             Assert.Equivalent(_dbContext.UserInfo.Count(), 0);
 
             //Act
-            var request = HttpHelper.GetHttpPostRequest<string>(approveRoute, null);
+            var request = HttpHelper.GetHttpPostRequest<string>(_approveRequest, registrationRequest.Id,  null);
             var response = await _httpClient.SendAsync(request);
             var result = await HttpHelper.GetHttpResponseObject<UserInfoDto>(response);
 

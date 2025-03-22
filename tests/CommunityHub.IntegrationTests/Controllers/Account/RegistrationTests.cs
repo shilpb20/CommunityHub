@@ -1,16 +1,20 @@
-﻿using CommunityHub.Core.Dtos;
+﻿using CommunityHub.Core.Constants;
+using CommunityHub.Core.Dtos;
 using CommunityHub.Core.Helpers;
-using CommunityHub.Core.Models;
+using CommunityHub.Infrastructure.Models;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using System.Text;
 
 namespace CommunityHub.IntegrationTests.Controllers.Account
 {
     public class RegistrationTests : BaseTestEnv
     {
+        string _registrationRequest = ApiRoute.Registration.Request;
+        string registrationRequestById = ApiRoute.Registration.GetRequestById;
+
         public RegistrationTests(ApplicationStartup application) : base(application)
         {
-            _url = "api/account";
         }
 
         #region add-registration-request
@@ -31,7 +35,7 @@ namespace CommunityHub.IntegrationTests.Controllers.Account
             };
 
             //Act
-            var request = HttpHelper.GetHttpPostRequest(_url, registrationDataCreateDto);
+            var request = HttpHelper.GetHttpPostRequest<RegistrationInfoCreateDto>(_registrationRequest, registrationDataCreateDto);
             var response = await _httpClient.SendAsync(request);
             var result = await HttpHelper.GetHttpResponseObject<RegistrationRequestDto>(response);
 
@@ -50,8 +54,8 @@ namespace CommunityHub.IntegrationTests.Controllers.Account
         public async Task RegisterUser_ReturnsBadRequest_WhenNullDataIsSent()
         {
             //Act
-            var request = HttpHelper.GetHttpPostRequest<RegistrationRequestDto>(_url, null);
-            request.Content = new StringContent("null", System.Text.Encoding.UTF8, "application/json");
+            var request = HttpHelper.GetHttpPostRequest<RegistrationRequestDto>(_registrationRequest, null);
+            request.Content = new StringContent("null", Encoding.UTF8, "application/json");
             var response = await _httpClient.SendAsync(request);
 
             //Assert
@@ -81,6 +85,8 @@ namespace CommunityHub.IntegrationTests.Controllers.Account
                     Email = "janet.smith@gmail.com",
                     CountryCode = "+61",
                     ContactNumber = "0420202020",
+                    Gender = "Male",
+                    Location = "New South Whales",
                     HomeTown = "Sydney",
                     HouseName = "Smith Family"
                 },
@@ -104,7 +110,7 @@ namespace CommunityHub.IntegrationTests.Controllers.Account
             await ClearRegistrationRequestsAsync();
 
             //Act
-            var request = HttpHelper.GetHttpGetRequestById(_url, 1);
+            var request = HttpHelper.GetHttpGetRequestById(registrationRequestById, 1);
             var response = await _httpClient.SendAsync(request);
 
             //Assert
@@ -125,7 +131,7 @@ namespace CommunityHub.IntegrationTests.Controllers.Account
         public async Task GetRegistrationRequest_ReturnsBadRequest_WhenNonPositiveIdIsSent(int id)
         {
             //Act
-            var request = HttpHelper.GetHttpGetRequestById(_url, id);
+            var request = HttpHelper.GetHttpGetRequestById(registrationRequestById, id);
             var response = await _httpClient.SendAsync(request);
 
             //Assert
@@ -139,7 +145,7 @@ namespace CommunityHub.IntegrationTests.Controllers.Account
             var registrationRequest = await AddRegistrationRequest();
 
             //Act
-            var request = HttpHelper.GetHttpGetRequestById(_url, registrationRequest.Id);
+            var request = HttpHelper.GetHttpGetRequestById(registrationRequestById, registrationRequest.Id);
             var response = await _httpClient.SendAsync(request);
             var result = await HttpHelper.GetHttpResponseObject<RegistrationRequestDto>(response);
 
@@ -153,7 +159,8 @@ namespace CommunityHub.IntegrationTests.Controllers.Account
         private async Task<RegistrationRequestDto> AddRegistrationRequest()
         {
             RegistrationInfoCreateDto registrationData = GetRegistrationDataCreateDto();
-            return await HttpSendRequestHelper.SendPostRequestAsync<RegistrationInfoCreateDto, RegistrationRequestDto>(_httpClient, _url, registrationData);
+            return await HttpSendRequestHelper.SendPostRequestAsync
+                <RegistrationInfoCreateDto, RegistrationRequestDto>(_httpClient, _registrationRequest, registrationData);
         }
     }
 }

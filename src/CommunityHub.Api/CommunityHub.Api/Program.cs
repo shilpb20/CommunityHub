@@ -1,16 +1,23 @@
 using AppComponents.Repository.Abstraction;
 using AppComponents.Repository.EFCore;
 using AppComponents.Repository.EFCore.Transaction;
-using CommunityHub.Core.Models;
+using CommunityHub.Infrastructure.Models;
 using CommunityHub.Infrastructure.Data;
+using CommunityHub.Infrastructure.Models;
 using CommunityHub.Infrastructure.Services.Registration;
 using CommunityHub.Infrastructure.Services.User;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using CommunityHub.Api.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 var transactionSettings = builder.Configuration.GetSection("TransactionSettings");
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
+
 bool useInMemoryDb = transactionSettings.GetValue<bool>("UseInMemoryDatabase"); 
 if (useInMemoryDb)
 {
@@ -33,6 +40,7 @@ builder.Services.AddRepository<UserInfo, ApplicationDbContext>();
 builder.Services.AddRepository<SpouseInfo, ApplicationDbContext>();
 builder.Services.AddRepository<Children, ApplicationDbContext>();
 
+builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IRegistrationService, RegistrationService>();
 
@@ -42,6 +50,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+var serviceProvider = app.Services.CreateScope().ServiceProvider;
+await DataSeeder.SeedRolesAsync(serviceProvider);
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

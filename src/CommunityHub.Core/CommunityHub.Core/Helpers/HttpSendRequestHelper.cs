@@ -48,7 +48,8 @@ namespace CommunityHub.Core.Helpers
         {
             try
             {
-                var Uri = new Uri(client.BaseAddress, url);
+                string formattedUrl = ApiRouteHelper.FormatRoute(url, id);
+                var Uri = new Uri(client.BaseAddress, formattedUrl);
                 HttpRequestMessage request = HttpHelper.GetHttpPutRequest<T>(Uri.ToString(), id, data);
                 return await SendAndProcessResponse<V>(client, request);
             }

@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using CommunityHub.Core.Dtos;
-using CommunityHub.Core.Models;
+using CommunityHub.Infrastructure.Models;
 using Newtonsoft.Json;
 
 public class Mapper : Profile

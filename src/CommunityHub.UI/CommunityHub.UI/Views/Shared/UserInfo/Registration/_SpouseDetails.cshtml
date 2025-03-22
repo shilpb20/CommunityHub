@@ -8,7 +8,7 @@
 <div class="col-md-6">
     <div class="card mt-4" id="spouseSection" style="@(isSpousePresent ? "" : "display:none;")">
         <div class="card-header">
-            <h4>Spouse Details</h4>
+            <h4>Spouse/Partner Details</h4>
         </div>
         <div class="card-body">
             <!-- Spouse Full Name -->
@@ -39,6 +39,50 @@
                 </div>
                 <div class="col-md-4">
                     <input type="text" class="form-control" id="ContactNumber" asp-for="SpouseInfo.ContactNumber" />
+                </div>
+            </div>
+
+            <!-- Location -->
+            <div class="form-group row mb-2">
+                <label for="Location" class="col-md-4 col-form-label">Location</label>
+                <div class="col-md-8">
+                    <select class="form-select" id="Location" asp-for="SpouseInfo.Location">
+                        <optgroup label="Australia">
+                            <option value=""></option>
+                            <option value="NSW">New South Wales</option>
+                            <option value="VIC">Victoria</option>
+                            <option value="QLD">Queensland</option>
+                            <option value="SA">South Australia</option>
+                            <option value="WA">Western Australia</option>
+                            <option value="TAS">Tasmania</option>
+                            <option value="ACT">Australian Capital Territory</option>
+                            <option value="NT">Northern Territory</option>
+                        </optgroup>
+                        <optgroup label="New Zealand">
+                            <option value="AUK">Auckland</option>
+                            <option value="WGN">Wellington</option>
+                            <option value="CAN">Canterbury</option>
+                            <option value="OTA">Otago</option>
+                            <option value="BOP">Bay of Plenty</option>
+                            <option value="WKO">Waikato</option>
+                            <option value="HKB">Hawke's Bay</option>
+                            <option value="MWT">Manawatu-Wanganui</option>
+                        </optgroup>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Gender -->
+            <div class="form-group row mb-2">
+                <label for="Gender" class="col-md-4 col-form-label">Gender</label>
+                <div class="col-md-8">
+                    <select class="form-select" asp-for="SpouseInfo.Gender">
+                        <option value=""></option>
+                        <option value="Female">Female</option>
+                        <option value="Male">Male</option>
+                        <option value="Other">Other</option>
+                        <option value="NotSpecified">Do not wish to specify</option>
+                    </select>
                 </div>
             </div>
 

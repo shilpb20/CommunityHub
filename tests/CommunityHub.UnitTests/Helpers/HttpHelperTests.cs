@@ -15,7 +15,7 @@ public class HttpHelperTests
     public void GetHttpGetRequestById_CreatesCorrectRequest()
     {
         // Arrange
-        var url = "https://api.example.com";
+        var url = "https://api.example.com/{id:int}";
         var id = 123;
 
         // Act
@@ -30,7 +30,7 @@ public class HttpHelperTests
     public void GetHttpPutRequest_CreatesCorrectRequest_WithSerializedData()
     {
         // Arrange
-        var url = "https://api.example.com";
+        var url = "https://api.example.com/{id:int}";
         var id = 123;
         var data = new { Name = "Test" };
 
@@ -47,7 +47,7 @@ public class HttpHelperTests
     public void BuildUri_CreatesCorrectUri_WithQueryParams()
     {
         // Arrange
-        var baseUrl = "https://api.example.com:8080";
+        var baseUrl = "https://api.example.com:8080/{id:int}";
         var path = "/endpoint";
         var queryParams = new Dictionary<string, string> { { "key", "value" } };
 

@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace CommunityHub.Core.Models
+namespace CommunityHub.Infrastructure.Models
 {
     public class RegistrationRequest
     {
