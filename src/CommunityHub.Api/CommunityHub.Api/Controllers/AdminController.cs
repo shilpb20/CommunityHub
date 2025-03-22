@@ -2,7 +2,7 @@
 using CommunityHub.Core.Constants;
 using CommunityHub.Core.Dtos;
 using CommunityHub.Core.Enums;
-using CommunityHub.Core.Models;
+using CommunityHub.Infrastructure.Models;
 using CommunityHub.Infrastructure.Services.Registration;
 using Microsoft.AspNetCore.Mvc;
 
@@ -80,6 +80,5 @@ namespace CommunityHub.Api.Controllers
 
             return Ok(_mapper.Map<UserInfoDto>(userInfo));
         }
-
     }
 }

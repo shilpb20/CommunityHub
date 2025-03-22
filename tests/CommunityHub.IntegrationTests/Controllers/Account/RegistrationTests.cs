@@ -1,6 +1,6 @@
 ﻿using CommunityHub.Core.Dtos;
 using CommunityHub.Core.Helpers;
-using CommunityHub.Core.Models;
+using CommunityHub.Infrastructure.Models;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 

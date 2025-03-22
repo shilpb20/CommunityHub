@@ -1,7 +1,7 @@
 ﻿ using AppComponents.Repository.Abstraction;
 using AutoMapper;
 using CommunityHub.Core.Dtos;
-using CommunityHub.Core.Models;
+using CommunityHub.Infrastructure.Models;
 using CommunityHub.Infrastructure.Services.User;
 using Microsoft.AspNetCore.Mvc;
 

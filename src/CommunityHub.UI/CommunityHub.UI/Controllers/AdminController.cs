@@ -2,7 +2,6 @@
 using CommunityHub.Core.Dtos;
 using CommunityHub.Core.Enums;
 using CommunityHub.Core.Helpers;
-using CommunityHub.Core.Models;
 using CommunityHub.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -65,7 +64,7 @@ namespace CommunityHub.UI.Controllers
         [HttpPost("request/approve")]
         public async Task<IActionResult> ApproveRequest([FromForm] int id)
         {
-            var result = await _service.AddRequestAsync<string, UserInfo>($"{ApiRouteSegment.ApproveRequest}/{id}", null);
+            var result = await _service.AddRequestAsync<string, UserInfoDto>($"{ApiRouteSegment.ApproveRequest}/{id}", null);
             if (result != null)
             {
                 TempData["SuccessMessage"] = "Registration request has been successfully approved. User details have been added to the system.";

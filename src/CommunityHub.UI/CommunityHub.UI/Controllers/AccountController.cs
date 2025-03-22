@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using CommunityHub.Core.Dtos;
 using CommunityHub.UI.Services;
-using CommunityHub.Core.Models;
 using CommunityHub.Core.Constants;
 
 namespace CommunityHub.UI.Controllers

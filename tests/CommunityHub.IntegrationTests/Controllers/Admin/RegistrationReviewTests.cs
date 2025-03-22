@@ -3,7 +3,7 @@ using CommunityHub.Core.Dtos;
 using CommunityHub.Core.Enums;
 using CommunityHub.Core.Extensions;
 using CommunityHub.Core.Helpers;
-using CommunityHub.Core.Models;
+using CommunityHub.Infrastructure.Models;
 using CommunityHub.IntegrationTests;
 using CommunityHub.IntegrationTests.TestData;
 using Microsoft.AspNetCore.Http;

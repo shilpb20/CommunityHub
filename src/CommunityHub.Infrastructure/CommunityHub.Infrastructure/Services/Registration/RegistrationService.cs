@@ -1,7 +1,7 @@
 ﻿using AppComponents.Repository.Abstraction;
 using CommunityHub.Core.Enums;
 using CommunityHub.Core.Extensions;
-using CommunityHub.Core.Models;
+using CommunityHub.Infrastructure.Models;
 using CommunityHub.Infrastructure.Data;
 using CommunityHub.Infrastructure.Services.User;
 using Microsoft.Extensions.Logging;

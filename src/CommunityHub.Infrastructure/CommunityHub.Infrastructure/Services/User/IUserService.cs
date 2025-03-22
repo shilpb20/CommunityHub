@@ -1,4 +1,4 @@
-﻿using CommunityHub.Core.Models;
+﻿using CommunityHub.Infrastructure.Models;
 
 namespace CommunityHub.Infrastructure.Services.User
 {
@@ -9,6 +9,6 @@ namespace CommunityHub.Infrastructure.Services.User
             List<Children>? children);
 
         Task<UserInfo> GetUserAsync(int id);
-        Task<List<UserInfo>> GetUsersAsync(Dictionary<string, bool> orderBy);
+        Task<List<UserInfo>> GetUsersAsync(Dictionary<string, bool>? orderBy = null);
     }
 }

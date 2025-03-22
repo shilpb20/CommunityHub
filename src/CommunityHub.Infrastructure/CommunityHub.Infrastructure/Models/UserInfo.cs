@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace CommunityHub.Core.Models
+namespace CommunityHub.Infrastructure.Models
 {
     public class UserInfo
     {
@@ -35,13 +35,12 @@ namespace CommunityHub.Core.Models
         public string HomeTown { get; set; } = string.Empty;
         public string? HouseName { get; set; }
 
-        public int? SpouseInfoId { get; set; }
-
-
-        [ForeignKey("SpouseInfoId")]
         public virtual SpouseInfo? SpouseInfo { get; set; }
-
-
         public virtual List<Children> Children { get; set; } = new List<Children>();
+
+        public string ApplicationUserId { get; set; }
+
+        [ForeignKey(nameof(ApplicationUserId))]
+        public ApplicationUser ApplicationUser { get; set; }
     }
 }

@@ -2,11 +2,15 @@
 @model List<UserInfoDto>
 
 @{
-    ViewData["Title"] = "Havyaka Family Directory";
+    ViewData["Title"] = "ANZ Havyaka Family Directory";
     int serial = 1;
 }
 
-<h1>Havyaka Family Directory</h1>
+<div class="text-center mb-4">
+    <h1>
+        Welcome to ANZ Havyaka Directory
+    </h1>
+</div>
 <hr />
 
 <!-- Location Filter and Sort By -->
@@ -55,8 +59,10 @@ else
         <thead>
             <tr>
                 <th>S.No</th>
-                <th>Members</th>
-                <th>Children</th>
+                <th>Primary Member</th>
+                <th>Primary Member Contact</th>
+                <th>Spouse/Partner</th>
+                <th>Spouse/Partner Contact</th>
                 <th>Location</th>
             </tr>
         </thead>
@@ -67,19 +73,20 @@ else
                     <td>@serial</td>
                     <td>
                         @user.FullName
+                    </td>
+                    <td>
+                        @user.ContactNumber
+                    </td>
+                    <td>
                         @if (user.SpouseInfo != null)
                         {
-                            <br />
                             @user.SpouseInfo.FullName
                         }
                     </td>
                     <td>
-                        @if (user.Children.Any())
+                        @if (user.SpouseInfo != null)
                         {
-                            @foreach (var child in user.Children)
-                            {
-                                <div>@child.Name</div>
-                            }
+                            @user.SpouseInfo.ContactNumber
                         }
                     </td>
                     <td><span class="compact-location">@user.Location</span></td>

@@ -1,5 +1,4 @@
 ﻿using CommunityHub.Core.Dtos;
-using CommunityHub.Core.Models;
 
 namespace CommunityHub.Core.Dtos
 {

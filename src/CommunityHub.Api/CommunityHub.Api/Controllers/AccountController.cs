@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using CommunityHub.Core.Constants;
 using CommunityHub.Core.Dtos;
-using CommunityHub.Core.Models;
+using CommunityHub.Infrastructure.Models;
 using CommunityHub.Infrastructure.Services.Registration;
 using Microsoft.AspNetCore.Mvc;
 

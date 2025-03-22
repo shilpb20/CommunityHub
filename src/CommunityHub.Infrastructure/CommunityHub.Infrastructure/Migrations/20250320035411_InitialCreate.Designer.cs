@@ -4,6 +4,7 @@ using CommunityHub.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CommunityHub.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250320035411_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -175,6 +178,9 @@ namespace CommunityHub.Infrastructure.Migrations
                     b.Property<int>("UserInfoId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("UserInfoId1")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ContactNumber")
@@ -183,8 +189,11 @@ namespace CommunityHub.Infrastructure.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.HasIndex("UserInfoId")
-                        .IsUnique();
+                    b.HasIndex("UserInfoId");
+
+                    b.HasIndex("UserInfoId1")
+                        .IsUnique()
+                        .HasFilter("[UserInfoId1] IS NOT NULL");
 
                     b.ToTable("SpouseInfo");
                 });
@@ -398,10 +407,14 @@ namespace CommunityHub.Infrastructure.Migrations
             modelBuilder.Entity("CommunityHub.Infrastructure.Models.SpouseInfo", b =>
                 {
                     b.HasOne("CommunityHub.Infrastructure.Models.UserInfo", "UserInfo")
-                        .WithOne("SpouseInfo")
-                        .HasForeignKey("CommunityHub.Infrastructure.Models.SpouseInfo", "UserInfoId")
+                        .WithMany()
+                        .HasForeignKey("UserInfoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("CommunityHub.Infrastructure.Models.UserInfo", null)
+                        .WithOne("SpouseInfo")
+                        .HasForeignKey("CommunityHub.Infrastructure.Models.SpouseInfo", "UserInfoId1");
 
                     b.Navigation("UserInfo");
                 });
