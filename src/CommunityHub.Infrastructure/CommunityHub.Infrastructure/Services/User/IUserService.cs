@@ -1,4 +1,5 @@
 ﻿using CommunityHub.Infrastructure.Models;
+using System.Linq.Expressions;
 
 namespace CommunityHub.Infrastructure.Services.User
 {
@@ -9,6 +10,7 @@ namespace CommunityHub.Infrastructure.Services.User
             List<Children>? children);
 
         Task<UserInfo> GetUserAsync(int id);
+        Task<UserInfo> GetUserAsync(Expression<Func<UserInfo, bool>> filter);
         Task<List<UserInfo>> GetUsersAsync(Dictionary<string, bool>? orderBy = null);
     }
 }

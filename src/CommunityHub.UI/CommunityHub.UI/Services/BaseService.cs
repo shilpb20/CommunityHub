@@ -21,9 +21,21 @@ namespace CommunityHub.UI.Services
             return await HttpSendRequestHelper.SendGetRequestAsync<T>(_httpClient, url);
         }
 
+        public async Task<T> GetRequestAsync<T>(string url, int id)
+        {
+            string formattedUrl = ApiRouteHelper.FormatRoute(url, id);
+            return await HttpSendRequestHelper.SendGetRequestAsync<T>(_httpClient, formattedUrl);
+        }
+
         public async Task<V> AddRequestAsync<T, V>(string url, T? data)
         {
             return await HttpSendRequestHelper.SendPostRequestAsync<T, V>(_httpClient, url, data);
+        }
+
+        public async Task<V> AddRequestAsync<T, V>(string url, int id, T? data)
+        {
+            string formattedUrl = ApiRouteHelper.FormatRoute(url, id);
+            return await HttpSendRequestHelper.SendPostRequestAsync<T, V>(_httpClient, formattedUrl, data);
         }
 
         public async Task<V> UpdateRequestAsync<T, V>(string url, int id, T? data)

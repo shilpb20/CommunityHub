@@ -2,12 +2,12 @@
 using CommunityHub.Core.Dtos;
 using CommunityHub.Core.Enums;
 using CommunityHub.Core.Helpers;
+using CommunityHub.UI.Constants;
 using CommunityHub.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CommunityHub.UI.Controllers
 {
-    [Route("admin")]
     public class AdminController : Controller
     {
         private readonly ILogger<AdminController> _logger;
@@ -19,14 +19,14 @@ namespace CommunityHub.UI.Controllers
             _service = service;
         }
 
-        [HttpGet]
+        [HttpGet(UiRoute.Admin.Index)]
         public IActionResult Index()
         {
             return View();
         }
 
 
-        [HttpGet("request")]
+        [HttpGet(UiRoute.Admin.RegistrationRequest)]
         public async Task<IActionResult> GetRequests([FromQuery] string status = "pending")
         {
             Response.Headers.Add("Cache-Control", "no-store");
@@ -41,18 +41,19 @@ namespace CommunityHub.UI.Controllers
 
             Dictionary<string, string> queryParameters = new Dictionary<string, string>()
             {
-               { RouteParameter.Request.RegistrationStatus, status }
+               { RouteParameter.Registration.Status, status }
             };
 
-            string uri = HttpHelper.BuildUri(_service.GetClient().BaseAddress.ToString(), ApiRouteSegment.AdminRequest, queryParameters);
+            string uri = HttpHelper.BuildUri(_service.GetClient().BaseAddress.ToString(), ApiRoute.Registration.Request, queryParameters);
             var result = await _service.GetRequestAsync<List<RegistrationRequestDto>>(uri);
             return View(result);
         }
 
-        [HttpPost("request/reject")]
+        [HttpPost(UiRoute.Admin.RejectRequest)]
         public async Task<IActionResult> RejectRequest([FromForm] int id, [FromForm] string comment)
         {
-            var result = await _service.UpdateRequestAsync<string, RegistrationRequestDto>(ApiRouteSegment.RejectRequest, id, comment);
+            var result = await _service.UpdateRequestAsync<string, RegistrationRequestDto>(
+                ApiRoute.Admin.RejectRequestById, id, comment);
             if (result != null)
             {
                 TempData["SuccessMessage"] = "Registration request has been successfully rejected!";
@@ -61,10 +62,12 @@ namespace CommunityHub.UI.Controllers
             return RedirectToAction("GetRequests", new { status = "pending" });
         }
 
-        [HttpPost("request/approve")]
+        [HttpPost(UiRoute.Admin.ApproveRequest)]
         public async Task<IActionResult> ApproveRequest([FromForm] int id)
         {
-            var result = await _service.AddRequestAsync<string, UserInfoDto>($"{ApiRouteSegment.ApproveRequest}/{id}", null);
+            //TODO: Check duplicate user
+
+            var result = await _service.AddRequestAsync<string, UserInfoDto>(ApiRoute.Admin.ApproveRequestById, id, null);
             if (result != null)
             {
                 TempData["SuccessMessage"] = "Registration request has been successfully approved. User details have been added to the system.";

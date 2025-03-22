@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using CommunityHub.UI.Models;
 using CommunityHub.Core.Dtos;
 using CommunityHub.UI.Services;
+using CommunityHub.Core.Constants;
+using CommunityHub.UI.Constants;
 
 namespace CommunityHub.UI.Controllers;
 
@@ -17,7 +19,7 @@ public class HomeController : Controller
         _service = baseService;
     }
 
-    [HttpGet]
+    [HttpGet(UiRoute.Home.Index)]
     public async Task<IActionResult> Index(string? sortBy = null, bool ascending = true)
     {
         ViewBag.SelectedSortBy = sortBy;
@@ -27,9 +29,15 @@ public class HomeController : Controller
         return View(users);
     }
 
+    [HttpGet(UiRoute.Home.Privacy)]
+    public IActionResult Privacy()
+    {
+        return View();
+    }
+
     private async Task<List<UserInfoDto>> FetchUsersAsync(string? sortBy, bool ascending)
     {
-        string uri = "api/users";
+        string uri = ApiRoute.Users.GetAll;
         if (!string.IsNullOrEmpty(sortBy))
         {
             uri += $"?sortBy={sortBy}&ascending={ascending}";
@@ -39,10 +47,7 @@ public class HomeController : Controller
         return users ?? new List<UserInfoDto>();
     }
 
-    public IActionResult Privacy()
-    {
-        return View();
-    }
+
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
     public IActionResult Error()

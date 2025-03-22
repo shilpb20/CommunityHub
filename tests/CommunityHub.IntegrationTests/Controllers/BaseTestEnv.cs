@@ -7,7 +7,6 @@ namespace CommunityHub.IntegrationTests
 {
     public abstract class BaseTestEnv : IClassFixture<ApplicationStartup>
     {
-        protected string _url = string.Empty;
         protected readonly ApplicationStartup _application;
         protected readonly HttpClient _httpClient;
         protected readonly IServiceProvider _serviceProvider;

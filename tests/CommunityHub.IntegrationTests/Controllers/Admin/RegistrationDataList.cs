@@ -45,6 +45,8 @@ namespace CommunityHub.IntegrationTests.TestData
                         ContactNumber = "0123123412",
                         HomeTown = "Georgia",
                         HouseName = "Adams Family",
+                        Gender = "Female",
+                        Location = "New Castle",
                     },
                     Children = new List<ChildrenCreateDto>()
                     {

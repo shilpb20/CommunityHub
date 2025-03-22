@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using CommunityHub.Core.Constants;
 using CommunityHub.Core.Dtos;
+using CommunityHub.Core.Enums;
 using CommunityHub.Infrastructure.Models;
 using CommunityHub.Infrastructure.Services.Registration;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 namespace CommunityHub.Api.Controllers
 {
     [ApiController]
-    [Route("api/account")]
     public class AccountController : ControllerBase
     {
         private readonly ILogger<AccountController> _logger;
@@ -25,10 +25,11 @@ namespace CommunityHub.Api.Controllers
             _registrationService = registrationService;
         }
 
-        [HttpPost]
+        [HttpPost(ApiRoute.Registration.Request)]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(RegistrationRequestDto))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+
         public async Task<ActionResult<RegistrationRequestDto>> AddRegistrationRequest([FromBody] RegistrationInfoCreateDto registrationInfoDto)
         {
             if (registrationInfoDto == null || !ModelState.IsValid)
@@ -55,7 +56,7 @@ namespace CommunityHub.Api.Controllers
             }
         }
 
-        [HttpGet("{id:int}", Name = "GetRegistrationRequest")]
+        [HttpGet(ApiRoute.Registration.GetRequestById, Name = "GetRegistrationRequest")]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(RegistrationRequestDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -74,6 +75,27 @@ namespace CommunityHub.Api.Controllers
 
             var resultDto = _mapper.Map<RegistrationRequestDto>(result);
             return Ok(resultDto);
+        }
+
+
+        [HttpGet(ApiRoute.Registration.Request)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<RegistrationRequestDto>))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<List<RegistrationRequestDto>>> GetRequests([FromQuery] string status = "pending")
+        {
+            if (Enum.TryParse<RegistrationStatus>(status, true, out var registrationStatus)
+                && Enum.IsDefined(typeof(RegistrationStatus), registrationStatus))
+            {
+                var requests = await _registrationService.GetRequestsAsync(registrationStatus);
+                if (!requests.Any()) { return NoContent(); }
+
+                return Ok(_mapper.Map<List<RegistrationRequestDto>>(requests));
+            }
+            else
+            {
+                return BadRequest($"Invalid registration status value: {status}. Valid values are {string.Join(", ", Enum.GetNames(typeof(RegistrationStatus)))}.");
+            }
         }
     }
 }

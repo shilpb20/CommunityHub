@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Internal;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System.Linq.Expressions;
 
 namespace CommunityHub.Infrastructure.Services.User
 {
@@ -72,7 +73,10 @@ namespace CommunityHub.Infrastructure.Services.User
             }
         }
 
-        private async Task<UserInfo?> CreateUser(UserInfo userInfo, SpouseInfo? spouseInfo, List<Children>? children)
+        private async Task<UserInfo?> CreateUser(
+            UserInfo userInfo, 
+            SpouseInfo? spouseInfo,
+            List<Children>? children)
         {
             var newUser = await _userRepository.AddAsync(userInfo);
             if (newUser == null)
@@ -100,6 +104,11 @@ namespace CommunityHub.Infrastructure.Services.User
         public async Task<UserInfo> GetUserAsync(int id)
         {
             return await _userRepository.GetAsync(x => x.Id == id);
+        }
+
+        public async Task<UserInfo> GetUserAsync(Expression<Func<UserInfo, bool>> filter)
+        {
+            return await _userRepository.GetAsync(filter);
         }
 
         public async Task<List<UserInfo>> GetUsersAsync(Dictionary<string, bool>? orderBy = null)

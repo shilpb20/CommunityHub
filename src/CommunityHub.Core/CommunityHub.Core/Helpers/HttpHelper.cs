@@ -24,7 +24,7 @@ namespace CommunityHub.Core.Helpers
 
         public static HttpRequestMessage GetHttpGetRequestById(string url, int id)
         {
-            var formattedUrl = url.TrimEnd('/') + "/" + id;
+            var formattedUrl = ApiRouteHelper.FormatRoute(url, id);
             return GetHttpGetRequest(formattedUrl);
         }
 
@@ -35,7 +35,9 @@ namespace CommunityHub.Core.Helpers
 
         public static HttpRequestMessage GetHttpPutRequest<T>(string url, int id, T? data)
         {
-            HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Put, url + $"/{id}");
+            var formattedUrl = ApiRouteHelper.FormatRoute(url, id);
+            HttpRequestMessage requestMessage = new HttpRequestMessage(HttpMethod.Put, formattedUrl);
+
             var json = data != null ? JsonConvert.SerializeObject(data) : null;
             if (json != null)
             {
@@ -53,6 +55,12 @@ namespace CommunityHub.Core.Helpers
         public static HttpRequestMessage GetHttpPutRequest(string url)
         {
             return new HttpRequestMessage(HttpMethod.Put, url);
+        }
+
+        public static HttpRequestMessage GetHttpPostRequest<T>(string url, int id, T? data)
+        {
+            string formattedUrl = ApiRouteHelper.FormatRoute(url, id);
+            return GetHttpPostRequest<T>(formattedUrl, data);
         }
 
         public static HttpRequestMessage GetHttpPostRequest<T>(string url, T? data)
