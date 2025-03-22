@@ -20,6 +20,11 @@ namespace CommunityHub.Infrastructure.Models
 
         [Required]
         public string ContactNumber { get; set; } = string.Empty;
+        [Required]
+        public string Gender { get; set; } = string.Empty;
+
+        [Required]
+        public string Location { get; set; } = string.Empty;
 
         [Required]
         public string HomeTown { get; set; } = string.Empty;

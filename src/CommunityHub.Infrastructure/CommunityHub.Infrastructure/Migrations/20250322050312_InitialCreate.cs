@@ -231,10 +231,11 @@ namespace CommunityHub.Infrastructure.Migrations
                     Email = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     CountryCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ContactNumber = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Gender = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Location = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     HomeTown = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     HouseName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserInfoId = table.Column<int>(type: "int", nullable: false),
-                    UserInfoId1 = table.Column<int>(type: "int", nullable: true)
+                    UserInfoId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -245,11 +246,6 @@ namespace CommunityHub.Infrastructure.Migrations
                         principalTable: "UserInfo",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_SpouseInfo_UserInfo_UserInfoId1",
-                        column: x => x.UserInfoId1,
-                        principalTable: "UserInfo",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
@@ -311,14 +307,8 @@ namespace CommunityHub.Infrastructure.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_SpouseInfo_UserInfoId",
                 table: "SpouseInfo",
-                column: "UserInfoId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SpouseInfo_UserInfoId1",
-                table: "SpouseInfo",
-                column: "UserInfoId1",
-                unique: true,
-                filter: "[UserInfoId1] IS NOT NULL");
+                column: "UserInfoId",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserInfo_ApplicationUserId",

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CommunityHub.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250320035411_InitialCreate")]
+    [Migration("20250322050312_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -168,6 +168,10 @@ namespace CommunityHub.Infrastructure.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("Gender")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("HomeTown")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -175,10 +179,11 @@ namespace CommunityHub.Infrastructure.Migrations
                     b.Property<string>("HouseName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("UserInfoId")
-                        .HasColumnType("int");
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("UserInfoId1")
+                    b.Property<int>("UserInfoId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -189,11 +194,8 @@ namespace CommunityHub.Infrastructure.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.HasIndex("UserInfoId");
-
-                    b.HasIndex("UserInfoId1")
-                        .IsUnique()
-                        .HasFilter("[UserInfoId1] IS NOT NULL");
+                    b.HasIndex("UserInfoId")
+                        .IsUnique();
 
                     b.ToTable("SpouseInfo");
                 });
@@ -407,14 +409,10 @@ namespace CommunityHub.Infrastructure.Migrations
             modelBuilder.Entity("CommunityHub.Infrastructure.Models.SpouseInfo", b =>
                 {
                     b.HasOne("CommunityHub.Infrastructure.Models.UserInfo", "UserInfo")
-                        .WithMany()
-                        .HasForeignKey("UserInfoId")
+                        .WithOne("SpouseInfo")
+                        .HasForeignKey("CommunityHub.Infrastructure.Models.SpouseInfo", "UserInfoId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("CommunityHub.Infrastructure.Models.UserInfo", null)
-                        .WithOne("SpouseInfo")
-                        .HasForeignKey("CommunityHub.Infrastructure.Models.SpouseInfo", "UserInfoId1");
 
                     b.Navigation("UserInfo");
                 });
