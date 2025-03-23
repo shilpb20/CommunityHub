@@ -192,12 +192,12 @@ namespace CommunityHub.IntegrationTests.Services
             // Assert
             retrievedRequest.Should().NotBeNull();
             retrievedRequest.Id.Should().Be(createdRequest.Id);
-            retrievedRequest.Should().Be(RegistrationStatusHelper.RejectedStatus);
+            retrievedRequest.RegistrationStatus.Should().Be(RegistrationStatusHelper.PendingStatus);
 
             var savedRequest = _context.RegistrationRequests.FirstOrDefault(r => r.Id == createdRequest.Id);
             savedRequest.Should().NotBeNull();
-            savedRequest.RegistrationStatus.Should().Be(RegistrationStatusHelper.RejectedStatus);
-            savedRequest.Review.Should().Be(_rejectionReason);
+            savedRequest.RegistrationStatus.Should().Be(RegistrationStatusHelper.PendingStatus);
+            savedRequest.Review.Should().BeNull();
         }
 
         [Fact]

@@ -52,6 +52,7 @@ namespace CommunityHub.Infrastructure.Models
             ValidateStateTransition();
 
             RegistrationStatus = RegistrationStatusHelper.RejectedStatus;
+            Review = comment;
             ReviewedAt = DateTime.UtcNow;
         }
 
