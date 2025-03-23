@@ -38,6 +38,8 @@ namespace CommunityHub.Infrastructure.Models
         public virtual SpouseInfo? SpouseInfo { get; set; }
         public virtual List<Children> Children { get; set; } = new List<Children>();
 
+        public virtual FamilyPicture? FamilyPicture { get; set; }
+
         public string ApplicationUserId { get; set; }
 
         [ForeignKey(nameof(ApplicationUserId))]

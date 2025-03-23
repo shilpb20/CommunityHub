@@ -1,14 +1,15 @@
 ﻿using CommunityHub.Core.Enums;
 using CommunityHub.Infrastructure.Models;
 
-namespace CommunityHub.Infrastructure.Services.Registration
+namespace CommunityHub.Infrastructure.Services
 {
     public interface IRegistrationService
     {
         Task<RegistrationRequest> CreateRequestAsync(RegistrationInfo registrationData);
-        Task<RegistrationRequest> GetRequestAsync(int id);
-        Task<List<RegistrationRequest>> GetRequestsAsync(RegistrationStatus status);
-        Task<RegistrationRequest> RejectRequestAsync(int id, string reviewComment);
-        Task<UserInfo> ApproveRequestAsync(int id);
+        Task<RegistrationRequest> ApproveRequestAsync(int id);
+        Task<RegistrationRequest> RejectRequestAsync(int id, string comment);
+
+        Task<RegistrationRequest> GetRequestByIdAsync(int id);
+        Task<List<RegistrationRequest>> GetRequestsAsync(eRegistrationStatus status);
     }
 }

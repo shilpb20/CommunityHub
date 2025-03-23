@@ -2,7 +2,7 @@
 
 namespace CommunityHub.Core.Enums
 {
-    public enum RegistrationStatus
+    public enum eRegistrationStatus
     {
         [EnumMember(Value = "pending")]
         Pending,
@@ -12,6 +12,7 @@ namespace CommunityHub.Core.Enums
 
         [EnumMember(Value = "rejected")]
         Rejected,
+
         [EnumMember(Value = "all")]
         All
     }

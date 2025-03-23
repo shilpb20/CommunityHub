@@ -7,6 +7,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="DataManagers\**" />
+    <Compile Remove="Services\**" />
+    <EmbeddedResource Remove="DataManagers\**" />
+    <EmbeddedResource Remove="Services\**" />
+    <None Remove="DataManagers\**" />
+    <None Remove="Services\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="Services\Registration\IRegistrationService.cs" />
+    <Compile Include="Services\Registration\RegistrationService.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AppComponents.Repository" Version="1.2.1" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.2" />

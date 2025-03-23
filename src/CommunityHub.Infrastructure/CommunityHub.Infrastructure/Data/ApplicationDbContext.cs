@@ -16,6 +16,8 @@ namespace CommunityHub.Infrastructure.Data
         public DbSet<SpouseInfo> SpouseInfo { get; set; }
         public DbSet<Children> Children { get; set; }
 
+        public DbSet<FamilyPicture> FamilyPictures { get; set; }
+
         public ApplicationDbContext(
             DbContextOptions<ApplicationDbContext> options) : base(options)
         {
@@ -48,6 +50,11 @@ namespace CommunityHub.Infrastructure.Data
                .HasOne(u => u.ApplicationUser)
                .WithOne()
                .HasForeignKey<UserInfo>(u => u.ApplicationUserId);
+
+            modelBuilder.Entity<FamilyPicture>()
+                .HasOne(c => c.UserInfo).
+                WithOne(u => u.FamilyPicture)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
         private void ApplyUniqueConstraintsToSpouseInfoTable(ModelBuilder modelBuilder)

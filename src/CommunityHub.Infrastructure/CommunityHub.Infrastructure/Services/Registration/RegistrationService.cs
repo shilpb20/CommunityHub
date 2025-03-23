@@ -1,121 +1,87 @@
 ﻿using AppComponents.Repository.Abstraction;
 using CommunityHub.Core.Enums;
 using CommunityHub.Core.Extensions;
-using CommunityHub.Infrastructure.Models;
 using CommunityHub.Infrastructure.Data;
-using CommunityHub.Infrastructure.Services.User;
+using CommunityHub.Infrastructure.Models;
+using CommunityHub.Infrastructure.Services;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using System.Runtime.CompilerServices;
 
-namespace CommunityHub.Infrastructure.Services.Registration
+public class RegistrationService : IRegistrationService
 {
-    public class RegistrationService : IRegistrationService
+    private readonly ILogger<IRegistrationService> _logger;
+    private readonly IRepository<RegistrationRequest, ApplicationDbContext> _repository;
+
+    public RegistrationService(
+        ILogger<IRegistrationService> logger,
+        IRepository<RegistrationRequest, ApplicationDbContext> repository)
     {
-        private readonly ILogger<IRegistrationService> _logger;
-        private readonly ITransactionManager _transactionManager;
-        private readonly IUserService _userService;
-        private readonly IRepository<RegistrationRequest, ApplicationDbContext> _requestRepository;
+        _logger = logger;
+        _repository = repository;
+    }
 
-        public RegistrationService(
-            ILogger<IRegistrationService> logger,
-            ITransactionManager transactionManager,
-            IUserService userService,
-            IRepository<RegistrationRequest, ApplicationDbContext> requestRepository,
-            IRepository<UserInfo, ApplicationDbContext> userInfoRepository)
+    public async Task<RegistrationRequest> CreateRequestAsync(RegistrationInfo registrationData)
+    {
+        try
         {
-            _logger = logger;
-            _transactionManager = transactionManager;
-            _requestRepository = requestRepository;
-            _userService = userService;
-        }
-
-        public async Task<UserInfo> ApproveRequestAsync(int id)
-        {
-            using (_transactionManager.BeginTransactionAsync())
+            if (registrationData == null)
             {
-                try
-                {
-                    var matchingRequest = await _requestRepository.GetAsync(x => x.Id == id);
-                    if (matchingRequest == null) return null;
-
-                    var registrationInfo = JsonConvert.DeserializeObject<RegistrationInfo>(matchingRequest.RegistrationInfo);
-                    var newUser = await _userService.CreateUserAsync(registrationInfo.UserInfo, registrationInfo.SpouseInfo, registrationInfo.Children);
-                    if (newUser == null) return null;
-
-                    matchingRequest.ReviewedAt = DateTime.UtcNow;
-                    matchingRequest.RegistrationStatus = RegistrationStatus.Approved.GetEnumMemberValue();
-                    await _requestRepository.UpdateAsync(matchingRequest);
-
-                    await _transactionManager.CommitTransactionAsync();
-                    return newUser;
-                }
-                catch (Exception ex)
-                {
-                    await _transactionManager.RollbackTransactionAsync();
-                    _logger.LogError(ex, "Error approving request {Id}", id);
-                    throw;
-                }
-            }
-        }
-
-
-        public async Task<RegistrationRequest> CreateRequestAsync(RegistrationInfo registrationData)
-        {
-            try
-            {
-                if (registrationData == null)
-                {
-                    _logger.LogDebug("Registration data null. Skipping request creation");
-                    return null;
-                }
-
-                _logger.LogDebug($"Creating registration request for user - {registrationData?.UserInfo.FullName}.");
-
-                string registrationInfo = JsonConvert.SerializeObject(registrationData);
-                RegistrationRequest registrationRequest = new RegistrationRequest()
-                {
-                    RegistrationInfo = registrationInfo,
-                    CreatedAt = DateTime.UtcNow,
-                    RegistrationStatus = "pending",
-                    Review = null,
-                    ReviewedAt = null
-                };
-
-                return await _requestRepository.AddAsync(registrationRequest);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error occurred while creating registration request: {ex.Message}", ex);
-                throw;
-            }
-        }
-
-        public async Task<RegistrationRequest> GetRequestAsync(int id)
-        {
-            return await _requestRepository.GetAsync(x => x.Id == id);
-        }
-
-        public async Task<List<RegistrationRequest>> GetRequestsAsync(RegistrationStatus status = RegistrationStatus.Pending)
-        {
-            if (status == RegistrationStatus.All)
-            {
-                return await _requestRepository.GetAllAsync();
+                _logger.LogDebug("Registration data null. Skipping request creation");
+                return null;
             }
 
-            return await _requestRepository.GetAllAsync(x => x.RegistrationStatus.ToLower() == status.GetEnumMemberValue().ToLower());
+            _logger.LogDebug($"Creating registration request for user - {registrationData?.UserInfo.FullName}.");
+
+            var registrationInfo = JsonConvert.SerializeObject(registrationData);
+            var registrationRequest = new RegistrationRequest(registrationInfo);
+
+            return await _repository.AddAsync(registrationRequest);
         }
-
-        public async Task<RegistrationRequest> RejectRequestAsync(int id, string reviewComment)
+        catch (Exception ex)
         {
-            var matchingRequest = await _requestRepository.GetAsync(x => x.Id == id);
-            if (matchingRequest == null) return null;
-
-            RegistrationRequest request = await GetRequestAsync(id);
-            request.Review = reviewComment;
-            request.RegistrationStatus = RegistrationStatus.Rejected.GetEnumMemberValue();
-            request.ReviewedAt = DateTime.UtcNow;
-
-            return await _requestRepository.UpdateAsync(request);
+            _logger.LogError($"Error occurred while creating registration request: {ex.Message}", ex);
+            throw;
         }
     }
+
+    public async Task<RegistrationRequest> GetRequestByIdAsync(int id)
+    {
+        if (id <= 0)
+        {
+            _logger.LogWarning($"Invalid ID: {id}. Cannot retrieve registration request.");
+            return null;
+        }
+
+        return await _repository.GetAsync(x => x.Id == id);
+    }
+
+    public async Task<List<RegistrationRequest>> GetRequestsAsync(eRegistrationStatus status)
+    {
+        if (status == eRegistrationStatus.All)
+        {
+            return await _repository.GetAllAsync();
+        }
+
+        return await _repository.GetAllAsync(x => x.RegistrationStatus.ToString() == status.GetEnumMemberValue());
+    }
+
+    public async Task<RegistrationRequest> ApproveRequestAsync(int id)
+    {
+        var request = await GetRequestByIdAsync(id);
+        if (request == null) return null;
+
+        request.Approve();
+        return await _repository.UpdateAsync(request);
+    }
+
+    public async Task<RegistrationRequest> RejectRequestAsync(int id, string comment)
+    {
+        var request = await GetRequestByIdAsync(id);
+        if (request == null) return null;
+
+        request.Reject(comment);
+        return await _repository.UpdateAsync(request);
+    }
+
 }

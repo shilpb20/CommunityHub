@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using System.Text;
 
-namespace CommunityHub.IntegrationTests.Controllers.Account
+namespace CommunityHub.IntegrationTests
 {
     public class RegistrationTests : BaseTestEnv
     {
@@ -23,16 +23,9 @@ namespace CommunityHub.IntegrationTests.Controllers.Account
         public async Task RegisterUser_ReturnsCreatedAtResult_WhenValidDataIsSent()
         {
             RegistrationInfoCreateDto registrationDataCreateDto = GetRegistrationDataCreateDto();
-
             var registrationData = _mapper.Map<RegistrationInfoDto>(registrationDataCreateDto);
-            var registrationRequest = new RegistrationRequest()
-            {
-                RegistrationInfo = JsonConvert.SerializeObject(registrationData),
-                CreatedAt = DateTime.UtcNow,
-                RegistrationStatus = "Pending",
-                ReviewedAt = null,
-                Review = null
-            };
+
+            var registrationRequest = _requestManager.CreateRegistrationRequest(registrationData);
 
             //Act
             var request = HttpHelper.GetHttpPostRequest<RegistrationInfoCreateDto>(_registrationRequest, registrationDataCreateDto);

@@ -33,8 +33,8 @@ namespace CommunityHub.UI.Controllers
             Response.Headers.Add("Pragma", "no-cache");
             Response.Headers.Add("Expires", "-1");
 
-            if (!Enum.TryParse<RegistrationStatus>(status, true, out var regStatus)
-                || !Enum.IsDefined(typeof(RegistrationStatus), regStatus))
+            if (!Enum.TryParse<eRegistrationStatus>(status, true, out var regStatus)
+                || !Enum.IsDefined(typeof(eRegistrationStatus), regStatus))
             {
                 return BadRequest("Invalid registration status value.");
             }

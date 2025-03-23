@@ -12,5 +12,8 @@ namespace CommunityHub.Infrastructure.Services.User
         Task<UserInfo> GetUserAsync(int id);
         Task<UserInfo> GetUserAsync(Expression<Func<UserInfo, bool>> filter);
         Task<List<UserInfo>> GetUsersAsync(Dictionary<string, bool>? orderBy = null);
+
+        Task<UserInfo> UpdateUsersAsync(UserInfo userInfo);
+        Task<UserInfo> DeleteUsersAsync(int id);
     }
 }

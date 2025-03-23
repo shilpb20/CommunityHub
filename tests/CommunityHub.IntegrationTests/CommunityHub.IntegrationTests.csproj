@@ -8,6 +8,28 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\Account\**" />
+    <Compile Remove="Controllers\Admin\**" />
+    <Compile Remove="Controllers\FamilyPicture\**" />
+    <Compile Remove="Controllers\Users\**" />
+    <EmbeddedResource Remove="Controllers\Account\**" />
+    <EmbeddedResource Remove="Controllers\Admin\**" />
+    <EmbeddedResource Remove="Controllers\FamilyPicture\**" />
+    <EmbeddedResource Remove="Controllers\Users\**" />
+    <None Remove="Controllers\Account\**" />
+    <None Remove="Controllers\Admin\**" />
+    <None Remove="Controllers\FamilyPicture\**" />
+    <None Remove="Controllers\Users\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Controllers\BaseTestEnv.cs" />
+    <Compile Remove="Services\AccountServiceTests.cs" />
+    <Compile Remove="Services\FamilyPictureServiceTests.cs" />
+    <Compile Remove="Services\UserServiceTests.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AppComponents.Repository" Version="1.2.1" />
     <PackageReference Include="AutoMapper" Version="14.0.0" />
     <PackageReference Include="coverlet.collector" Version="6.0.2" />
@@ -29,6 +51,10 @@
 
   <ItemGroup>
     <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\" />
   </ItemGroup>
 
 </Project>

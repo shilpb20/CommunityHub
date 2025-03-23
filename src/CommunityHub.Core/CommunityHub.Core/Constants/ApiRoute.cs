@@ -9,6 +9,10 @@
 
             /// <summary>Finds a user by - email or contact or spouse email or spouse contact</summary>
             public const string Find = $"{ApiPrefixes.Users}/find";
+
+            /// <summary>Uploads profile/family picture</summary>
+            public const string UploadPicture = $"{ApiPrefixes.Users}/upload/{{id:int}}";
+            
         }
 
         public static class Registration
@@ -27,6 +31,15 @@
 
             /// <summary>Gets request by id</summary>
             public const string ApproveRequestById = $"{ApiPrefixes.Admin}/request/approve/{{id:int}}";
+        }
+
+        public static class FamilyPicture
+        {
+            /// <summary>Gets all family pictures</summary>
+            public const string GetAll = $"{ApiPrefixes.FamilyPictures}/all";
+
+            /// <summary>Get/Update/Delete family picture by id</summary>
+            public const string ById = $"{ApiPrefixes.FamilyPictures}/{{id:int}}";
         }
     }
 }

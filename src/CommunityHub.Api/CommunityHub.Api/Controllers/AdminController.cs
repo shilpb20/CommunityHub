@@ -11,12 +11,12 @@ namespace CommunityHub.Api.Controllers
     {
         private readonly ILogger<AdminController> _logger;
         private readonly IMapper _mapper;
-        private readonly IRegistrationService _registrationService;
+        private readonly IAdminService _registrationService;
 
         public AdminController(
             ILogger<AdminController> logger,
             IMapper mapper,
-            IRegistrationService registrationService)
+            IAdminService registrationService)
         {
             _logger = logger;
             _mapper = mapper;

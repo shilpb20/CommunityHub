@@ -9,6 +9,8 @@ using CommunityHub.Infrastructure.Services.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using CommunityHub.Api.Data;
+using CommunityHub.Infrastructure.Services;
+using CommunityHub.Infrastructure.DataManagers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,14 +37,20 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.Configure<TransactionSettings>(builder.Configuration.GetSection("TransactionSettings"));
 builder.Services.AddTransactionManager<ApplicationDbContext>();
 
-builder.Services.AddRepository<RegistrationRequest, ApplicationDbContext>();
 builder.Services.AddRepository<UserInfo, ApplicationDbContext>();
 builder.Services.AddRepository<SpouseInfo, ApplicationDbContext>();
 builder.Services.AddRepository<Children, ApplicationDbContext>();
+builder.Services.AddRepository<FamilyPicture, ApplicationDbContext>();
+
+builder.Services.AddScoped<IRegistrationRequestManager, RegistrationRequestManager>();
+builder.Services.AddRepository<RegistrationRequest, ApplicationDbContext>();
+builder.Services.AddScoped<IRegistrationService, RegistrationService>();
 
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IRegistrationService, RegistrationService>();
+builder.Services.AddScoped<IAdminService, AdminService>();
+
+builder.Services.AddScoped<IFamilyPictureService, FamilyPictureService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
