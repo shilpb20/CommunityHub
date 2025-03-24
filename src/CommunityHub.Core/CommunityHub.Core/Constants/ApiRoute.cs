@@ -17,8 +17,11 @@
 
         public static class Registration
         {
-            /// <summary>Adds or retrieves registration requests</summary>
-            public const string Request = $"{ApiPrefixes.Account}/register";
+            /// <summary>Adds registration requests</summary>
+            public const string CreateRequest = $"{ApiPrefixes.Account}/register";
+
+            /// <summary>Retrieves registration requests</summary>
+            public const string GetAllRequests = $"{ApiPrefixes.Account}/register/all";
 
             /// <summary>Gets registration requests with id</summary>
             public const string GetRequestById = $"{ApiPrefixes.Account}/register/{{id:int}}";

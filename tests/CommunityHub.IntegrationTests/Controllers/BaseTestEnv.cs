@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using CommunityHub.Infrastructure.Data;
-using CommunityHub.Infrastructure.DataManagers;
+using CommunityHub.Infrastructure.Services;
 using CommunityHub.Infrastructure.Services.Registration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,9 +15,7 @@ namespace CommunityHub.IntegrationTests
 
         protected readonly IMapper _mapper;
 
-        protected readonly IRegistrationRequestManager _requestManager;
-
-        protected readonly IAdminService _adminService;
+        protected readonly IRegistrationService _registrationService;
 
         public BaseTestEnv(ApplicationStartup application)
         {
@@ -30,9 +28,9 @@ namespace CommunityHub.IntegrationTests
 
             using (var scope = _serviceProvider.CreateScope())
             {
-                _requestManager = scope.ServiceProvider.GetRequiredService<IRegistrationRequestManager>();
+                _registrationService = scope.ServiceProvider.GetRequiredService<IRegistrationService>();
 
-                _adminService = scope.ServiceProvider.GetRequiredService<IAdminService>();
+                //_adminService = scope.ServiceProvider.GetRequiredService<IAdminService>();
             }
         }
     }

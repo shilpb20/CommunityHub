@@ -44,7 +44,7 @@ namespace CommunityHub.UI.Controllers
                { RouteParameter.Registration.Status, status }
             };
 
-            string uri = HttpHelper.BuildUri(_service.GetClient().BaseAddress.ToString(), ApiRoute.Registration.Request, queryParameters);
+            string uri = HttpHelper.BuildUri(_service.GetClient().BaseAddress.ToString(), ApiRoute.Registration.GetAllRequests, queryParameters);
             var result = await _service.GetRequestAsync<List<RegistrationRequestDto>>(uri);
             return View(result);
         }

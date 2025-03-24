@@ -1,7 +1,7 @@
 ﻿using CommunityHub.Core.Enums;
 using CommunityHub.Infrastructure.Models;
 
-namespace CommunityHub.Infrastructure.Services
+namespace CommunityHub.Infrastructure.Services.Registration
 {
     public interface IRegistrationService
     {

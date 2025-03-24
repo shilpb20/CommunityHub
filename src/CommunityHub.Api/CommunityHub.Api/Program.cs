@@ -1,16 +1,16 @@
+
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using AppComponents.Repository.Abstraction;
 using AppComponents.Repository.EFCore;
 using AppComponents.Repository.EFCore.Transaction;
+using AppComponents.Email;
+using CommunityHub.Api.Data;
 using CommunityHub.Infrastructure.Models;
 using CommunityHub.Infrastructure.Data;
-using CommunityHub.Infrastructure.Models;
-using CommunityHub.Infrastructure.Services.Registration;
-using CommunityHub.Infrastructure.Services.User;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
-using CommunityHub.Api.Data;
 using CommunityHub.Infrastructure.Services;
-using CommunityHub.Infrastructure.DataManagers;
+using CommunityHub.Infrastructure.Services.Registration;
+using AppComponents.Email.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,22 +42,28 @@ builder.Services.AddRepository<SpouseInfo, ApplicationDbContext>();
 builder.Services.AddRepository<Children, ApplicationDbContext>();
 builder.Services.AddRepository<FamilyPicture, ApplicationDbContext>();
 
-builder.Services.AddScoped<IRegistrationRequestManager, RegistrationRequestManager>();
+var emailSettings = builder.Configuration.GetSection("EmailSettings").Get<EmailSettings>();
+builder.Services.AddEmailService(emailSettings);
+
+
 builder.Services.AddRepository<RegistrationRequest, ApplicationDbContext>();
 builder.Services.AddScoped<IRegistrationService, RegistrationService>();
 
-builder.Services.AddScoped<IAccountService, AccountService>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IAdminService, AdminService>();
+//builder.Services.AddScoped<IAccountService, AccountService>();
+//builder.Services.AddScoped<IUserService, UserService>();
+//builder.Services.AddScoped<IAdminService, AdminService>();
 
-builder.Services.AddScoped<IFamilyPictureService, FamilyPictureService>();
+//builder.Services.AddScoped<IFamilyPictureService, FamilyPictureService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddHttpClient();
 
 var app = builder.Build();
+
+var emailService = app.Services.GetService<IEmailService>();
 
 var serviceProvider = app.Services.CreateScope().ServiceProvider;
 await DataSeeder.SeedRolesAsync(serviceProvider);

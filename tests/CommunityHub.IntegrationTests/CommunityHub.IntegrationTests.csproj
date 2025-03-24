@@ -23,7 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Controllers\BaseTestEnv.cs" />
     <Compile Remove="Services\AccountServiceTests.cs" />
     <Compile Remove="Services\FamilyPictureServiceTests.cs" />
     <Compile Remove="Services\UserServiceTests.cs" />
@@ -51,10 +50,6 @@
 
   <ItemGroup>
     <Using Include="Xunit" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\" />
   </ItemGroup>
 
 </Project>

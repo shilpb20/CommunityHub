@@ -35,4 +35,10 @@
     <ProjectReference Include="..\..\CommunityHub.Core\CommunityHub.Core\CommunityHub.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="AppComponents.Email">
+      <HintPath>..\..\..\..\AppComponents\AppComponents.Email\src\AppComponents.Email\bin\Release\net8.0\AppComponents.Email.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

@@ -3,7 +3,7 @@ using CommunityHub.Core.Enums;
 using CommunityHub.Core.Helpers;
 using CommunityHub.Infrastructure.Data;
 using CommunityHub.Infrastructure.Models;
-using CommunityHub.Infrastructure.Services;
+using CommunityHub.Infrastructure.Services.Registration;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -257,7 +257,7 @@ namespace CommunityHub.IntegrationTests.Services
             var requests = await _registrationService.GetRequestsAsync(eRegistrationStatus.Approved);
 
             // Assert
-            requests.Should().HaveCount(2); 
+            requests.Should().HaveCount(2);
             requests.All(r => r.RegistrationStatus == RegistrationStatusHelper.ApprovedStatus).Should().BeTrue();
         }
 
@@ -278,7 +278,7 @@ namespace CommunityHub.IntegrationTests.Services
             var requests = await _registrationService.GetRequestsAsync(eRegistrationStatus.Rejected);
 
             // Assert
-            requests.Should().HaveCount(2);  
+            requests.Should().HaveCount(2);
             requests.All(r => r.RegistrationStatus == RegistrationStatusHelper.RejectedStatus).Should().BeTrue();
         }
 

@@ -50,21 +50,19 @@ namespace CommunityHub.UI.Controllers
                 return View("register", registrationData);
             }
 
-            //TODO: Check duplicate user
-            var duplicateUser = FindUserAsync(
-                registrationData.UserInfo.Email, 
-                registrationData.UserInfo.ContactNumber);
+            //TODO: Check duplicate details - user/partner
+            //var duplicateUser = await FindUserAsync(
+            //    registrationData.UserInfo.Email, 
+            //    registrationData.UserInfo.ContactNumber);
 
-            if (duplicateUser != null)
-            {
-                //Add error
-                return View("register", registrationData);
-            }
-
-            //Check spouse info matching
+            //if (duplicateUser != null)
+            //{
+            //    //Add error
+            //    return View("register", registrationData);
+            //}
 
             var result = await _service.AddRequestAsync<RegistrationInfoCreateDto, RegistrationRequestDto>(
-                ApiRoute.Registration.Request, registrationData);
+                ApiRoute.Registration.CreateRequest, registrationData);
             if (result == null)
             {
                 ModelState.AddModelError("", "An error occurred while registering.");

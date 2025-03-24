@@ -1,87 +1,103 @@
-﻿using AppComponents.Repository.Abstraction;
+﻿using AppComponents.Email.Models;
+using AppComponents.Email.Services;
+using AppComponents.Repository.Abstraction;
 using CommunityHub.Core.Enums;
 using CommunityHub.Core.Extensions;
 using CommunityHub.Infrastructure.Data;
 using CommunityHub.Infrastructure.Models;
-using CommunityHub.Infrastructure.Services;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using System.Runtime.CompilerServices;
 
-public class RegistrationService : IRegistrationService
+namespace CommunityHub.Infrastructure.Services.Registration
 {
-    private readonly ILogger<IRegistrationService> _logger;
-    private readonly IRepository<RegistrationRequest, ApplicationDbContext> _repository;
-
-    public RegistrationService(
-        ILogger<IRegistrationService> logger,
-        IRepository<RegistrationRequest, ApplicationDbContext> repository)
+    public class RegistrationService : IRegistrationService
     {
-        _logger = logger;
-        _repository = repository;
-    }
+        private readonly ILogger<IRegistrationService> _logger;
+        private readonly IEmailService _emailService;
+        private readonly IRepository<RegistrationRequest, ApplicationDbContext> _repository;
 
-    public async Task<RegistrationRequest> CreateRequestAsync(RegistrationInfo registrationData)
-    {
-        try
+        public RegistrationService(
+            ILogger<IRegistrationService> logger,
+            IEmailService emailService,
+            IRepository<RegistrationRequest, ApplicationDbContext> repository)
         {
-            if (registrationData == null)
+            _logger = logger;
+            _emailService = emailService;
+            _repository = repository;
+        }
+
+        public async Task<RegistrationRequest> CreateRequestAsync(RegistrationInfo registrationData)
+        {
+            try
             {
-                _logger.LogDebug("Registration data null. Skipping request creation");
+                if (registrationData == null)
+                {
+                    _logger.LogDebug("Registration data null. Skipping request creation");
+                    return null;
+                }
+
+                _logger.LogDebug($"Creating registration request for user - {registrationData?.UserInfo.FullName}.");
+
+                var registrationInfo = JsonConvert.SerializeObject(registrationData);
+                var registrationRequest = new RegistrationRequest(registrationInfo);
+
+                var newRequest = await _repository.AddAsync(registrationRequest);
+
+                var emailRequest = new EmailRequest
+                {
+                    To = new List<string> { "shilbh20@gmail.com" },
+                    Subject = "Test Email from Community Hub",
+                    HtmlContent = "<h1>This is a test email</h1>"
+                };
+
+                EmailStatus emailStatus = await _emailService.SendEmailAsync(emailRequest);
+                return newRequest;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error occurred while creating registration request: {ex.Message}", ex);
+                throw;
+            }
+        }
+
+        public async Task<RegistrationRequest> GetRequestByIdAsync(int id)
+        {
+            if (id <= 0)
+            {
+                _logger.LogWarning($"Invalid ID: {id}. Cannot retrieve registration request.");
                 return null;
             }
 
-            _logger.LogDebug($"Creating registration request for user - {registrationData?.UserInfo.FullName}.");
-
-            var registrationInfo = JsonConvert.SerializeObject(registrationData);
-            var registrationRequest = new RegistrationRequest(registrationInfo);
-
-            return await _repository.AddAsync(registrationRequest);
+            return await _repository.GetAsync(x => x.Id == id);
         }
-        catch (Exception ex)
+
+        public async Task<List<RegistrationRequest>> GetRequestsAsync(eRegistrationStatus status)
         {
-            _logger.LogError($"Error occurred while creating registration request: {ex.Message}", ex);
-            throw;
-        }
-    }
+            if (status == eRegistrationStatus.All)
+            {
+                return await _repository.GetAllAsync();
+            }
 
-    public async Task<RegistrationRequest> GetRequestByIdAsync(int id)
-    {
-        if (id <= 0)
+            return await _repository.GetAllAsync(x => x.RegistrationStatus.ToString() == status.GetEnumMemberValue());
+        }
+
+        public async Task<RegistrationRequest> ApproveRequestAsync(int id)
         {
-            _logger.LogWarning($"Invalid ID: {id}. Cannot retrieve registration request.");
-            return null;
+            var request = await GetRequestByIdAsync(id);
+            if (request == null) return null;
+
+            request.Approve();
+            return await _repository.UpdateAsync(request);
         }
 
-        return await _repository.GetAsync(x => x.Id == id);
-    }
-
-    public async Task<List<RegistrationRequest>> GetRequestsAsync(eRegistrationStatus status)
-    {
-        if (status == eRegistrationStatus.All)
+        public async Task<RegistrationRequest> RejectRequestAsync(int id, string comment)
         {
-            return await _repository.GetAllAsync();
+            var request = await GetRequestByIdAsync(id);
+            if (request == null) return null;
+
+            request.Reject(comment);
+            return await _repository.UpdateAsync(request);
         }
 
-        return await _repository.GetAllAsync(x => x.RegistrationStatus.ToString() == status.GetEnumMemberValue());
     }
-
-    public async Task<RegistrationRequest> ApproveRequestAsync(int id)
-    {
-        var request = await GetRequestByIdAsync(id);
-        if (request == null) return null;
-
-        request.Approve();
-        return await _repository.UpdateAsync(request);
-    }
-
-    public async Task<RegistrationRequest> RejectRequestAsync(int id, string comment)
-    {
-        var request = await GetRequestByIdAsync(id);
-        if (request == null) return null;
-
-        request.Reject(comment);
-        return await _repository.UpdateAsync(request);
-    }
-
 }
