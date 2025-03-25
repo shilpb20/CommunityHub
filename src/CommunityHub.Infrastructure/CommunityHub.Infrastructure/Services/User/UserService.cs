@@ -26,43 +26,9 @@ namespace CommunityHub.Infrastructure.Services.User
             _childRepository = childRepository;
         }
 
-        public async Task<UserInfo> CreateUserAsync(UserInfo userInfo, SpouseInfo? spouseInfo, List<Children>? children)
-        {
-            var newUser = await _userRepository.AddAsync(userInfo);
-            if (newUser == null)
-                throw new Exception("User info creation failed.");
-
-            if (spouseInfo != null)
-            {
-                spouseInfo.UserInfoId = newUser.Id;
-                var spouseInfoDto = await _spouseRepository.AddAsync(spouseInfo);
-                if (spouseInfoDto == null)
-                    throw new Exception("Spouse info creation failed.");
-            }
-
-            foreach (var child in children)
-            {
-                child.UserInfoId = newUser.Id;
-                await _childRepository.AddAsync(child);
-            }
-
-            return newUser;
-        }
-
-        public async Task<UserInfo> DeleteUsersAsync(int id)
-        {
-            return null;
-        }
-
-
-        public async Task<UserInfo> GetUserAsync(int id)
+        public async Task<UserInfo> GetUserAsyncById(int id)
         {
             return await _userRepository.GetAsync(x => x.Id == id);
-        }
-
-        public async Task<UserInfo> GetUserAsync(Expression<Func<UserInfo, bool>> filter)
-        {
-            return await _userRepository.GetAsync(filter);
         }
 
         public async Task<List<UserInfo>> GetUsersAsync(Dictionary<string, bool>? orderBy = null)
@@ -80,9 +46,42 @@ namespace CommunityHub.Infrastructure.Services.User
             return await users.Include(x => x.SpouseInfo).Include(y => y.Children).ToListAsync();
         }
 
-        public Task<UserInfo> UpdateUsersAsync(UserInfo userInfo)
-        {
-            throw new NotImplementedException();
-        }
+        //public async Task<UserInfo> CreateUserAsync(UserInfo userInfo, SpouseInfo? spouseInfo, List<Children>? children)
+        //{
+        //    var newUser = await _userRepository.AddAsync(userInfo);
+        //    if (newUser == null)
+        //        throw new Exception("User info creation failed.");
+
+        //    if (spouseInfo != null)
+        //    {
+        //        spouseInfo.UserInfoId = newUser.Id;
+        //        var spouseInfoDto = await _spouseRepository.AddAsync(spouseInfo);
+        //        if (spouseInfoDto == null)
+        //            throw new Exception("Spouse info creation failed.");
+        //    }
+
+        //    foreach (var child in children)
+        //    {
+        //        child.UserInfoId = newUser.Id;
+        //        await _childRepository.AddAsync(child);
+        //    }
+
+        //    return newUser;
+        //}
+
+        //public async Task<UserInfo> DeleteUsersAsync(int id)
+        //{
+        //    return null;
+        //}
+
+        //public async Task<UserInfo> GetUserAsync(Expression<Func<UserInfo, bool>> filter)
+        //{
+        //    return await _userRepository.GetAsync(filter);
+        //}
+
+        //public Task<UserInfo> UpdateUsersAsync(UserInfo userInfo)
+        //{
+        //    throw new NotImplementedException();
+        //}
     }
 }

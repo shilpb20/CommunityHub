@@ -25,7 +25,6 @@
   <ItemGroup>
     <Compile Remove="Services\AccountServiceTests.cs" />
     <Compile Remove="Services\FamilyPictureServiceTests.cs" />
-    <Compile Remove="Services\UserServiceTests.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -46,6 +45,12 @@
     <ProjectReference Include="..\..\src\CommunityHub.Core\CommunityHub.Core\CommunityHub.Core.csproj" />
     <ProjectReference Include="..\..\src\CommunityHub.Infrastructure\CommunityHub.Infrastructure\CommunityHub.Infrastructure.csproj" />
     <ProjectReference Include="..\CommunityHub.Tests.Core\CommunityHub.Tests.Core\CommunityHub.Tests.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="AppComponents.Email">
+      <HintPath>..\..\..\AppComponents\AppComponents.Email\src\AppComponents.Email\bin\Debug\net8.0\AppComponents.Email.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>

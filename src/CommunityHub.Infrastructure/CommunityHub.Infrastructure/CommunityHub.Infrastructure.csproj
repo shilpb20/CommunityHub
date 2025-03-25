@@ -8,20 +8,26 @@
 
   <ItemGroup>
     <Compile Remove="DataManagers\**" />
+    <Compile Remove="EmailSenderService\**" />
     <Compile Remove="Services\**" />
     <EmbeddedResource Remove="DataManagers\**" />
+    <EmbeddedResource Remove="EmailSenderService\**" />
     <EmbeddedResource Remove="Services\**" />
     <None Remove="DataManagers\**" />
+    <None Remove="EmailSenderService\**" />
     <None Remove="Services\**" />
   </ItemGroup>
 
   <ItemGroup>
     <Compile Include="Services\Registration\IRegistrationService.cs" />
     <Compile Include="Services\Registration\RegistrationService.cs" />
+    <Compile Include="Services\User\IUserService.cs" />
+    <Compile Include="Services\User\UserService.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="AppComponents.Repository" Version="1.2.1" />
+    <PackageReference Include="AppComponents.TemplateEngine" Version="1.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.2" />

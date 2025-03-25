@@ -9,47 +9,44 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using TestDataHelper = RegistrationTestDataHelper;
+using AppComponents.Email.Models;
+using AppComponents.Email.Services;
+using Moq;
+using System.Net.Mail;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 namespace CommunityHub.IntegrationTests.Services
 {
-    public class RegistrationServiceTests : IDisposable
+    public class RegistrationServiceTests : BaseServiceTest
     {
         #region class-initiazation
 
-        private ServiceProvider _serviceProvider;
-        private ApplicationDbContext _context;
         private IRegistrationService _registrationService;
-
+        private Mock<IEmailService> _emailService;
         private readonly string _rejectionReason = "Invalid request";
 
-        public RegistrationServiceTests()
+        public RegistrationServiceTests() : base()
         {
-            var serviceCollection = new ServiceCollection();
-
-            // Register in-memory DbContext
-            serviceCollection.AddDbContext<ApplicationDbContext>(options =>
-                options.UseInMemoryDatabase("TestDb"));
-
-            serviceCollection.AddRepository<RegistrationRequest, ApplicationDbContext>();
-            serviceCollection.AddScoped<IRegistrationService, RegistrationService>();
-            serviceCollection.AddLogging();
-
-            _serviceProvider = serviceCollection.BuildServiceProvider();
-
-            _context = _serviceProvider.GetRequiredService<ApplicationDbContext>();
-            _registrationService = _serviceProvider.GetRequiredService<IRegistrationService>();
+            _registrationService = ServiceProvider.GetRequiredService<IRegistrationService>();
         }
 
-        public void Dispose()
+        protected override void AddServices(IServiceCollection services)
         {
-            _context.Database.EnsureDeleted();
-            _context.Database.EnsureCreated();
+            _emailService = new Mock<IEmailService>();
+            _emailService
+                .Setup(x => x.SendEmailAsync(It.IsAny<EmailRequest>()))
+                .ReturnsAsync(new EmailStatus
+                {
+                    IsSuccess = true,
+                    Message = "Email sent successfully"
+                });
 
-            _serviceProvider.Dispose();
+            services.AddSingleton(_emailService.Object);
+
+            services.AddRepository<RegistrationRequest, ApplicationDbContext>();
+            services.AddScoped<IRegistrationService, RegistrationService>();
+            services.AddLogging();
         }
-
-
-
 
         #endregion
 
@@ -71,7 +68,7 @@ namespace CommunityHub.IntegrationTests.Services
             request.CreatedAt.Should().BeCloseTo(DateTime.UtcNow, TimeSpan.FromSeconds(1));
             request.ReviewedAt.Should().BeNull();
 
-            var savedRequest = _context.RegistrationRequests.FirstOrDefault();
+            var savedRequest = Context.RegistrationRequests.FirstOrDefault();
             savedRequest.Should().NotBeNull();
             savedRequest.RegistrationInfo.Should().Be(JsonConvert.SerializeObject(registrationData));
         }
@@ -106,7 +103,7 @@ namespace CommunityHub.IntegrationTests.Services
             updatedRequest.RegistrationStatus.Should().Be(RegistrationStatusHelper.ApprovedStatus);
 
             // Check if updated request is saved correctly in DB
-            var savedRequest = _context.RegistrationRequests.FirstOrDefault(r => r.Id == createdRequest.Id);
+            var savedRequest = Context.RegistrationRequests.FirstOrDefault(r => r.Id == createdRequest.Id);
             savedRequest.Should().NotBeNull();
             savedRequest.RegistrationStatus.Should().Be(RegistrationStatusHelper.ApprovedStatus);
         }
@@ -142,7 +139,7 @@ namespace CommunityHub.IntegrationTests.Services
             updatedRequest.RegistrationStatus.Should().Be(RegistrationStatusHelper.RejectedStatus);
 
             // Check if updated request is saved correctly in DB
-            var savedRequest = _context.RegistrationRequests.FirstOrDefault(r => r.Id == createdRequest.Id);
+            var savedRequest = Context.RegistrationRequests.FirstOrDefault(r => r.Id == createdRequest.Id);
             savedRequest.Should().NotBeNull();
             savedRequest.RegistrationStatus.Should().Be(RegistrationStatusHelper.RejectedStatus);
         }
@@ -194,7 +191,7 @@ namespace CommunityHub.IntegrationTests.Services
             retrievedRequest.Id.Should().Be(createdRequest.Id);
             retrievedRequest.RegistrationStatus.Should().Be(RegistrationStatusHelper.PendingStatus);
 
-            var savedRequest = _context.RegistrationRequests.FirstOrDefault(r => r.Id == createdRequest.Id);
+            var savedRequest = Context.RegistrationRequests.FirstOrDefault(r => r.Id == createdRequest.Id);
             savedRequest.Should().NotBeNull();
             savedRequest.RegistrationStatus.Should().Be(RegistrationStatusHelper.PendingStatus);
             savedRequest.Review.Should().BeNull();

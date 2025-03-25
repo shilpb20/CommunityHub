@@ -43,14 +43,9 @@ namespace CommunityHub.Infrastructure.Services.Registration
 
                 var newRequest = await _repository.AddAsync(registrationRequest);
 
-                var emailRequest = new EmailRequest
-                {
-                    To = new List<string> { "shilbh20@gmail.com" },
-                    Subject = "Test Email from Community Hub",
-                    HtmlContent = "<h1>This is a test email</h1>"
-                };
+                //TODO: Send registration email notification
 
-                EmailStatus emailStatus = await _emailService.SendEmailAsync(emailRequest);
+                //EmailStatus emailStatus = await _emailService.SendEmailAsync(emailRequest);
                 return newRequest;
             }
             catch (Exception ex)

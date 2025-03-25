@@ -5,15 +5,15 @@ namespace CommunityHub.Infrastructure.Services.User
 {
     public interface IUserService
     {
-        Task<UserInfo> CreateUserAsync(UserInfo userInfo,
-            SpouseInfo? spouseInfo,
-            List<Children>? children);
-
-        Task<UserInfo> GetUserAsync(int id);
-        Task<UserInfo> GetUserAsync(Expression<Func<UserInfo, bool>> filter);
+        Task<UserInfo> GetUserAsyncById(int id);
         Task<List<UserInfo>> GetUsersAsync(Dictionary<string, bool>? orderBy = null);
 
-        Task<UserInfo> UpdateUsersAsync(UserInfo userInfo);
-        Task<UserInfo> DeleteUsersAsync(int id);
+        //Task<UserInfo> CreateUserAsync(UserInfo userInfo,
+        //    SpouseInfo? spouseInfo,
+        //    List<Children>? children);
+
+        //Task<UserInfo> GetUserAsync(Expression<Func<UserInfo, bool>> filter);
+        //Task<UserInfo> UpdateUsersAsync(UserInfo userInfo);
+        //Task<UserInfo> DeleteUsersAsync(int id);
     }
 }
