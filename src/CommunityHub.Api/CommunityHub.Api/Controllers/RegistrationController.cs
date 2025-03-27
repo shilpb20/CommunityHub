@@ -1,9 +1,17 @@
 ﻿using AutoMapper;
 using CommunityHub.Api.NamedConstants;
+using CommunityHub.Core;
 using CommunityHub.Core.Constants;
 using CommunityHub.Core.Dtos;
+using CommunityHub.Core.Enums;
+using CommunityHub.Core.Extensions;
+using CommunityHub.Core.Factory;
+using CommunityHub.Core.Helpers;
+using CommunityHub.Core.Messages;
+using CommunityHub.Core.Models;
 using CommunityHub.Infrastructure.Models;
 using CommunityHub.Infrastructure.Services.Registration;
+using CommunityHub.Infrastructure.Services.User;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CommunityHub.Api.Controllers
@@ -12,39 +20,57 @@ namespace CommunityHub.Api.Controllers
     {
         private readonly ILogger<RegistrationController> _logger;
         private readonly IMapper _mapper;
+        private readonly IResponseFactory _responseFactory;
+
         private readonly IRegistrationService _registrationService;
+        private readonly IUserService _userService;
 
         public RegistrationController(
             ILogger<RegistrationController> logger,
             IMapper mapper,
-            IRegistrationService registrationService)
+            IResponseFactory responseFactory,
+            IRegistrationService registrationService,
+            IUserService userService)
         {
             _logger = logger;
             _mapper = mapper;
+            _responseFactory = responseFactory;
 
+            _userService = userService;
             _registrationService = registrationService;
         }
+
 
         [HttpPost(ApiRoute.Registration.CreateRequest)]
         [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(RegistrationRequestDto))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
 
-        public async Task<ActionResult<RegistrationRequestDto>> AddRegistrationRequest([FromBody] RegistrationInfoCreateDto registrationInfoDto)
+        public async Task<ActionResult<ApiResponse<RegistrationRequestDto>>> AddRegistrationRequest([FromBody] RegistrationInfoCreateDto registrationInfoDto)
         {
-            if (registrationInfoDto == null || !ModelState.IsValid)
+            ApiResponse<RegistrationRequestDto> responseObject = null;
+            var errorResponse = ValidationHelper.ValidateModelState(ModelState, ErrorMessage.InvalidData);
+            if (errorResponse != null)
             {
-                return BadRequest(ErrorMessages.Registration.InvalidCreateData);
+                responseObject = _responseFactory.Failure<RegistrationRequestDto>(errorResponse);
+                return BadRequest(responseObject);
             }
 
             try
             {
-                var registrationInfo = _mapper.Map<RegistrationInfo>(registrationInfoDto);
+                eDuplicateStatus duplicateStatus = await CheckDuplicateUser(registrationInfoDto);
+                if (duplicateStatus != eDuplicateStatus.NoDuplicate)
+                {
+                    responseObject = _responseFactory.Failure<RegistrationRequestDto>(ErrorCode.DuplicateUser, duplicateStatus.GetDescription());
+                    return BadRequest(responseObject);
+                }
 
+                var registrationInfo = _mapper.Map<RegistrationInfo>(registrationInfoDto);
                 var registrationRequest = await _registrationService.CreateRequestAsync(registrationInfo);
                 var registrationRequestDto = _mapper.Map<RegistrationRequestDto>(registrationRequest);
 
-                return CreatedAtRoute(RouteNames.Registration.GetRequest, new { id = registrationRequestDto.Id }, registrationRequestDto);
+                responseObject = _responseFactory.Success<RegistrationRequestDto>(registrationRequestDto);
+                return CreatedAtRoute(RouteNames.Registration.GetRequest, new { id = registrationRequestDto.Id }, responseObject);
             }
             catch (Exception ex)
             {
@@ -55,25 +81,76 @@ namespace CommunityHub.Api.Controllers
             }
         }
 
+        private async Task<eDuplicateStatus> CheckDuplicateUser(RegistrationInfoCreateDto registrationInfoDto)
+        {
+            var userContactDto = new UserContactDto()
+            {
+                CountryCode = registrationInfoDto.UserInfo.CountryCode,
+                ContactNumber = registrationInfoDto.UserInfo.ContactNumber,
+                Email = registrationInfoDto.UserInfo.Email
+            };
+
+            var spouseContactDto = registrationInfoDto.SpouseInfo != null ? new UserContactDto()
+            {
+                CountryCode = registrationInfoDto.UserInfo.CountryCode,
+                ContactNumber = registrationInfoDto.UserInfo.ContactNumber,
+                Email = registrationInfoDto.UserInfo.Email
+            } : null;
+
+            var duplicateStatus = await _userService.CheckDuplicateUser(userContactDto, spouseContactDto);
+            return duplicateStatus;
+        }
+
+        [HttpGet(ApiRoute.Registration.GetRequests)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<RegistrationRequestDto>))]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<ApiResponse<List<RegistrationRequestDto>>>> GetRequests([FromQuery] string status = "pending")
+        {
+            ApiResponse<List<RegistrationRequestDto>> responseObject = null;
+            if (Enum.TryParse<eRegistrationStatus>(status, true, out var registrationStatus)
+                && Enum.IsDefined(typeof(eRegistrationStatus), registrationStatus))
+            {
+                var requests = await _registrationService.GetRequestsAsync(registrationStatus);
+                if (!requests.Any()) { return NoContent(); }
+
+                var requestDtos = _mapper.Map<List<RegistrationRequestDto>>(requests);
+                responseObject = _responseFactory.Success<List<RegistrationRequestDto>>(_mapper.Map<List<RegistrationRequestDto>>(requestDtos));
+                return Ok(responseObject);
+            }
+            else
+            {
+                responseObject = _responseFactory.Failure<List<RegistrationRequestDto>>(ErrorCode.InvalidData,
+                    $"Invalid registration status value: {status}. " +
+                    $"Valid values are {string.Join(", ", Enum.GetNames(typeof(eRegistrationStatus)))}");
+
+                return BadRequest(responseObject);
+            }
+        }
+
         [HttpGet(ApiRoute.Registration.GetRequestById, Name = RouteNames.Registration.GetRequest)]
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(RegistrationRequestDto))]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<RegistrationRequestDto>> GetRegistrationRequest(int id)
+        public async Task<ActionResult<ApiResponse<RegistrationRequestDto>>> GetRegistrationRequest(int id)
         {
+            ApiResponse<RegistrationRequestDto> responseObject = null;
             if (id <= 0)
             {
-                return BadRequest("Id must be a positive number");
+                responseObject = _responseFactory.Failure<RegistrationRequestDto>(ErrorCode.InvalidData, ErrorMessage.InvalidId);
+                return BadRequest(responseObject);
             }
 
             var result = await _registrationService.GetRequestByIdAsync(id);
             if (result == null)
             {
-                return NotFound($"Request with Id - {id} is not found.");
+                responseObject = _responseFactory.Failure<RegistrationRequestDto>(ErrorCode.InvalidData, $"Request with Id - {id} is not found.");
+                return NotFound(responseObject);
             }
 
             var resultDto = _mapper.Map<RegistrationRequestDto>(result);
-            return Ok(resultDto);
+            responseObject = _responseFactory.Success(resultDto);
+            return Ok(responseObject);
         }
     }
 }

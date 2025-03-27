@@ -21,7 +21,7 @@
             public const string CreateRequest = $"{ApiPrefixes.Account}/register";
 
             /// <summary>Retrieves registration requests</summary>
-            public const string GetAllRequests = $"{ApiPrefixes.Account}/register/all";
+            public const string GetRequests = $"{ApiPrefixes.Account}/register";
 
             /// <summary>Gets registration requests with id</summary>
             public const string GetRequestById = $"{ApiPrefixes.Account}/register/{{id:int}}";
@@ -30,10 +30,10 @@
         public static class Admin
         {
             /// <summary>Rejects request by id</summary>
-            public const string RejectRequestById = $"{ApiPrefixes.Admin}/request/reject/{{id:int}}";
+            public const string RejectRequestById = $"{ApiPrefixes.Admin}/registrations/{{id:int}}/reject";
 
             /// <summary>Gets request by id</summary>
-            public const string ApproveRequestById = $"{ApiPrefixes.Admin}/request/approve/{{id:int}}";
+            public const string ApproveRequestById = $"{ApiPrefixes.Admin}/registrations/{{id:int}}/approve";
         }
 
         public static class FamilyPicture

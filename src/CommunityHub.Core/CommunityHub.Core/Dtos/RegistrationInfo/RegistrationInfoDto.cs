@@ -1,4 +1,5 @@
-﻿namespace CommunityHub.Core.Dtos
+﻿
+namespace CommunityHub.Core.Dtos
 {
     public class RegistrationInfoDto
     {

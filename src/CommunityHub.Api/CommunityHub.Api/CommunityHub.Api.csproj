@@ -17,9 +17,7 @@
   <ItemGroup>
     <Compile Remove="ApplicationDbContext.cs" />
     <Compile Remove="Controllers\AccountController.cs" />
-    <Compile Remove="Controllers\AdminController.cs" />
     <Compile Remove="Controllers\FamilyPictureController.cs" />
-    <Compile Remove="Controllers\UserController.cs" />
   </ItemGroup>
 
   <ItemGroup>

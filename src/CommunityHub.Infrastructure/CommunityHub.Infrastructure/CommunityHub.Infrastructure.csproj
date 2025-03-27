@@ -8,17 +8,16 @@
 
   <ItemGroup>
     <Compile Remove="DataManagers\**" />
-    <Compile Remove="EmailSenderService\**" />
     <Compile Remove="Services\**" />
     <EmbeddedResource Remove="DataManagers\**" />
-    <EmbeddedResource Remove="EmailSenderService\**" />
     <EmbeddedResource Remove="Services\**" />
     <None Remove="DataManagers\**" />
-    <None Remove="EmailSenderService\**" />
     <None Remove="Services\**" />
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="Services\Admin\AdminService.cs" />
+    <Compile Include="Services\Admin\IAdminService.cs" />
     <Compile Include="Services\Registration\IRegistrationService.cs" />
     <Compile Include="Services\Registration\RegistrationService.cs" />
     <Compile Include="Services\User\IUserService.cs" />

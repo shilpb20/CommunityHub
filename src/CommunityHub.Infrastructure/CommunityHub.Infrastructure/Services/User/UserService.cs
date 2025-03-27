@@ -1,4 +1,7 @@
 ﻿using AppComponents.Repository.Abstraction;
+using CommunityHub.Core.Dtos;
+using CommunityHub.Core.Enums;
+using CommunityHub.Core.Helpers;
 using CommunityHub.Infrastructure.Data;
 using CommunityHub.Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
@@ -31,9 +34,17 @@ namespace CommunityHub.Infrastructure.Services.User
             return await _userRepository.GetAsync(x => x.Id == id);
         }
 
-        public async Task<List<UserInfo>> GetUsersAsync(Dictionary<string, bool>? orderBy = null)
+        public async Task<List<UserInfo>> GetUsersAsync(string? sortBy, bool ascending)
         {
-            if (orderBy == null)
+            var orderBy = GetOrderByDictionary(sortBy, ascending);
+            var users = await _userRepository.GetAll(orderByClause: orderBy);
+            return await users.Include(x => x.SpouseInfo).Include(y => y.Children).ToListAsync();
+        }
+
+        private Dictionary<string, bool> GetOrderByDictionary(string? sortBy, bool ascending)
+        {
+            Dictionary<string, bool> orderBy = new();
+            if (sortBy == null)
             {
                 orderBy = new Dictionary<string, bool>
                 {
@@ -41,10 +52,72 @@ namespace CommunityHub.Infrastructure.Services.User
                     { "FullName", true }
                 };
             }
+            else
+            {
+                orderBy = new Dictionary<string, bool>()
+                {
+                    { sortBy, ascending }
+                };
+            }
 
-            var users = await _userRepository.GetAll(orderByClause: orderBy);
-            return await users.Include(x => x.SpouseInfo).Include(y => y.Children).ToListAsync();
+            return orderBy;
         }
+
+        public async Task<eDuplicateStatus> CheckDuplicateUser(UserContactDto userContactDto, UserContactDto? spouseContact)
+        {
+            if (await IsDuplicateEmailAsync(userContactDto.Email))
+            {
+                return eDuplicateStatus.DuplicateUserEmail;
+            }
+
+            if (await IsDuplicateContactAsync(userContactDto))
+            {
+                return eDuplicateStatus.DuplicateUserContact;
+            }
+
+            if (spouseContact != null)
+            {
+                if (await IsDuplicateEmailAsync(spouseContact.Email))
+                {
+                    return eDuplicateStatus.DuplicateSpouseEmail;
+                }
+
+                if (await IsDuplicateContactAsync(spouseContact))
+                {
+                    return eDuplicateStatus.DuplicateSpouseContact;
+                }
+            }
+
+            return eDuplicateStatus.NoDuplicate;
+        }
+
+        private async Task<bool> IsDuplicateEmailAsync(string email)
+        {
+            var user = await _userRepository.GetAsync(x => x.Email == email);
+            if (user != null)
+            {
+                return true;
+            }
+
+            return await _spouseRepository.GetAsync(x => x.Email == email) != null;
+        }
+
+        private async Task<bool> IsDuplicateContactAsync(UserContactDto contactDto)
+        {
+            var user = await _userRepository.GetAsync(x => x.CountryCode == contactDto.CountryCode 
+                && x.ContactNumber == contactDto.ContactNumber);
+            
+            if(user != null)
+            {
+                return true;
+            }
+
+            var spouse = await _spouseRepository.GetAsync(x => x.CountryCode == contactDto.CountryCode
+                && x.ContactNumber == contactDto.ContactNumber);
+
+            return spouse != null;
+        }
+
 
         //public async Task<UserInfo> CreateUserAsync(UserInfo userInfo, SpouseInfo? spouseInfo, List<Children>? children)
         //{

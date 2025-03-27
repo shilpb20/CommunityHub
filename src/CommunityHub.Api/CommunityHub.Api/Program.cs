@@ -1,4 +1,3 @@
-
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using AppComponents.Repository.Abstraction;
@@ -11,16 +10,47 @@ using CommunityHub.Infrastructure.Data;
 using CommunityHub.Infrastructure.Services;
 using CommunityHub.Infrastructure.Services.Registration;
 using AppComponents.Email.Services;
+using CommunityHub.Infrastructure.Services.User;
+using AppComponents.TemplateEngine;
+using CommunityHub.Infrastructure.EmailService;
+using CommunityHub.Api;
+using Microsoft.Extensions.Options;
+using CommunityHub.Core.Factory;
+using CommunityHub.Infrastructure.Services.AdminService;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-var transactionSettings = builder.Configuration.GetSection("TransactionSettings");
+// Bind the "AppSettings" section (for general app settings) and register it as a singleton.
+var appSettingsSection = builder.Configuration.GetSection("AppSettings");
+builder.Services.Configure<AppSettings>(appSettingsSection);
+builder.Services.AddSingleton(sp => sp.GetRequiredService<IOptions<AppSettings>>().Value);
+
+// Bind the "EmailAppSettings" section (for email-specific settings) and register it as a singleton.
+var emailAppSettingsSection = builder.Configuration.GetSection("EmailAppSettings");
+builder.Services.Configure<EmailAppSettings>(emailAppSettingsSection);
+builder.Services.AddSingleton(sp => sp.GetRequiredService<IOptions<EmailAppSettings>>().Value);
+
+// Email-related services
+var emailSettings = builder.Configuration.GetSection("EmailSettings").Get<EmailSettings>();
+builder.Services.AddEmailService(emailSettings);
+
+builder.Services.AddScoped<IModelTemplateEngine>(provider =>
+{
+    var logger = provider.GetRequiredService<ILogger<IModelTemplateEngine>>();
+    return new ModelTemplateEngine(logger, "{{", "}}");
+});
+
+
+builder.Services.AddScoped<IAppMailService, AppMailService>();
+
+// Database setup
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders();
 
-bool useInMemoryDb = transactionSettings.GetValue<bool>("UseInMemoryDatabase"); 
+var appSettings = appSettingsSection.Get<AppSettings>();
+bool useInMemoryDb = appSettings.TransactionSettings.UseInMemoryDatabase;
+
 if (useInMemoryDb)
 {
     builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -32,42 +62,36 @@ else
         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 }
 
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
-builder.Services.Configure<TransactionSettings>(builder.Configuration.GetSection("TransactionSettings"));
 builder.Services.AddTransactionManager<ApplicationDbContext>();
 
+// Repositories and other services
 builder.Services.AddRepository<UserInfo, ApplicationDbContext>();
 builder.Services.AddRepository<SpouseInfo, ApplicationDbContext>();
 builder.Services.AddRepository<Children, ApplicationDbContext>();
 builder.Services.AddRepository<FamilyPicture, ApplicationDbContext>();
 
-var emailSettings = builder.Configuration.GetSection("EmailSettings").Get<EmailSettings>();
-builder.Services.AddEmailService(emailSettings);
-
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 builder.Services.AddRepository<RegistrationRequest, ApplicationDbContext>();
 builder.Services.AddScoped<IRegistrationService, RegistrationService>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<IResponseFactory, ResponseFactory>();
 
-//builder.Services.AddScoped<IAccountService, AccountService>();
-//builder.Services.AddScoped<IUserService, UserService>();
-//builder.Services.AddScoped<IAdminService, AdminService>();
-
-//builder.Services.AddScoped<IFamilyPictureService, FamilyPictureService>();
-
+// Controllers, API setup, and Swagger
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
 
+// Configure the app to explicitly use HTTP/HTTPS ports
+builder.WebHost.UseUrls("http://localhost:5000", "https://localhost:5001");
+
 var app = builder.Build();
 
-var emailService = app.Services.GetService<IEmailService>();
-
+// Seed roles
 var serviceProvider = app.Services.CreateScope().ServiceProvider;
 await DataSeeder.SeedRolesAsync(serviceProvider);
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -77,14 +101,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
-
-public partial class Program
-{
-
-}

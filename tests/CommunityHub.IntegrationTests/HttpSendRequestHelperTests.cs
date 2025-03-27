@@ -1,11 +1,18 @@
-﻿namespace CommunityHub.Core.Helpers.Tests
+﻿using CommunityHub.Core.Factory;
+
+namespace CommunityHub.Core.Helpers.Tests
 {
     public class HttpSendRequestHelperTests
     {
         private readonly HttpClient _httpClient;
+        private IResponseFactory _responseFactory;
+        private readonly HttpRequestSender _httpRequestSender;
 
         public HttpSendRequestHelperTests()
         {
+            _responseFactory = new ResponseFactory();
+            _httpRequestSender = new HttpRequestSender(_responseFactory);
+
             _httpClient = new HttpClient { BaseAddress = new Uri("https://jsonplaceholder.typicode.com") };
         }
 
@@ -14,7 +21,7 @@
         {
             var url = "/todos/1";
 
-            var result = await HttpSendRequestHelper.SendGetRequestAsync<object>(_httpClient, url);
+            var result = await _httpRequestSender.SendGetRequestAsync<object>(_httpClient, url);
 
             Assert.NotNull(result);
             Assert.Contains("userId", result.ToString());
@@ -26,7 +33,7 @@
             var url = "/invalidendpoint";
 
             var exception = await Assert.ThrowsAsync<Exception>(() =>
-                HttpSendRequestHelper.SendGetRequestAsync<object>(_httpClient, url));
+                _httpRequestSender.SendGetRequestAsync<object>(_httpClient, url));
 
             Assert.Contains("An error occurred while sending the GET request.", exception.Message);
         }
@@ -55,7 +62,7 @@
             var newTodo = new { userId = 1, title = "Test Todo", completed = false };
 
             var exception = await Assert.ThrowsAsync<Exception>(() =>
-                HttpSendRequestHelper.SendPostRequestAsync<object, object>(_httpClient, url, newTodo));
+                _httpRequestSender.SendPostRequestAsync<object, object>(_httpClient, url, newTodo));
 
             Assert.Contains("An error occurred while sending the POST request.", exception.Message);
         }
@@ -87,7 +94,7 @@
             var todoId = 999;
 
             var exception = await Assert.ThrowsAsync<Exception>(() =>
-                HttpSendRequestHelper.SendUpdateRequestAsync<object, object>(_httpClient, url, todoId, updateTodo));
+                _httpRequestSender.SendUpdateRequestAsync<object, object>(_httpClient, url, todoId, updateTodo));
 
             Assert.Contains("An error occurred while sending the PUT request.", exception.Message);
         }

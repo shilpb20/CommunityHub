@@ -1,51 +1,68 @@
 ﻿using CommunityHub.Core.Helpers;
+using CommunityHub.Core.Models;
 using Microsoft.Extensions.Options;
 
 namespace CommunityHub.UI.Services
 {
-    public class BaseService : IBaseService
+    public class BaseService
     {
-        private readonly ApiSettings _apiSettings;
-        private readonly HttpClient _httpClient;
+        protected readonly HttpClient _httpClient;
+        protected readonly IHttpRequestSender _requestSender;
 
-        public BaseService(HttpClient httpClient, IOptions<ApiSettings> apiSettings)
+        public BaseService(HttpClient httpClient, IHttpRequestSender requestSender, IOptions<ApiSettings> apiSettings)
         {
-            _apiSettings = apiSettings.Value;
-
             _httpClient = httpClient;
-            _httpClient.BaseAddress = new Uri(_apiSettings.BaseUrl);
+            _httpClient.BaseAddress = new Uri(apiSettings.Value.BaseUrl.TrimEnd('/'));
+            _requestSender = requestSender;
         }
 
-        public async Task<T> GetRequestAsync<T>(string url)
+        public async Task<ApiResponse<T>> GetRequestAsync<T>(string url)
         {
-            return await HttpSendRequestHelper.SendGetRequestAsync<T>(_httpClient, url);
+            var formattedUrl = EnsureBaseUrl(url);
+            return await _requestSender.SendGetRequestAsync<T>(_httpClient, formattedUrl);
         }
 
-        public async Task<T> GetRequestAsync<T>(string url, int id)
-        {
-            string formattedUrl = ApiRouteHelper.FormatRoute(url, id);
-            return await HttpSendRequestHelper.SendGetRequestAsync<T>(_httpClient, formattedUrl);
-        }
-
-        public async Task<V> AddRequestAsync<T, V>(string url, T? data)
-        {
-            return await HttpSendRequestHelper.SendPostRequestAsync<T, V>(_httpClient, url, data);
-        }
-
-        public async Task<V> AddRequestAsync<T, V>(string url, int id, T? data)
+        public async Task<ApiResponse<T>> GetRequestAsync<T>(string url, int id)
         {
             string formattedUrl = ApiRouteHelper.FormatRoute(url, id);
-            return await HttpSendRequestHelper.SendPostRequestAsync<T, V>(_httpClient, formattedUrl, data);
+            formattedUrl = EnsureBaseUrl(formattedUrl);
+            return await _requestSender.SendGetRequestAsync<T>(_httpClient, formattedUrl);
         }
 
-        public async Task<V> UpdateRequestAsync<T, V>(string url, int id, T? data)
+        public async Task<ApiResponse<V>> AddRequestAsync<T, V>(string url, T? data)
         {
-            return await HttpSendRequestHelper.SendUpdateRequestAsync<T, V>(_httpClient, url, id, data);
+            var formattedUrl = EnsureBaseUrl(url);
+            return await _requestSender.SendPostRequestAsync<T, V>(_httpClient, formattedUrl, data);
+        }
+
+        public async Task<ApiResponse<V>> AddRequestAsync<T, V>(string url, int id, T? data)
+        {
+            string formattedUrl = ApiRouteHelper.FormatRoute(url, id);
+            formattedUrl = EnsureBaseUrl(formattedUrl);
+            return await _requestSender.SendPostRequestAsync<T, V>(_httpClient, formattedUrl, data);
+        }
+
+        public async Task<ApiResponse<V>> UpdateRequestAsync<T, V>(string url, int id, T? data)
+        {
+            var formattedUrl = EnsureBaseUrl(url);
+            return await _requestSender.SendUpdateRequestAsync<T, V>(_httpClient, formattedUrl, id, data);
         }
 
         public HttpClient GetClient()
         {
             return _httpClient;
+        }
+
+        private string EnsureBaseUrl(string url)
+        {
+            var baseUrl = _httpClient.BaseAddress.ToString();
+
+            if (!url.StartsWith(baseUrl, StringComparison.OrdinalIgnoreCase))
+            {
+                return baseUrl.TrimEnd('/') + (url.StartsWith("/") ? url : "/" + url);
+            }
+
+            return url;
         }
     }
 }

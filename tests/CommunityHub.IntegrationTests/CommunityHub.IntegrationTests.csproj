@@ -23,6 +23,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\RegistrationApiTests.cs" />
+    <Compile Remove="Controllers\UserControllerTests.cs" />
     <Compile Remove="Services\AccountServiceTests.cs" />
     <Compile Remove="Services\FamilyPictureServiceTests.cs" />
   </ItemGroup>

@@ -6,10 +6,9 @@ namespace CommunityHub.Infrastructure.Services.Registration
     public interface IRegistrationService
     {
         Task<RegistrationRequest> CreateRequestAsync(RegistrationInfo registrationData);
-        Task<RegistrationRequest> ApproveRequestAsync(int id);
-        Task<RegistrationRequest> RejectRequestAsync(int id, string comment);
-
         Task<RegistrationRequest> GetRequestByIdAsync(int id);
-        Task<List<RegistrationRequest>> GetRequestsAsync(eRegistrationStatus status);
+        Task<List<RegistrationRequest>> GetRequestsAsync(eRegistrationStatus status = eRegistrationStatus.Pending);
+
+        Task<RegistrationRequest> UpdateRequestAsync(RegistrationRequest registrationRequest);
     }
 }

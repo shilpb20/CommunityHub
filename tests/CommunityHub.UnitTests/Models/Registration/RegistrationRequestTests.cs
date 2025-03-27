@@ -79,12 +79,12 @@ namespace CommunityHub.UnitTests.Models
         private void ApplyInvalidStateTransitions(RegistrationRequest request, string status)
         {
             //Act
-            var expectedErrorMessage1 = string.Format(ErrorMessages.InvalidStateTransition, status);
+            var expectedErrorMessage1 = string.Format(ErrorMessage.InvalidStateTransition, status);
             var exception1 = Assert.Throws<InvalidOperationException>(() => request.Approve());
             Assert.Contains(expectedErrorMessage1, exception1.Message.ToString());
 
             //Act
-            var expectedErrorMessage2 = string.Format(ErrorMessages.InvalidStateTransition, status);
+            var expectedErrorMessage2 = string.Format(ErrorMessage.InvalidStateTransition, status);
             var exception2 = Assert.Throws<InvalidOperationException>(() => request.Reject(_comment));
             Assert.Contains(expectedErrorMessage2, exception2.Message.ToString());
         }

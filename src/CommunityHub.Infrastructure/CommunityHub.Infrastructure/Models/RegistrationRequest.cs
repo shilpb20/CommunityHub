@@ -60,7 +60,7 @@ namespace CommunityHub.Infrastructure.Models
         {
             if (RegistrationStatus != RegistrationStatusHelper.PendingStatus)
             {
-                throw new InvalidOperationException(string.Format(ErrorMessages.InvalidStateTransition, RegistrationStatus));
+                throw new InvalidOperationException(string.Format(ErrorMessage.InvalidStateTransition, RegistrationStatus));
             }
         }
     }
