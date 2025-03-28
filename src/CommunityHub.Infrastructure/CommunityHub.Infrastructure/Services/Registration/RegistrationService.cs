@@ -1,9 +1,12 @@
-﻿using AppComponents.Repository.Abstraction;
+﻿using AppComponents.Email.Services;
+using AppComponents.Repository.Abstraction;
+using CommunityHub.Core.Constants;
 using CommunityHub.Core.Enums;
 using CommunityHub.Core.Extensions;
-using CommunityHub.Infrastructure.Models;
 using CommunityHub.Infrastructure.Data;
-using CommunityHub.Infrastructure.Services.User;
+using CommunityHub.Infrastructure.EmailSenderService;
+using CommunityHub.Infrastructure.EmailService;
+using CommunityHub.Infrastructure.Models;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -12,52 +15,18 @@ namespace CommunityHub.Infrastructure.Services.Registration
     public class RegistrationService : IRegistrationService
     {
         private readonly ILogger<IRegistrationService> _logger;
-        private readonly ITransactionManager _transactionManager;
-        private readonly IUserService _userService;
-        private readonly IRepository<RegistrationRequest, ApplicationDbContext> _requestRepository;
+        private readonly IAppMailService _appMailService;
+        private readonly IRepository<RegistrationRequest, ApplicationDbContext> _repository;
 
         public RegistrationService(
             ILogger<IRegistrationService> logger,
-            ITransactionManager transactionManager,
-            IUserService userService,
-            IRepository<RegistrationRequest, ApplicationDbContext> requestRepository,
-            IRepository<UserInfo, ApplicationDbContext> userInfoRepository)
+            IAppMailService appMailService,
+            IRepository<RegistrationRequest, ApplicationDbContext> repository)
         {
             _logger = logger;
-            _transactionManager = transactionManager;
-            _requestRepository = requestRepository;
-            _userService = userService;
+            _appMailService = appMailService;
+            _repository = repository;
         }
-
-        public async Task<UserInfo> ApproveRequestAsync(int id)
-        {
-            using (_transactionManager.BeginTransactionAsync())
-            {
-                try
-                {
-                    var matchingRequest = await _requestRepository.GetAsync(x => x.Id == id);
-                    if (matchingRequest == null) return null;
-
-                    var registrationInfo = JsonConvert.DeserializeObject<RegistrationInfo>(matchingRequest.RegistrationInfo);
-                    var newUser = await _userService.CreateUserAsync(registrationInfo.UserInfo, registrationInfo.SpouseInfo, registrationInfo.Children);
-                    if (newUser == null) return null;
-
-                    matchingRequest.ReviewedAt = DateTime.UtcNow;
-                    matchingRequest.RegistrationStatus = RegistrationStatus.Approved.GetEnumMemberValue();
-                    await _requestRepository.UpdateAsync(matchingRequest);
-
-                    await _transactionManager.CommitTransactionAsync();
-                    return newUser;
-                }
-                catch (Exception ex)
-                {
-                    await _transactionManager.RollbackTransactionAsync();
-                    _logger.LogError(ex, "Error approving request {Id}", id);
-                    throw;
-                }
-            }
-        }
-
 
         public async Task<RegistrationRequest> CreateRequestAsync(RegistrationInfo registrationData)
         {
@@ -71,17 +40,23 @@ namespace CommunityHub.Infrastructure.Services.Registration
 
                 _logger.LogDebug($"Creating registration request for user - {registrationData?.UserInfo.FullName}.");
 
-                string registrationInfo = JsonConvert.SerializeObject(registrationData);
-                RegistrationRequest registrationRequest = new RegistrationRequest()
-                {
-                    RegistrationInfo = registrationInfo,
-                    CreatedAt = DateTime.UtcNow,
-                    RegistrationStatus = "pending",
-                    Review = null,
-                    ReviewedAt = null
-                };
+                var registrationInfo = JsonConvert.SerializeObject(registrationData);
+                var registrationRequest = new RegistrationRequest(registrationInfo);
 
-                return await _requestRepository.AddAsync(registrationRequest);
+                var newRequest = await _repository.AddAsync(registrationRequest);
+
+
+                var model = new RegistrationModel()
+                {
+                    Id = newRequest.Id,
+                    Location = registrationData.UserInfo.Location,
+                    UserName = registrationData.UserInfo.FullName,
+                    RegistrationDate = newRequest.CreatedAt
+                };  
+
+                await _appMailService.SendRegistrationNotificationAsync(model);
+
+                return newRequest;
             }
             catch (Exception ex)
             {
@@ -90,32 +65,30 @@ namespace CommunityHub.Infrastructure.Services.Registration
             }
         }
 
-        public async Task<RegistrationRequest> GetRequestAsync(int id)
+        public async Task<RegistrationRequest> GetRequestByIdAsync(int id)
         {
-            return await _requestRepository.GetAsync(x => x.Id == id);
-        }
-
-        public async Task<List<RegistrationRequest>> GetRequestsAsync(RegistrationStatus status = RegistrationStatus.Pending)
-        {
-            if (status == RegistrationStatus.All)
+            if (id <= 0)
             {
-                return await _requestRepository.GetAllAsync();
+                _logger.LogWarning($"Invalid ID: {id}. Cannot retrieve registration request.");
+                return null;
             }
 
-            return await _requestRepository.GetAllAsync(x => x.RegistrationStatus.ToLower() == status.GetEnumMemberValue().ToLower());
+            return await _repository.GetAsync(x => x.Id == id);
         }
 
-        public async Task<RegistrationRequest> RejectRequestAsync(int id, string reviewComment)
+        public async Task<List<RegistrationRequest>> GetRequestsAsync(eRegistrationStatus status = eRegistrationStatus.Pending)
         {
-            var matchingRequest = await _requestRepository.GetAsync(x => x.Id == id);
-            if (matchingRequest == null) return null;
+            if (status == eRegistrationStatus.All)
+            {
+                return await _repository.GetAllAsync();
+            }
 
-            RegistrationRequest request = await GetRequestAsync(id);
-            request.Review = reviewComment;
-            request.RegistrationStatus = RegistrationStatus.Rejected.GetEnumMemberValue();
-            request.ReviewedAt = DateTime.UtcNow;
+            return await _repository.GetAllAsync(x => x.RegistrationStatus == status.GetEnumMemberValue());
+        }
 
-            return await _requestRepository.UpdateAsync(request);
+        public async Task<RegistrationRequest> UpdateRequestAsync(RegistrationRequest registrationRequest)
+        {
+            return await _repository.UpdateAsync(registrationRequest);
         }
     }
 }

@@ -134,7 +134,7 @@ namespace CommunityHub.Integrations.Controllers.Admin
                 (_httpClient, _rejectRequest, expectedResult.Id, comment);
 
             //Assert
-            Assert.Equivalent(RegistrationStatus.Rejected.GetEnumMemberValue().ToLower(), result.RegistrationStatus.ToLower());
+            Assert.Equivalent(eRegistrationStatus.Rejected.GetEnumMemberValue().ToLower(), result.RegistrationStatus.ToLower());
             Assert.Equivalent(comment, result.Review);
 
             Assert.NotNull(result.ReviewedAt);
@@ -185,7 +185,7 @@ namespace CommunityHub.Integrations.Controllers.Admin
         {
             //Arrange
             RegistrationRequest registrationRequest = _dbContext.RegistrationRequests.FirstOrDefault(
-                    x => x.RegistrationStatus == RegistrationStatus.Pending.GetEnumMemberValue());
+                    x => x.RegistrationStatus == eRegistrationStatus.Pending.GetEnumMemberValue());
 
             Assert.Equivalent(_dbContext.UserInfo.Count(), 0);
 

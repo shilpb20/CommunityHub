@@ -1,41 +1,32 @@
-using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
-using CommunityHub.UI.Models;
-using CommunityHub.Core.Dtos;
-using CommunityHub.UI.Services;
 using CommunityHub.Core.Constants;
+using CommunityHub.Core.Dtos;
+using CommunityHub.Core.Factory;
+using CommunityHub.Core.Models;
 using CommunityHub.UI.Constants;
+using CommunityHub.UI.Models;
+using CommunityHub.UI.Services;
+using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
 namespace CommunityHub.UI.Controllers;
 
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
-    private readonly IBaseService _service;
+    private readonly BaseService _service;
+    private readonly IResponseFactory _responseFactory;
 
-    public HomeController(ILogger<HomeController> logger, IBaseService baseService)
+    public HomeController(ILogger<HomeController> logger, 
+       IResponseFactory responseFactory,
+       BaseService baseService)
     {
         _logger = logger;
         _service = baseService;
+        _responseFactory = responseFactory;
     }
 
     [HttpGet(UiRoute.Home.Index)]
     public async Task<IActionResult> Index(string? sortBy = null, bool ascending = true)
-    {
-        ViewBag.SelectedSortBy = sortBy;
-        ViewBag.SelectedAscending = ascending;
-
-        var users = await FetchUsersAsync(sortBy, ascending);
-        return View(users);
-    }
-
-    [HttpGet(UiRoute.Home.Privacy)]
-    public IActionResult Privacy()
-    {
-        return View();
-    }
-
-    private async Task<List<UserInfoDto>> FetchUsersAsync(string? sortBy, bool ascending)
     {
         string uri = ApiRoute.Users.GetAll;
         if (!string.IsNullOrEmpty(sortBy))
@@ -43,8 +34,17 @@ public class HomeController : Controller
             uri += $"?sortBy={sortBy}&ascending={ascending}";
         }
 
-        var users = await _service.GetRequestAsync<List<UserInfoDto>>(uri);
-        return users ?? new List<UserInfoDto>();
+        ApiResponse<List<UserInfoDto>> users = await _service.GetRequestAsync<List<UserInfoDto>>(uri);
+
+        ViewBag.SelectedSortBy = sortBy;
+        ViewBag.SelectedAscending = ascending;
+        return View(users.Data);
+    }
+
+    [HttpGet(UiRoute.Home.Privacy)]
+    public IActionResult Privacy()
+    {
+        return View();
     }
 
 

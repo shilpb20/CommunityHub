@@ -1,0 +1,29 @@
+﻿<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{Title}}</title>
+    <link rel="stylesheet" type="text/css" href="_style.css">
+</head>
+<body>
+    <div class="email-container">
+        {{header}}
+
+        <div class="content">
+            <h2>Registration Request Accepted</h2>
+            <p>Dear {{UserName}},</p>
+
+            <p>Congratulations! Your registration request for the <strong>ANZ Havyaka Directory</strong> has been accepted. You can now log in and set your password.</p>
+
+            <p>Please click the button below to set your password:</p>
+            <p><a href="{{PasswordSetLink}}" class="button" target="_blank">Set Your Password</a></p>
+
+            <p>Once you've set your password, you can log in using your username and the newly set password.</p>
+
+            <p>If you have any questions or need further assistance, feel free to contact us.</p>
+        </div>
+
+        {{footer}}
+    </div>
+</body>
+</html>

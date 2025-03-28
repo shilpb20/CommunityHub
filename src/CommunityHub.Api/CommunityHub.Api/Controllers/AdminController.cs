@@ -1,8 +1,18 @@
 ﻿using AutoMapper;
+using CommunityHub.Core;
 using CommunityHub.Core.Constants;
 using CommunityHub.Core.Dtos;
+using CommunityHub.Core.Enums;
+using CommunityHub.Core.Extensions;
+using CommunityHub.Core.Factory;
+using CommunityHub.Core.Messages;
+using CommunityHub.Core.Models;
+using CommunityHub.Infrastructure.Models;
+using CommunityHub.Infrastructure.Services.AdminService;
 using CommunityHub.Infrastructure.Services.Registration;
+using CommunityHub.Infrastructure.Services.User;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 
 namespace CommunityHub.Api.Controllers
 {
@@ -11,16 +21,30 @@ namespace CommunityHub.Api.Controllers
     {
         private readonly ILogger<AdminController> _logger;
         private readonly IMapper _mapper;
+        private readonly IResponseFactory _responseFactory;
+
+        private readonly IUserService _userService;
+        private readonly IAdminService _adminService;
         private readonly IRegistrationService _registrationService;
+        private readonly IUserInfoValidationService _userInfoValidationService;
 
         public AdminController(
             ILogger<AdminController> logger,
             IMapper mapper,
-            IRegistrationService registrationService)
+            IResponseFactory responseFactory,
+            IRegistrationService registrationService,
+            IUserService userService,
+            IAdminService adminService,
+            IUserInfoValidationService userInfoValidationService)
         {
             _logger = logger;
             _mapper = mapper;
+            _responseFactory = responseFactory;
+
+            _userService = userService;
             _registrationService = registrationService;
+            _adminService = adminService;
+            _userInfoValidationService = userInfoValidationService;
         }
 
 
@@ -28,16 +52,18 @@ namespace CommunityHub.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(RegistrationRequestDto))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<RegistrationRequestDto>> RejectRequest(int id, [FromBody] string comment)
+        public async Task<ActionResult<ApiResponse<RegistrationRequestDto>>> RejectRequest(int id, [FromBody] string comment)
         {
             try
             {
-                if (id <= 0) return BadRequest("Id must be a positive number.");
+                if (id <= 0) return BadRequest(_responseFactory.Failure<RegistrationRequestDto>(ErrorCode.InvalidData, ErrorMessage.InvalidId));
 
-                var registrationRequest = await _registrationService.RejectRequestAsync(id, comment);
-                if (registrationRequest == null) return BadRequest($"Request with ID {id} not found or could not be rejected.");
+                var registrationRequest = await _adminService.RejectRequestAsync(id, comment);
+                if (registrationRequest == null) return BadRequest(_responseFactory.Failure<RegistrationRequestDto>(ErrorCode.InvalidData,
+                    $"Request with ID {id} not found or could not be rejected."));
 
-                return Ok(_mapper.Map<RegistrationRequestDto>(registrationRequest));
+                var responseObject = _responseFactory.Success(_mapper.Map<RegistrationRequestDto>(registrationRequest));
+                return Ok(responseObject);
             }
             catch (Exception ex)
             {
@@ -47,17 +73,33 @@ namespace CommunityHub.Api.Controllers
         }
 
         [HttpPost(ApiRoute.Admin.ApproveRequestById)]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(UserInfoDto))]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<UserInfoDto>))]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<UserInfoDto>> ApproveRequest(int id)
+        public async Task<ActionResult<ApiResponse<UserInfoDto>>> ApproveRequest(int id)
         {
-            if (id <= 0) return BadRequest("Id must be a positive number.");
+            if (id <= 0) return BadRequest(_responseFactory.Failure<UserInfoDto>(ErrorCode.InvalidData, ErrorMessage.InvalidId));
 
-            var userInfo = await _registrationService.ApproveRequestAsync(id);
-            if (userInfo == null) return NotFound($"Request with ID {id} not found or could not be approved.");
+            var request = await _registrationService.GetRequestByIdAsync(id);
+            if (request == null) return NotFound(_responseFactory.Failure<UserInfoDto>(ErrorCode.InvalidData,
+                $"Request with ID {id} not found or could not be approved."));
 
-            return Ok(_mapper.Map<UserInfoDto>(userInfo));
+            var registrationInfo = JsonConvert.DeserializeObject<RegistrationInfo>(request.RegistrationInfo);
+            var userContactDto = new UserContact(registrationInfo.UserInfo.Email, registrationInfo.UserInfo.CountryCode, registrationInfo.UserInfo.ContactNumber);
+
+            var spouseContactDto = registrationInfo.SpouseInfo != null ?
+                new UserContact(registrationInfo.SpouseInfo.Email, registrationInfo.SpouseInfo.ContactNumber, registrationInfo.SpouseInfo.CountryCode) : null;
+
+            var duplicateUser = await _userInfoValidationService.CheckDuplicateUser(userContactDto, spouseContactDto);
+            if (duplicateUser != eDuplicateStatus.NoDuplicate)
+            {
+                return BadRequest(_responseFactory.Failure<UserInfoDto>(ErrorCode.DuplicateUser, duplicateUser.GetDescription()));
+            }
+
+            var userInfo = await _adminService.ApproveRequestAsync(request);
+            var responseObject = _responseFactory.Success(_mapper.Map<UserInfoDto>(userInfo));
+            return Ok(responseObject);
         }
     }
 }

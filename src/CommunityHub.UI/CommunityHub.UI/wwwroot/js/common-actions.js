@@ -1,7 +1,9 @@
 ﻿document.addEventListener("DOMContentLoaded", function () {
 
-    //Growl
+    var successMessage = document.getElementById("successMessage");
+    if (successMessage) {
         setTimeout(function () {
-            $('#successMessage').fadeOut();
-        }, 5000); 
+            $(successMessage).fadeOut();
+        }, 5000);
+    }
 });

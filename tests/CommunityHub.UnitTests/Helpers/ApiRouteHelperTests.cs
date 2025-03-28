@@ -10,6 +10,7 @@ namespace CommunityHub.UnitTests.Helpers
         [InlineData("api/account/register/{id:int}", 42, "api/account/register/42")]
         [InlineData("api/admin/approve/{id:int}", 1000, "api/admin/approve/1000")]
         [InlineData("api/admin/reject/{id:int}", 99, "api/admin/reject/99")]
+        [InlineData("api/users/{id:int}/details", 567, "api/users/567/details")]
         public void FormatRoute_ShouldReplaceIdPlaceholder_WithGivenId(string route, int id, string expectedRoute)
         {
             var result = ApiRouteHelper.FormatRoute(route, id);
@@ -32,15 +33,6 @@ namespace CommunityHub.UnitTests.Helpers
             int id = 123;
             var result = ApiRouteHelper.FormatRoute(route, id);
             result.Should().Be("");
-        }
-
-        [Fact]
-        public void FormatRoute_ShouldHandleSpecialCharactersInRoute()
-        {
-            string route = "api/users/{id:int}/details";
-            int id = 567;
-            var result = ApiRouteHelper.FormatRoute(route, id);
-            result.Should().Be("api/users/567/details");
         }
     }
 }

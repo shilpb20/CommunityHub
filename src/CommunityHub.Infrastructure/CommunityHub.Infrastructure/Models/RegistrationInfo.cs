@@ -7,6 +7,6 @@ namespace CommunityHub.Infrastructure.Models
         public UserInfo UserInfo { get; set; }
 
         public SpouseInfo? SpouseInfo { get; set; }
-        public List<Children>? Children { get; set; } = new List<Children>();
+        public List<Child>? Children { get; set; } = new List<Child>();
     }
 }

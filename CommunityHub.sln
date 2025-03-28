@@ -5,8 +5,6 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommunityHub.Core", "src\CommunityHub.Core\CommunityHub.Core\CommunityHub.Core.csproj", "{48A8D59A-279F-426C-930F-394EA08F6071}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommunityHub.Api", "src\CommunityHub.Api\CommunityHub.Api\CommunityHub.Api.csproj", "{D034F7E7-CCE7-4E06-9DC9-183E391CCF17}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommunityHub.UI", "src\CommunityHub.UI\CommunityHub.UI\CommunityHub.UI.csproj", "{51EBCD68-2D91-422F-88DA-50FF5FA63356}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{602C3854-4D92-4690-89B6-E1C7CB0B2144}"
@@ -21,6 +19,24 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommunityHub.Tests.Core", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommunityHub.Infrastructure", "src\CommunityHub.Infrastructure\CommunityHub.Infrastructure\CommunityHub.Infrastructure.csproj", "{D880B983-C08E-437A-B7B1-AEF086DD1E02}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "github-workflow", "github-workflow", "{544EE33C-DF52-4BAC-82C8-4A073B1C5BB1}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\dotnetcore_ci.yml = .github\workflows\dotnetcore_ci.yml
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommunityHub.Api", "src\CommunityHub.Api\CommunityHub.Api\CommunityHub.Api.csproj", "{AE791F6D-A9A7-4F9A-A4D9-A91FDE1E186E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EmailTemplates", "EmailTemplates", "{D0048F18-58B2-4428-995F-A0DA28874554}"
+	ProjectSection(SolutionItems) = preProject
+		Data\EmailTemplates\registration-request-approval.html = Data\EmailTemplates\registration-request-approval.html
+		Data\EmailTemplates\registration-request-rejection.html = Data\EmailTemplates\registration-request-rejection.html
+		Data\EmailTemplates\registration-request.html = Data\EmailTemplates\registration-request.html
+		Data\EmailTemplates\_footer.html = Data\EmailTemplates\_footer.html
+		Data\EmailTemplates\_header.html = Data\EmailTemplates\_header.html
+		Data\EmailTemplates\_logo.png = Data\EmailTemplates\_logo.png
+		Data\EmailTemplates\_style.css = Data\EmailTemplates\_style.css
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,10 +47,6 @@ Global
 		{48A8D59A-279F-426C-930F-394EA08F6071}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{48A8D59A-279F-426C-930F-394EA08F6071}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{48A8D59A-279F-426C-930F-394EA08F6071}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D034F7E7-CCE7-4E06-9DC9-183E391CCF17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D034F7E7-CCE7-4E06-9DC9-183E391CCF17}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D034F7E7-CCE7-4E06-9DC9-183E391CCF17}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D034F7E7-CCE7-4E06-9DC9-183E391CCF17}.Release|Any CPU.Build.0 = Release|Any CPU
 		{51EBCD68-2D91-422F-88DA-50FF5FA63356}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{51EBCD68-2D91-422F-88DA-50FF5FA63356}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{51EBCD68-2D91-422F-88DA-50FF5FA63356}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -55,17 +67,21 @@ Global
 		{D880B983-C08E-437A-B7B1-AEF086DD1E02}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D880B983-C08E-437A-B7B1-AEF086DD1E02}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D880B983-C08E-437A-B7B1-AEF086DD1E02}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AE791F6D-A9A7-4F9A-A4D9-A91FDE1E186E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AE791F6D-A9A7-4F9A-A4D9-A91FDE1E186E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AE791F6D-A9A7-4F9A-A4D9-A91FDE1E186E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AE791F6D-A9A7-4F9A-A4D9-A91FDE1E186E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{48A8D59A-279F-426C-930F-394EA08F6071} = {602C3854-4D92-4690-89B6-E1C7CB0B2144}
-		{D034F7E7-CCE7-4E06-9DC9-183E391CCF17} = {602C3854-4D92-4690-89B6-E1C7CB0B2144}
 		{51EBCD68-2D91-422F-88DA-50FF5FA63356} = {602C3854-4D92-4690-89B6-E1C7CB0B2144}
 		{6AEF226C-7059-4D39-B3E1-ED2F7F7F0249} = {8EB5C17D-544C-4AE9-9E87-2A49AFFDB5D5}
 		{78524C66-84D5-48E1-A54C-7CE1C7DE3692} = {8EB5C17D-544C-4AE9-9E87-2A49AFFDB5D5}
 		{7EC4CA59-1B4D-40F1-BC0A-D02A24F95035} = {8EB5C17D-544C-4AE9-9E87-2A49AFFDB5D5}
 		{D880B983-C08E-437A-B7B1-AEF086DD1E02} = {602C3854-4D92-4690-89B6-E1C7CB0B2144}
+		{AE791F6D-A9A7-4F9A-A4D9-A91FDE1E186E} = {602C3854-4D92-4690-89B6-E1C7CB0B2144}
 	EndGlobalSection
 EndGlobal

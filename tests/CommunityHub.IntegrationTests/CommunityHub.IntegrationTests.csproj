@@ -8,6 +8,28 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\Account\**" />
+    <Compile Remove="Controllers\Admin\**" />
+    <Compile Remove="Controllers\FamilyPicture\**" />
+    <Compile Remove="Controllers\Users\**" />
+    <EmbeddedResource Remove="Controllers\Account\**" />
+    <EmbeddedResource Remove="Controllers\Admin\**" />
+    <EmbeddedResource Remove="Controllers\FamilyPicture\**" />
+    <EmbeddedResource Remove="Controllers\Users\**" />
+    <None Remove="Controllers\Account\**" />
+    <None Remove="Controllers\Admin\**" />
+    <None Remove="Controllers\FamilyPicture\**" />
+    <None Remove="Controllers\Users\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Controllers\RegistrationApiTests.cs" />
+    <Compile Remove="Controllers\UserControllerTests.cs" />
+    <Compile Remove="Services\AccountServiceTests.cs" />
+    <Compile Remove="Services\FamilyPictureServiceTests.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AppComponents.Repository" Version="1.2.1" />
     <PackageReference Include="AutoMapper" Version="14.0.0" />
     <PackageReference Include="coverlet.collector" Version="6.0.2" />
@@ -25,6 +47,12 @@
     <ProjectReference Include="..\..\src\CommunityHub.Core\CommunityHub.Core\CommunityHub.Core.csproj" />
     <ProjectReference Include="..\..\src\CommunityHub.Infrastructure\CommunityHub.Infrastructure\CommunityHub.Infrastructure.csproj" />
     <ProjectReference Include="..\CommunityHub.Tests.Core\CommunityHub.Tests.Core\CommunityHub.Tests.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="AppComponents.Email">
+      <HintPath>..\..\..\AppComponents\AppComponents.Email\src\AppComponents.Email\bin\Debug\net8.0\AppComponents.Email.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
   <ItemGroup>
