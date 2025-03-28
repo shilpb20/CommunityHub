@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace CommunityHub.Infrastructure.Models
 {
-    public class Children
+    public class Child
     {
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]

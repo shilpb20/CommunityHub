@@ -105,8 +105,11 @@ public class HttpRequestSender : IHttpRequestSender
         try
         {
             var data = await response.Content.ReadAsStringAsync();
+            if(string.IsNullOrEmpty(data))
+                return _responseFactory.Success<T>(default(T));
+
             var parsedData = JsonConvert.DeserializeObject<ApiResponse<T>>(data);
-            return _responseFactory.Success(parsedData.Data);
+            return _responseFactory.Success<T>(parsedData.Data);
         }
         catch (Exception ex)
         {

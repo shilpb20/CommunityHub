@@ -28,10 +28,10 @@ public static class RegistrationTestDataHelper
                     Location = "New York",
                     HomeTown = "Somewhere"
                 },
-                Children = new List<Children>
+                Children = new List<Child>
                 {
-                    new Children { Name = "Child One" },
-                    new Children { Name = "Child Two" }
+                    new Child { Name = "Child One" },
+                    new Child { Name = "Child Two" }
                 }
             }
         };

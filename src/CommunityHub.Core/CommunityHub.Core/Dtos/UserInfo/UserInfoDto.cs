@@ -14,6 +14,6 @@
         public string? HouseName { get; set; }
 
         public SpouseInfoDto? SpouseInfo { get; set; }
-        public List<ChildrenDto> Children { get; set; } = new List<ChildrenDto>();
+        public List<ChildDto> Children { get; set; } = new List<ChildDto>();
     }
 }

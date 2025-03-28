@@ -10,6 +10,7 @@ using CommunityHub.Infrastructure.Services.Registration;
 using CommunityHub.Infrastructure.EmailService;
 using CommunityHub.Core.Models;
 using CommunityHub.Infrastructure.AppMailService;
+using Newtonsoft.Json.Linq;
 
 namespace CommunityHub.Infrastructure.Services.AdminService
 {
@@ -18,52 +19,92 @@ namespace CommunityHub.Infrastructure.Services.AdminService
         private readonly ILogger<IAdminService> _logger;
         private readonly ITransactionManager _transactionManager;
         private readonly IRegistrationService _registrationService;
+        private readonly IAccountService _accountService;
         private readonly IUserService _userService;
+        private readonly ISpouseService _spouseService;
+        private readonly IChildService _childService;
         private readonly IAppMailService _mailService;
 
         public AdminService(
             ILogger<IAdminService> logger,
             ITransactionManager transactionManager,
             IRegistrationService registrationService,
+            IAccountService accountService,
             IUserService userService,
+            ISpouseService spouseService,
+            IChildService childService,
             IAppMailService mailService)
         {
             _logger = logger;
             _transactionManager = transactionManager;
             _registrationService = registrationService;
+            _accountService = accountService;
             _userService = userService;
+            _spouseService = spouseService;
+            _childService = childService;
             _mailService = mailService;
         }
 
-        public async Task<UserInfo> ApproveRequestAsync(int id)
+        public async Task<UserInfo> ApproveRequestAsync(RegistrationRequest registrationRequest)
         {
-            return null;
-            //using (_transactionManager.BeginTransactionAsync())
-            //{
-            //    try
-            //    {
-            //        var matchingRequest = await _registrationService.GetRequestByIdAsync(id);
-            //        if (matchingRequest == null) return null;
+            await _transactionManager.BeginTransactionAsync();
+            try
+            {
+                var matchingRequest = await _registrationService.GetRequestByIdAsync(registrationRequest.Id);
+                if (matchingRequest == null) return null;
 
-            //        return null;
-            //        //var registrationInfo = JsonConvert.DeserializeObject<RegistrationInfo>(matchingRequest.RegistrationInfo);
-            //        //var newUser = await _userService.CreateUserAsync(registrationInfo.UserInfo, registrationInfo.SpouseInfo, registrationInfo.Children);
-            //        //if (newUser == null) return null;
+                var registrationInfo = JsonConvert.DeserializeObject<RegistrationInfo>(matchingRequest.RegistrationInfo);
 
-            //        //matchingRequest.ReviewedAt = DateTime.UtcNow;
-            //        //matchingRequest.RegistrationStatus = RegistrationStatus.Approved.GetEnumMemberValue();
-            //        //await _requestRepository.UpdateAsync(matchingRequest);
+                var applicationUser = await _accountService.CreateAccountAsync(registrationInfo.UserInfo);
+                if (applicationUser == null)
+                {
+                    await _transactionManager.RollbackTransactionAsync();
+                    return null;
+                };
 
-            //        //await _transactionManager.CommitTransactionAsync();
-            //        //return newUser;
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        await _transactionManager.RollbackTransactionAsync();
-            //        _logger.LogError(ex, "Error approving request {Id}", id);
-            //        throw;
-            //    }
-            //}
+                var userInfo = registrationInfo.UserInfo;
+                userInfo.ApplicationUserId = applicationUser.Id;
+                var newUser = await _userService.CreateUserAsync(userInfo);
+
+                var spouseInfo = registrationInfo.SpouseInfo;
+                if (spouseInfo != null)
+                {
+                    spouseInfo.UserInfoId = newUser.Id;
+                    await _spouseService.CreateSpouseAsync(spouseInfo);
+                }
+
+                var children = registrationInfo.Children;
+                if (children.Any())
+                {
+                    foreach (var child in children)
+                    {
+                        child.UserInfoId = newUser.Id;
+                        await _childService.CreateChildAsync(child);
+                    }
+                }
+
+                matchingRequest.Approve();
+                await _registrationService.UpdateRequestAsync(matchingRequest);
+
+                await _transactionManager.CommitTransactionAsync();
+
+                string token = await _accountService.GenerateTokenAsync(applicationUser);
+                var model = new RegistrationApprovalModel()
+                { 
+                    UserName = userInfo.FullName,
+                    Email = userInfo.Email,
+                    PasswordSetLink = token,
+                };
+
+                var emailStatus = await _mailService.SendRegistrationRequestApprovalNotificationAsync(model);
+                return newUser;
+            }
+            catch (Exception ex)
+            {
+                await _transactionManager.RollbackTransactionAsync();
+                _logger.LogError(ex, "Error approving request {Id}", registrationRequest.Id);
+                throw;
+            }
         }
 
         public async Task<RegistrationRequest> RejectRequestAsync(int id, string reviewComment)

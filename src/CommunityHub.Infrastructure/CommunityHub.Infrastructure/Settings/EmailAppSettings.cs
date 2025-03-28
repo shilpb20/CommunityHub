@@ -1,4 +1,4 @@
-﻿namespace CommunityHub.Infrastructure
+﻿namespace CommunityHub.Infrastructure.Settings
 {
     public class EmailAppSettings
     {

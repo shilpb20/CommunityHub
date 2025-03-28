@@ -14,7 +14,7 @@ namespace CommunityHub.Infrastructure.Data
         public DbSet<RegistrationRequest> RegistrationRequests { get; set; }
         public DbSet<UserInfo> UserInfo { get; set; }
         public DbSet<SpouseInfo> SpouseInfo { get; set; }
-        public DbSet<Children> Children { get; set; }
+        public DbSet<Child> Children { get; set; }
 
         public DbSet<FamilyPicture> FamilyPictures { get; set; }
 
@@ -40,7 +40,7 @@ namespace CommunityHub.Infrastructure.Data
                         .HasForeignKey<SpouseInfo>(r => r.UserInfoId)
                         .OnDelete(DeleteBehavior.Cascade);
 
-            modelBuilder.Entity<Children>()
+            modelBuilder.Entity<Child>()
                 .HasOne(c => c.UserInfo)
                 .WithMany(r => r.Children)
                 .HasForeignKey(c => c.UserInfoId)
@@ -64,7 +64,7 @@ namespace CommunityHub.Infrastructure.Data
             .IsUnique();
 
             modelBuilder.Entity<SpouseInfo>()
-                .HasIndex(s => s.ContactNumber)
+                .HasIndex(s => new { s.CountryCode, s.ContactNumber })
                 .IsUnique();
         }
 
@@ -75,7 +75,7 @@ namespace CommunityHub.Infrastructure.Data
            .IsUnique();
 
             modelBuilder.Entity<UserInfo>()
-                .HasIndex(u => u.ContactNumber)
+                .HasIndex(s => new { s.CountryCode, s.ContactNumber })
                 .IsUnique();
         }
     }

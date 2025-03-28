@@ -36,7 +36,7 @@ namespace CommunityHub.Infrastructure.Models
         public string? HouseName { get; set; }
 
         public virtual SpouseInfo? SpouseInfo { get; set; }
-        public virtual List<Children> Children { get; set; } = new List<Children>();
+        public virtual List<Child> Children { get; set; } = new List<Child>();
 
         public virtual FamilyPicture? FamilyPicture { get; set; }
 

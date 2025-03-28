@@ -2,9 +2,8 @@
 
 namespace CommunityHub.Core.Dtos
 {
-    public class ChildrenDto
+    public class ChildCreateDto
     {
-        public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
     }
 }

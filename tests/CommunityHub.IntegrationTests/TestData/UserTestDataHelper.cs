@@ -31,10 +31,10 @@ namespace CommunityHub.Tests.Data
                         Location = "City A",
                         HomeTown = "Town B"
                     },
-                    Children = new List<Children>
+                    Children = new List<Child>
                     {
-                        new Children { Name = "Child One" },
-                        new Children { Name = "Child Two" }
+                        new Child { Name = "Child One" },
+                        new Child { Name = "Child Two" }
                     }
                 },
                 new UserInfo
@@ -51,7 +51,7 @@ namespace CommunityHub.Tests.Data
                     HouseName = "House B",
                     ApplicationUserId = "app-user-2",
                     SpouseInfo = null,
-                    Children = new List<Children>()
+                    Children = new List<Child>()
                 },
                 new UserInfo
                 {
@@ -67,9 +67,9 @@ namespace CommunityHub.Tests.Data
                     HouseName = "House C",
                     ApplicationUserId = "app-user-3",
                     SpouseInfo = null,
-                    Children = new List<Children>
+                    Children = new List<Child>
                     {
-                        new Children { Name = "Child One" }
+                        new Child { Name = "Child One" }
                     }
                 }
             };

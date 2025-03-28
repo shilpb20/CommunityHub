@@ -1,9 +1,11 @@
 ﻿using AppComponents.Repository.Abstraction;
 using CommunityHub.Core.Constants;
 using CommunityHub.Infrastructure.Models;
+using CommunityHub.Infrastructure.Services.AdminService;
 using CommunityHub.Infrastructure.Services.Registration;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
+using static CommunityHub.Core.Constants.ApiRoute;
 
 namespace CommunityHub.Infrastructure.Services.User
 {
@@ -11,85 +13,62 @@ namespace CommunityHub.Infrastructure.Services.User
     {
         private ILogger<AccountService> _logger;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IAdminService _registrationService;
-        private readonly IUserService _userService;
-        private readonly ITransactionManager _transactionManager;
        
         public AccountService(
             ILogger<AccountService> logger,
-            ITransactionManager transactionManager,
-            IAdminService registrationService,
-            IUserService userService,
             UserManager<ApplicationUser> userManager)
         {
             _logger = logger;
-            _registrationService = registrationService;
-            _userService = userService;
             _userManager = userManager;
         }
 
-        public async Task<UserInfo> CreateAccountAsync()
+        public async Task<ApplicationUser> CreateAccountAsync(UserInfo userInfo)
         {
-            using (_transactionManager.BeginTransactionAsync())
+            try
             {
-                try
+                var applicationUser = new ApplicationUser()
                 {
+                    Email = userInfo.Email,
+                    UserName = userInfo.Email,
+                    NormalizedEmail = userInfo.Email.ToUpper(),
+                    NormalizedUserName = userInfo.Email.ToUpper()
+                };
 
-                    var applicationUser = new ApplicationUser()
-                    {
-                        //Email = userInfo.Email,
-                        //UserName = userInfo.Email,
-                        //NormalizedEmail = userInfo.Email.ToUpper(),
-                        //NormalizedUserName = userInfo.Email.ToUpper()
-                    };
+                var identityResult = await _userManager.CreateAsync(applicationUser);
+                if (!identityResult.Succeeded) return null;
 
-                    var result = await CreateUserAsync(applicationUser);
-                    if (result.Succeeded) 
-                    {
-                       await _transactionManager.CommitTransactionAsync();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    await _transactionManager.RollbackTransactionAsync();
-                    //_logger.LogError(ex, "Error creating user {userName}", userInfo.FullName);
-                    throw;
-                }
+                var roleResult = await _userManager.AddToRoleAsync(applicationUser, Roles.User);
+                if (!roleResult.Succeeded) return null;
 
-                return null;
+                return applicationUser;
             }
-        }
-
-        private async Task<IdentityResult> CreateUserAsync(ApplicationUser user)
-        {
-            var identityResult = await _userManager.CreateAsync(user);
-            if (!identityResult.Succeeded) return identityResult;
-
-            var roleResult = await _userManager.AddToRoleAsync(user, Roles.User);
-            if (!roleResult.Succeeded) return roleResult;
-
-            return identityResult;
-        }
-
-        public async Task<IdentityResult> DeleteAccountAsync(ApplicationUser user)
-        {
-            if (user == null)
+            catch (Exception ex)
             {
-                throw new ArgumentNullException(nameof(user));
+                _logger.LogError(ex, "Error creating user {userName}", userInfo.FullName);
+                throw;
             }
-
-            var result = await _userManager.DeleteAsync(user);
-            if (!result.Succeeded)
-            {
-                return result;
-            }
-
-            return result;
         }
 
-        Task<IdentityResult> IAccountService.CreateUserAsync(ApplicationUser user)
+        public async Task<string> GenerateTokenAsync(ApplicationUser applicationUser)
         {
-            throw new NotImplementedException();
+            return await _userManager.GeneratePasswordResetTokenAsync(applicationUser);
         }
+
+
+        //public async Task<IdentityResult> DeleteAccountAsync(ApplicationUser user)
+        //{
+        //    if (user == null)
+        //    {
+        //        throw new ArgumentNullException(nameof(user));
+        //    }
+
+        //    var result = await _userManager.DeleteAsync(user);
+        //    if (!result.Succeeded)
+        //    {
+        //        return result;
+        //    }
+
+        //    return result;
+        //}
     }
 }

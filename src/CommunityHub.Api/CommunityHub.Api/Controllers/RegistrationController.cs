@@ -10,6 +10,7 @@ using CommunityHub.Core.Helpers;
 using CommunityHub.Core.Messages;
 using CommunityHub.Core.Models;
 using CommunityHub.Infrastructure.Models;
+using CommunityHub.Infrastructure.Services;
 using CommunityHub.Infrastructure.Services.Registration;
 using CommunityHub.Infrastructure.Services.User;
 using Microsoft.AspNetCore.Mvc;
@@ -24,20 +25,26 @@ namespace CommunityHub.Api.Controllers
 
         private readonly IRegistrationService _registrationService;
         private readonly IUserService _userService;
+        private readonly ISpouseService _spouseService;
+        private readonly IUserInfoValidationService _validationService;
 
         public RegistrationController(
             ILogger<RegistrationController> logger,
             IMapper mapper,
             IResponseFactory responseFactory,
             IRegistrationService registrationService,
-            IUserService userService)
+            IUserService userService,
+            ISpouseService spouseService,
+            IUserInfoValidationService validationService)
         {
             _logger = logger;
             _mapper = mapper;
             _responseFactory = responseFactory;
 
             _userService = userService;
+            _spouseService = spouseService;
             _registrationService = registrationService;
+            _validationService = validationService;
         }
 
 
@@ -58,7 +65,10 @@ namespace CommunityHub.Api.Controllers
 
             try
             {
-                eDuplicateStatus duplicateStatus = await CheckDuplicateUser(registrationInfoDto);
+                var userContact = new UserContact(registrationInfoDto.UserInfo.Email, registrationInfoDto.UserInfo.CountryCode, registrationInfoDto.UserInfo.ContactNumber);
+                var spouseContact = registrationInfoDto.SpouseInfo != null ? new UserContact(registrationInfoDto.SpouseInfo.Email, registrationInfoDto.SpouseInfo.CountryCode, registrationInfoDto.SpouseInfo.ContactNumber) : null;
+               
+                eDuplicateStatus duplicateStatus = await _validationService.CheckDuplicateUser(userContact, spouseContact);
                 if (duplicateStatus != eDuplicateStatus.NoDuplicate)
                 {
                     responseObject = _responseFactory.Failure<RegistrationRequestDto>(ErrorCode.DuplicateUser, duplicateStatus.GetDescription());
@@ -79,26 +89,6 @@ namespace CommunityHub.Api.Controllers
 
                 return StatusCode(StatusCodes.Status500InternalServerError, ErrorMessages.Common.RequestProcessingError);
             }
-        }
-
-        private async Task<eDuplicateStatus> CheckDuplicateUser(RegistrationInfoCreateDto registrationInfoDto)
-        {
-            var userContactDto = new UserContactDto()
-            {
-                CountryCode = registrationInfoDto.UserInfo.CountryCode,
-                ContactNumber = registrationInfoDto.UserInfo.ContactNumber,
-                Email = registrationInfoDto.UserInfo.Email
-            };
-
-            var spouseContactDto = registrationInfoDto.SpouseInfo != null ? new UserContactDto()
-            {
-                CountryCode = registrationInfoDto.UserInfo.CountryCode,
-                ContactNumber = registrationInfoDto.UserInfo.ContactNumber,
-                Email = registrationInfoDto.UserInfo.Email
-            } : null;
-
-            var duplicateStatus = await _userService.CheckDuplicateUser(userContactDto, spouseContactDto);
-            return duplicateStatus;
         }
 
         [HttpGet(ApiRoute.Registration.GetRequests)]

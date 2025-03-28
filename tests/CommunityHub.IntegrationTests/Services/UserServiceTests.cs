@@ -28,7 +28,7 @@ namespace CommunityHub.IntegrationTests.Services
         {
             services.AddRepository<UserInfo, ApplicationDbContext>();
             services.AddRepository<SpouseInfo, ApplicationDbContext>();
-            services.AddRepository<Children, ApplicationDbContext>();
+            services.AddRepository<Child, ApplicationDbContext>();
 
             services.AddScoped<IUserService, UserService>();
             services.AddLogging();

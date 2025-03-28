@@ -32,5 +32,13 @@ namespace CommunityHub.UI.Services
 
             return result;
         }
+
+        public async Task<ApiResponse<UserInfoDto>> ApproveRegistrationRequest(int id)
+        {
+            var formattedRoute = ApiRouteHelper.FormatRoute(ApiRoute.Admin.ApproveRequestById, id);
+            var result = await _requestSender.SendPostRequestAsync<string, UserInfoDto>(_httpClient, formattedRoute, null);
+
+            return result;
+        }
     }
 }

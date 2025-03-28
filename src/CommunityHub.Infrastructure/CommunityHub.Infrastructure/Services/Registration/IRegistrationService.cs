@@ -8,7 +8,6 @@ namespace CommunityHub.Infrastructure.Services.Registration
         Task<RegistrationRequest> CreateRequestAsync(RegistrationInfo registrationData);
         Task<RegistrationRequest> GetRequestByIdAsync(int id);
         Task<List<RegistrationRequest>> GetRequestsAsync(eRegistrationStatus status = eRegistrationStatus.Pending);
-
         Task<RegistrationRequest> UpdateRequestAsync(RegistrationRequest registrationRequest);
     }
 }

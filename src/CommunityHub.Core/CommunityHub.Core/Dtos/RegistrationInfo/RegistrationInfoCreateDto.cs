@@ -5,6 +5,6 @@
         public UserInfoCreateDto UserInfo { get; set; }
 
         public SpouseInfoCreateDto? SpouseInfo { get; set; }
-        public List<ChildrenCreateDto>? Children { get; set; } = new List<ChildrenCreateDto>();
+        public List<ChildCreateDto>? Children { get; set; } = new List<ChildCreateDto>();
     }
 }

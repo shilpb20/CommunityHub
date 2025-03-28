@@ -28,9 +28,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommunityHub.Api", "src\Com
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EmailTemplates", "EmailTemplates", "{D0048F18-58B2-4428-995F-A0DA28874554}"
 	ProjectSection(SolutionItems) = preProject
-		Data\EmailTemplates\registration-request.html = Data\EmailTemplates\registration-request.html
 		Data\EmailTemplates\registration-request-approval.html = Data\EmailTemplates\registration-request-approval.html
 		Data\EmailTemplates\registration-request-rejection.html = Data\EmailTemplates\registration-request-rejection.html
+		Data\EmailTemplates\registration-request.html = Data\EmailTemplates\registration-request.html
 		Data\EmailTemplates\_footer.html = Data\EmailTemplates\_footer.html
 		Data\EmailTemplates\_header.html = Data\EmailTemplates\_header.html
 		Data\EmailTemplates\_logo.png = Data\EmailTemplates\_logo.png

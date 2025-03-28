@@ -33,7 +33,7 @@ namespace CommunityHub.UI.Controllers
             {
                 UserInfo = new UserInfoCreateDto(),
                 SpouseInfo = null,
-                Children = new List<ChildrenCreateDto>()
+                Children = new List<ChildCreateDto>()
             };
 
             return View(registrationData);
