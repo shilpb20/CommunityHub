@@ -1,4 +1,4 @@
-﻿namespace CommunityHub.Infrastructure.EmailSenderService
+﻿namespace CommunityHub.Infrastructure.AppMailService
 {
     public class TemplateModelBase
     {

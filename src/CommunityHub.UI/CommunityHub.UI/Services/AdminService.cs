@@ -1,4 +1,4 @@
-﻿using Azure;
+﻿
 using CommunityHub.Core.Constants;
 using CommunityHub.Core.Dtos;
 using CommunityHub.Core.Enums;
@@ -6,12 +6,13 @@ using CommunityHub.Core.Helpers;
 using CommunityHub.Core.Models;
 using CommunityHub.UI.Controllers;
 using Microsoft.Extensions.Options;
+using System.Net.Http;
 
 namespace CommunityHub.UI.Services
 {
     public class AdminService : BaseService, IAdminService
     {
-        public AdminService(HttpClient httpClient, IHttpRequestSender requestSender, IOptions<ApiSettings> options) : base(httpClient, requestSender, options) { }
+        public AdminService(HttpClient httpClient, IHttpRequestSender requestSender, IOptions<AppSettings> options) : base(httpClient, requestSender, options) { }
 
         public async Task<ApiResponse<List<RegistrationRequestDto>>> GetPendingRequests()
         {
@@ -33,10 +34,10 @@ namespace CommunityHub.UI.Services
             return result;
         }
 
-        public async Task<ApiResponse<UserInfoDto>> ApproveRegistrationRequest(int id)
+        public async Task<ApiResponse<UserInfoDto>> ApproveRegistrationRequest(int id, string appUrl)
         {
             var formattedRoute = ApiRouteHelper.FormatRoute(ApiRoute.Admin.ApproveRequestById, id);
-            var result = await _requestSender.SendPostRequestAsync<string, UserInfoDto>(_httpClient, formattedRoute, null);
+            var result = await _requestSender.SendPostRequestAsync<string, UserInfoDto>(_httpClient, formattedRoute, appUrl);
 
             return result;
         }

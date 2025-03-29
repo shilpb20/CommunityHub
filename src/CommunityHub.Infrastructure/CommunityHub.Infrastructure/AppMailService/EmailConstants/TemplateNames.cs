@@ -8,5 +8,8 @@
         public const string RegistrationNotification = "registration-request.html";
         public const string RegistrationRequestRejection = "registration-request-rejection.html";
         public const string RegistrationRequestApproval = "registration-request-approval.html";
+
+        public const string AccountVerificationEmail = "account-verification-mail.html";
+        public const string ResetPassword = "password-reset-mail.html";
     }
 }

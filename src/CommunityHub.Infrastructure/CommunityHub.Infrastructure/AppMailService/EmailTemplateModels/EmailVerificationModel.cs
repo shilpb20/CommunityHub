@@ -1,10 +1,9 @@
 ﻿namespace CommunityHub.Infrastructure.AppMailService
 {
-    public class RegistrationApprovalModel : TemplateModelBase
+    public class EmailVerificationModel : TemplateModelBase
     {
         public string UserName { get; set; }
         public string Email { get; set; }
         public string EmailVerificationLink { get; set; }
-        public string PasswordSetLink { get; set; }
     }
 }

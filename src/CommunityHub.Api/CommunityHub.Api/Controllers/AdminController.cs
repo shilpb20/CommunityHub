@@ -11,6 +11,7 @@ using CommunityHub.Infrastructure.Models;
 using CommunityHub.Infrastructure.Services.AdminService;
 using CommunityHub.Infrastructure.Services.Registration;
 using CommunityHub.Infrastructure.Services.User;
+using CommunityHub.Infrastructure.Settings;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 
@@ -77,7 +78,7 @@ namespace CommunityHub.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<ApiResponse<UserInfoDto>>> ApproveRequest(int id)
+        public async Task<ActionResult<ApiResponse<UserInfoDto>>> ApproveRequest(int id, [FromBody]string setPasswordUrl)
         {
             if (id <= 0) return BadRequest(_responseFactory.Failure<UserInfoDto>(ErrorCode.InvalidData, ErrorMessage.InvalidId));
 
@@ -97,7 +98,7 @@ namespace CommunityHub.Api.Controllers
                 return BadRequest(_responseFactory.Failure<UserInfoDto>(ErrorCode.DuplicateUser, duplicateUser.GetDescription()));
             }
 
-            var userInfo = await _adminService.ApproveRequestAsync(request);
+            var userInfo = await _adminService.ApproveRequestAsync(request, setPasswordUrl);
             var responseObject = _responseFactory.Success(_mapper.Map<UserInfoDto>(userInfo));
             return Ok(responseObject);
         }

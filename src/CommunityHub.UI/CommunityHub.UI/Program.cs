@@ -4,31 +4,34 @@ using CommunityHub.UI.Services;
 using Microsoft.Extensions.Options;
 using CommunityHub.Core.Factory;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Identity;
+;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
-var apiSettings = builder.Configuration.GetSection("ApiSettings");
-builder.Services.Configure<ApiSettings>(apiSettings);
+var appSettings = builder.Configuration.GetSection("AppSettings");
+builder.Services.Configure<AppSettings>(appSettings);
 builder.Services.AddHttpClient<BaseService>((sp, client) =>
 {
-    var apiSettings = sp.GetRequiredService<IOptions<ApiSettings>>();
-    client.BaseAddress = new Uri(apiSettings.Value.BaseUrl);
+    var appSettings = sp.GetRequiredService<IOptions<AppSettings>>();
+    client.BaseAddress = new Uri(appSettings.Value.ClientUrl);
 });
 
 builder.Services.AddScoped<BaseService>((sp) =>
 {
     var httpClient = sp.GetRequiredService<HttpClient>();
-    var apiSettings = sp.GetRequiredService<IOptions<ApiSettings>>();
+    var appSettings = sp.GetRequiredService<IOptions<AppSettings>>();
     var requestSender = sp.GetRequiredService<IHttpRequestSender>();
 
-    return new BaseService(httpClient, requestSender, apiSettings);
+    return new BaseService(httpClient, requestSender, appSettings);
 });
 
 builder.Services.AddScoped<IResponseFactory, ResponseFactory>();
 builder.Services.AddScoped<IHttpRequestSender, HttpRequestSender>();
 builder.Services.AddScoped<IRegistrationService, RegistrationService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
 
 builder.Services.AddControllersWithViews();
 
@@ -51,7 +54,7 @@ app.MapStaticAssets();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Account}/{action=Index}/{id?}")
+    pattern: "{controller=Account}/{action=Login}/{id?}")
     .WithStaticAssets();
 
 

@@ -3,8 +3,8 @@ using AppComponents.Repository.Abstraction;
 using CommunityHub.Core.Constants;
 using CommunityHub.Core.Enums;
 using CommunityHub.Core.Extensions;
+using CommunityHub.Infrastructure.AppMailService;
 using CommunityHub.Infrastructure.Data;
-using CommunityHub.Infrastructure.EmailSenderService;
 using CommunityHub.Infrastructure.EmailService;
 using CommunityHub.Infrastructure.Models;
 using Microsoft.Extensions.Logging;
@@ -54,7 +54,7 @@ namespace CommunityHub.Infrastructure.Services.Registration
                     RegistrationDate = newRequest.CreatedAt
                 };  
 
-                await _appMailService.SendRegistrationNotificationAsync(model);
+                await _appMailService.SendRegistrationNotificationEmailAsync(model);
 
                 return newRequest;
             }

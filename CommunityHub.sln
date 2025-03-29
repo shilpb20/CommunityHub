@@ -29,6 +29,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "EmailTemplates", "EmailTemplates", "{D0048F18-58B2-4428-995F-A0DA28874554}"
 	ProjectSection(SolutionItems) = preProject
 		Data\EmailTemplates\registration-request-approval.html = Data\EmailTemplates\registration-request-approval.html
+		Data\EmailTemplates\password-reset-mail.html = Data\EmailTemplates\password-reset-mail.html
 		Data\EmailTemplates\registration-request-rejection.html = Data\EmailTemplates\registration-request-rejection.html
 		Data\EmailTemplates\registration-request.html = Data\EmailTemplates\registration-request.html
 		Data\EmailTemplates\_footer.html = Data\EmailTemplates\_footer.html

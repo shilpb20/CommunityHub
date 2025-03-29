@@ -6,6 +6,6 @@ namespace CommunityHub.Infrastructure.Services.AdminService
     public interface IAdminService
     {
         Task<RegistrationRequest> RejectRequestAsync(int id, string reviewComment);
-        Task<UserInfo> ApproveRequestAsync(RegistrationRequest request);
+        Task<UserInfo> ApproveRequestAsync(RegistrationRequest request, string setPasswordUrl);
     }
 }

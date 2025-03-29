@@ -6,7 +6,7 @@ using CommunityHub.Core.Helpers;
 using CommunityHub.UI.Constants;
 using CommunityHub.UI.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Options;
 
 namespace CommunityHub.UI.Controllers
 {
@@ -14,12 +14,16 @@ namespace CommunityHub.UI.Controllers
     {
         private readonly ILogger<AdminController> _logger;
         private readonly IAdminService _service;
+        private readonly AppSettings _appSettings;
 
         public AdminController(ILogger<AdminController> logger, 
-            IAdminService service)
+            IAdminService service,
+            IOptions<AppSettings> appSettings)
         {
             _logger = logger;
             _service = service;
+
+            _appSettings = appSettings.Value;
         }
 
         [HttpGet(UiRoute.Admin.Index)]
@@ -59,7 +63,8 @@ namespace CommunityHub.UI.Controllers
         [HttpPost(UiRoute.Admin.ApproveRequest)]
         public async Task<IActionResult> ApproveRequest([FromForm] int id)
         {
-            var result = await _service.ApproveRegistrationRequest(id);
+            string setPasswordUrl = _appSettings.AppUrl + UiRoute.Account.SetPassword;
+            var result = await _service.ApproveRegistrationRequest(id, setPasswordUrl);
             if (result != null && result.Success)
             {
                 TempData["SuccessMessage"] = "Registration request has been successfully approved!";

@@ -1,6 +1,4 @@
-﻿using System.Data.Common;
-
-namespace CommunityHub.Infrastructure.EmailSenderService
+﻿namespace CommunityHub.Infrastructure.AppMailService
 {
     public class RegistrationModel : TemplateModelBase
     {

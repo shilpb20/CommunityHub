@@ -1,11 +1,4 @@
-﻿using CommunityHub.Infrastructure.EmailSenderService;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace CommunityHub.Infrastructure.AppMailService
+﻿namespace CommunityHub.Infrastructure.AppMailService
 {
     public class RegistrationRejectModel : TemplateModelBase
     {

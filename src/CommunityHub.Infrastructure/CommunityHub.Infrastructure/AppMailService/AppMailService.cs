@@ -3,19 +3,18 @@ using AppComponents.Email.Services;
 using AppComponents.TemplateEngine;
 using CommunityHub.Infrastructure.AppMailService;
 using CommunityHub.Infrastructure.AppMailService.EmailConstants;
-using CommunityHub.Infrastructure.EmailSenderService;
 using CommunityHub.Infrastructure.Models;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using CommunityHub.Infrastructure.Settings;
+using CommunityHub.Core.Models;
 
 namespace CommunityHub.Infrastructure.EmailService
 {
     public class AppMailService : IAppMailService
     {
-        private readonly string _baseUrl;
         private readonly ILogger<AppMailService> _logger;
         private readonly IModelTemplateEngine _templateEngine;
         private readonly IEmailService _emailService;
@@ -33,11 +32,10 @@ namespace CommunityHub.Infrastructure.EmailService
             _templateEngine = templateEngine;
             _emailService = emailService;
 
-            _baseUrl = appSettings.BaseUrl;
             _settings = appSettings.EmailAppSettings;
         }
 
-        public async Task<EmailStatus> SendRegistrationNotificationAsync(RegistrationModel model)
+        public async Task<EmailStatus> SendRegistrationNotificationEmailAsync(RegistrationModel model)
         {
             model.Title = EmailSubject.RegistrationNotification;
 
@@ -54,39 +52,45 @@ namespace CommunityHub.Infrastructure.EmailService
             return await _emailService.SendEmailAsync(emailRequest);
         }
 
-        public async Task<EmailStatus> SendRegistrationRequestApprovalNotificationAsync(RegistrationApprovalModel model)
+        public async Task<EmailStatus> SendRegistrationApprovalEmailAsync(RegistrationApprovalModel model)
         {
-            string passwordSetLink = $"{_baseUrl}/set-password?email={model.Email}&token={model.PasswordSetLink}";
-            model.PasswordSetLink = passwordSetLink;
-
-            model.Title = EmailSubject.RegistrationRequestApproval;
-
-            string template = await EmailTemplateGetter.GetTemplateAsync(_settings.EmailTemplateDirectory, TemplateNames.RegistrationRequestApproval);
-            string content = _templateEngine.Render(template, model);
-
-            var emailRequest = new EmailRequest
-            {
-                //TODO: replace user email
-                To = new List<string> { _settings.AdminEmail },
-                Subject = model.Title,
-                HtmlContent = content
-            };
-
-            return await _emailService.SendEmailAsync(emailRequest);
+             return await SendEmailToUserAsync(
+                 TemplateNames.RegistrationRequestApproval,
+                 EmailSubject.RegistrationRequestApproval,
+                 model);
         }
 
-        public async Task<EmailStatus> SendRegistrationRequestRejectionNotificationAsync(RegistrationRejectModel model)
-        {
-            model.Title = EmailSubject.RegistrationRequestRejection;
 
-            string template = await EmailTemplateGetter.GetTemplateAsync(_settings.EmailTemplateDirectory, TemplateNames.RegistrationRequestRejection);
-            string content = _templateEngine.Render(template, model);
+        public async Task<EmailStatus> SendRegistrationRejectionEmailAsync(RegistrationRejectModel model)
+        {
+            return await SendEmailToUserAsync(
+                TemplateNames.RegistrationRequestRejection,
+                EmailSubject.RegistrationRequestRejection,
+                model);
+        }
+
+        public async Task<EmailStatus> SendPasswordResetEmailAsync(EmailLink model)
+        {
+            return await SendEmailToUserAsync(
+                TemplateNames.ResetPassword,
+                EmailSubject.ResetPassword,
+                model);
+        }
+
+        private async Task<EmailStatus> SendEmailToUserAsync<T>(string templateName, string subject, T model)
+        {
+            if(model is TemplateModelBase)
+                (model as TemplateModelBase).Title = subject;
+
+            string template = await EmailTemplateGetter.GetTemplateAsync(_settings.EmailTemplateDirectory, templateName);
+            string content = _templateEngine.Render<T>(template, model);
 
             var emailRequest = new EmailRequest
             {
                 //TODO: replace user email
                 To = new List<string> { _settings.AdminEmail },
-                Subject = model.Title,
+                Subject = model is TemplateModelBase templateModelBase ? templateModelBase.Title : "",
+
                 HtmlContent = content
             };
 

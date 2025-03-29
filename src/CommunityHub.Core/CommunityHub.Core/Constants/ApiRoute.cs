@@ -2,6 +2,23 @@
 {
     public static class ApiRoute
     {
+        public static class Account
+        {
+            /// <summary>Registers a new user</summary>
+            public const string SetPassword = $"{ApiPrefixes.Account}/set-password";
+          
+            /// <summary>
+            /// Logs in a user
+            /// </summary>
+            public const string Login = $"{ApiPrefixes.Account}/login";
+           
+            /// <summary>
+            /// Sends a password reset email
+            /// </summary>
+            public const string SendPasswordResetEmail = $"{ApiPrefixes.Account}/send-password-reset-email";
+
+        }
+
         public static class Users
         {
             /// <summary>Gets all users.</summary>

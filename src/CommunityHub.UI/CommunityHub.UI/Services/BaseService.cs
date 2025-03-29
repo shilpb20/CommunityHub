@@ -8,12 +8,15 @@ namespace CommunityHub.UI.Services
     {
         protected readonly HttpClient _httpClient;
         protected readonly IHttpRequestSender _requestSender;
+        protected readonly AppSettings _appSettings;
 
-        public BaseService(HttpClient httpClient, IHttpRequestSender requestSender, IOptions<ApiSettings> apiSettings)
+        public BaseService(HttpClient httpClient, IHttpRequestSender requestSender, IOptions<AppSettings> appSettings)
         {
             _httpClient = httpClient;
-            _httpClient.BaseAddress = new Uri(apiSettings.Value.BaseUrl.TrimEnd('/'));
+            _appSettings = appSettings.Value;
+            _httpClient.BaseAddress = new Uri(_appSettings.ClientUrl.TrimEnd('/'));
             _requestSender = requestSender;
+
         }
 
         public async Task<ApiResponse<T>> GetRequestAsync<T>(string url)

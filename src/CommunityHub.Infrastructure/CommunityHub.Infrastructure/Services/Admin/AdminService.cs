@@ -11,6 +11,9 @@ using CommunityHub.Infrastructure.EmailService;
 using CommunityHub.Core.Models;
 using CommunityHub.Infrastructure.AppMailService;
 using Newtonsoft.Json.Linq;
+using CommunityHub.Infrastructure.Services.Account;
+using System.Web;
+using AppComponents.Email.Models;
 
 namespace CommunityHub.Infrastructure.Services.AdminService
 {
@@ -45,7 +48,8 @@ namespace CommunityHub.Infrastructure.Services.AdminService
             _mailService = mailService;
         }
 
-        public async Task<UserInfo> ApproveRequestAsync(RegistrationRequest registrationRequest)
+        public async Task<UserInfo> ApproveRequestAsync(RegistrationRequest registrationRequest, 
+            string appSetPasswordUrl)
         {
             await _transactionManager.BeginTransactionAsync();
             try
@@ -89,14 +93,19 @@ namespace CommunityHub.Infrastructure.Services.AdminService
                 await _transactionManager.CommitTransactionAsync();
 
                 string token = await _accountService.GenerateTokenAsync(applicationUser);
+                string encodedEmail = HttpUtility.UrlEncode(userInfo.Email);
+                string encodedToken = HttpUtility.UrlEncode(token);
                 var model = new RegistrationApprovalModel()
                 { 
                     UserName = userInfo.FullName,
                     Email = userInfo.Email,
-                    PasswordSetLink = token,
+                    PasswordSetLink = $"{appSetPasswordUrl}?email={encodedEmail}&token={encodedToken}",
                 };
 
-                var emailStatus = await _mailService.SendRegistrationRequestApprovalNotificationAsync(model);
+                var emailStatus = await _mailService.SendRegistrationApprovalEmailAsync(model);
+                if (emailStatus.IsSuccess)
+                    _logger.LogError("Email sending failed - Registration request approval for {Email}", userInfo.Email);
+
                 return newUser;
             }
             catch (Exception ex)
@@ -125,7 +134,7 @@ namespace CommunityHub.Infrastructure.Services.AdminService
                   RegistrationDate = registrationRequest.CreatedAt.ToString("dd MMM yyyy")
             };
 
-            var emailStatus = await _mailService.SendRegistrationRequestRejectionNotificationAsync(registrationRejectModel);
+            var emailStatus = await _mailService.SendRegistrationRejectionEmailAsync(registrationRejectModel);
             return result;
         }
     }

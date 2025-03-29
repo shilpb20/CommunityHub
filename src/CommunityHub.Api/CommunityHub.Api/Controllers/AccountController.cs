@@ -2,8 +2,10 @@
 using CommunityHub.Core.Constants;
 using CommunityHub.Core.Dtos;
 using CommunityHub.Core.Enums;
+using CommunityHub.Core.Factory;
+using CommunityHub.Core.Models;
 using CommunityHub.Infrastructure.Models;
-using CommunityHub.Infrastructure.Services;
+using CommunityHub.Infrastructure.Services.Account;
 using CommunityHub.Infrastructure.Services.Registration;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,93 +15,83 @@ namespace CommunityHub.Api.Controllers
     public class AccountController : ControllerBase
     {
         private readonly ILogger<AccountController> _logger;
-        private readonly IMapper _mapper;
-        private readonly IAdminService _adminService;
-        private readonly IRegistrationService _registrationService;
+
+        private readonly IAccountService _accountService;
+        private readonly IResponseFactory _responseFactory;
 
         public AccountController(
             ILogger<AccountController> logger,
-            IMapper mapper,
-            IRegistrationService registrationService,
-            IAdminService adminService)
+            IAccountService accountService,
+            IResponseFactory responseFactory)
         {
             _logger = logger;
-            _mapper = mapper;
-
-            _registrationService = registrationService;
-            _adminService = adminService;
+            _accountService = accountService;
+            _responseFactory = responseFactory;
         }
 
-        [HttpPost(ApiRoute.Registration.Request)]
-        [ProducesResponseType(StatusCodes.Status201Created, Type = typeof(RegistrationRequestDto))]
+        [HttpPost(ApiRoute.Account.Login)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<LoginResponse>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-
-        public async Task<ActionResult<RegistrationRequestDto>> AddRegistrationRequest([FromBody] RegistrationInfoCreateDto registrationInfoDto)
+        public async Task<ActionResult<ApiResponse<LoginResponse>>> Login([FromBody] Login model)
         {
-            if (registrationInfoDto == null || !ModelState.IsValid)
+            if (string.IsNullOrEmpty(model.Email) || string.IsNullOrEmpty(model.Password))
             {
-                return BadRequest("Invalid registration data");
+                var response = _responseFactory.Failure<LoginResponse>("Login Error", "Email and password are required.");
+                return BadRequest(response);
             }
 
-            try
+            var result = await _accountService.LoginAsync(model.Email, model.Password);
+            if (result.IsSuccess)
             {
-                var registrationInfo = _mapper.Map<RegistrationInfo>(registrationInfoDto);
-
-                var registrationRequest = await _registrationService.CreateRequestAsync(registrationInfo);
-                var registrationRequestDto = _mapper.Map<RegistrationRequestDto>(registrationRequest);
-
-                return CreatedAtRoute("GetRegistrationRequest", new { id = registrationRequestDto.Id }, registrationRequestDto);
+                var response = _responseFactory.Success<LoginResponse>(result);
+                return Ok(response);
             }
-            catch (Exception ex)
-            {
-                _logger.LogError("An error occurred while processing Add Registration Request");
-                _logger.LogError($"Add Registration Request error - {ex.Message}");
 
-                return StatusCode(StatusCodes.Status500InternalServerError, "An error occurred while processing the request.");
-            }
+            var failureResponse = _responseFactory.Failure<LoginResponse>("Login Error", $"Failed to login: {result.Message}");
+            return BadRequest(failureResponse);
         }
 
-        [HttpGet(ApiRoute.Registration.GetRequestById, Name = "GetRegistrationRequest")]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(RegistrationRequestDto))]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+
+        [HttpPost(ApiRoute.Account.SendPasswordResetEmail)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<bool>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<RegistrationRequestDto>> GetRegistrationRequest(int id)
+        public async Task<ActionResult<ApiResponse<bool>>> SendPasswordResetEmailAsync(PasswordLink passwordLink)
         {
-            if (id <= 0)
+            var result = await _accountService.SendPasswordResetEmailAsync(passwordLink.Email, passwordLink.Url);
+            if (result)
             {
-                return BadRequest("Id must be a positive number");
+                var response = _responseFactory.Success<bool>(true);
+                return Ok(response);
             }
-
-            var result = await _registrationService.GetRequestByIdAsync(id);
-            if (result == null)
-            {
-                return NotFound($"Request with Id - {id} is not found.");
-            }
-
-            var resultDto = _mapper.Map<RegistrationRequestDto>(result);
-            return Ok(resultDto);
+            
+            var failureResponse = _responseFactory.Failure<bool>("Password Reset Error", $"Failed to send password reset email.");
+            return BadRequest(failureResponse);
         }
 
 
-        [HttpGet(ApiRoute.Registration.Request)]
-        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(List<RegistrationRequestDto>))]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
+
+        [HttpPost(ApiRoute.Account.SetPassword)]
+        [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponse<bool>))]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<List<RegistrationRequestDto>>> GetRequests([FromQuery] string status = "pending")
+        public async Task<ActionResult<ApiResponse<bool>>> SetPasswordAsync([FromBody] SetPassword model)
         {
-            if (Enum.TryParse<eRegistrationStatus>(status, true, out var registrationStatus)
-                && Enum.IsDefined(typeof(eRegistrationStatus), registrationStatus))
+            if (model.Password != model.ConfirmPassword)
             {
-                var requests = await _registrationService.GetRequestsAsync(registrationStatus);
-                if (!requests.Any()) { return NoContent(); }
+                var response = _responseFactory.Failure<bool>("Password Error", "Passwords do not match");
+                return BadRequest(response);
+            }
 
-                return Ok(_mapper.Map<List<RegistrationRequestDto>>(requests));
-            }
-            else
+            var result = await _accountService.SetNewPasswordAsync(model);
+            if (result.Success)
             {
-                return BadRequest($"Invalid registration status value: {status}. Valid values are {string.Join(", ", Enum.GetNames(typeof(eRegistrationStatus)))}.");
+                var response = _responseFactory.Success<bool>(true);
+                return Ok(response);
             }
+
+            var errorMessage = string.Join(", ", result.Errors);
+            var failureResponse = _responseFactory.Failure<bool>("Password Error", $"Failed to set password: {errorMessage}");
+            return BadRequest(failureResponse);
         }
+
     }
 }

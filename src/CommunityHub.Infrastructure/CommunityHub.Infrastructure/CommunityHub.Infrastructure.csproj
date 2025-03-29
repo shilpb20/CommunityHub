@@ -16,14 +16,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Include="Services\Account\IJwtTokenService.cs" />
+    <Compile Include="Services\Account\JwtTokenService.cs" />
     <Compile Include="Services\Admin\AdminService.cs" />
     <Compile Include="Services\Admin\IAdminService.cs" />
     <Compile Include="Services\Registration\IRegistrationService.cs" />
     <Compile Include="Services\Registration\RegistrationService.cs" />
-    <Compile Include="Services\User\AccountService.cs" />
+    <Compile Include="Services\Account\AccountService.cs" />
     <Compile Include="Services\User\ChildService.cs" />
     <Compile Include="Services\User\DuplicateUserInfoChecker.cs" />
-    <Compile Include="Services\User\IAccountService.cs" />
+    <Compile Include="Services\Account\IAccountService.cs" />
     <Compile Include="Services\User\IChildService.cs" />
     <Compile Include="Services\User\ISpouseService.cs" />
     <Compile Include="Services\User\IUserInfoValidationService.cs" />

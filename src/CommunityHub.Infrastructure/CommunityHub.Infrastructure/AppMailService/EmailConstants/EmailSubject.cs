@@ -11,5 +11,7 @@ namespace CommunityHub.Infrastructure.AppMailService.EmailConstants
         public const string RegistrationNotification = "New Registration Request";
         public const string RegistrationRequestRejection = "Registration Request Rejected";
         public const string RegistrationRequestApproval = "Registration Request Approved";
+
+        public const string ResetPassword = "Reset Password";
     }
 }

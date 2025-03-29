@@ -7,7 +7,7 @@ namespace CommunityHub.UI.Services.Registration
 {
     public class RegistrationService : BaseService, IRegistrationService
     {
-        public RegistrationService(HttpClient httpClient, IHttpRequestSender requestSender, IOptions<ApiSettings> options) : base(httpClient, requestSender, options) { }
+        public RegistrationService(HttpClient httpClient, IHttpRequestSender requestSender, IOptions<AppSettings> options) : base(httpClient, requestSender, options) { }
 
         public async Task<ApiResponse<RegistrationRequestDto>> SendRegistrationRequestAsync(RegistrationInfoCreateDto registrationData)
         {
